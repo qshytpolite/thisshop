@@ -26,7 +26,7 @@ def login_page(request):
                 return redirect("/")
             else:
                 messages.error(request, "Invalid User Name or Password")
-                return redirect("/login")
+                return redirect("auths/login")
         return render(request, "auths/login.html")
 
 
@@ -38,5 +38,5 @@ def register(request):
             form.save()
             messages.success(
                 request, "Registration Success You can Login Now..!")
-            return redirect('/login')
+            return redirect('auths/login')
     return render(request, "auths/register.html", {'form': form})
