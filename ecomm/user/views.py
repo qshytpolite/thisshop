@@ -26,7 +26,7 @@ def login_page(request):
                 return redirect("/")
             else:
                 messages.error(request, "Invalid User Name or Password")
-                return redirect("auths/login")
+                return redirect("login")
         return render(request, "auths/login.html")
 
 
