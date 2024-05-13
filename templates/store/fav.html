@@ -1,0 +1,37 @@
+{% extends 'layouts/base.html' %}
+{% block title %}
+  Registration | thisShop
+{% endblock title %}
+{% block content %}
+  <section class="bg-gray-100 py-4 my-5" style="min-height:600px;">
+    <div class="container mx-auto sm:px-4">
+      <div class="flex flex-wrap ">
+        <div class="w-full">
+          <h4 class="mb-3">Favourite Item</h4>
+          <hr style="border-color:#b8bfc2;">
+        </div>
+      
+        <table>
+            <tr>
+                <th>Image</th>
+                <th>Product Name</th>
+                <th>Unit</th>
+                <th>Remove</th>
+            </tr>
+          
+
+            {% for item in fav %}
+           <tr>
+              <td><img src="{{item.product.product_image.url}}" height="75px" alt="{{item.product.name}}"></td>
+              <td>{{item.product.name}}</td>
+              <td>{{item.product.selling_price | stringformat:'d'}}</td>
+              <td><a href="{% url 'remove_fav' item.id %}"  onclick="return confirm('Are you sure? to Remove')"  class="inline-block align-middle text-center select-none border font-normal whitespace-no-wrap rounded  no-underline bg-red-600 text-white hover:bg-red-700 py-1 px-2 leading-tight text-xs "><i class="fa fa-trash"></i> Remove</a></td>
+            </tr>
+            {% endfor %}
+            <tr>
+        </table>
+       
+      </div>
+      </div>
+  </section>
+{% endblock content %}

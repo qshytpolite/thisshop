@@ -1,0 +1,39 @@
+<nav class="bg-primary text-white">
+  <div class="container mx-auto px-4 py-2 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="{% url 'index' %}" class="text-xl font-bold">thisShop</a>
+
+    <!-- Navigation Links -->
+    <ul class="flex items-center space-x-4">
+      <li><a href="{% url 'index' %}" class="hover:text-secondary transition-colors duration-300">Home</a></li>
+      <li><a href="" class="hover:text-secondary transition-colors duration-300">Shop</a></li>
+      <li><a href="" class="hover:text-secondary transition-colors duration-300">About</a></li>
+      <li><a href="" class="hover:text-secondary transition-colors duration-300">Contact</a></li>
+    </ul>
+
+    <!-- Auth Links -->
+    <div class="flex items-center space-x-">
+      {% if user.is_authenticated %}
+      <!-- If user is authenticated, show Logout button -->
+      <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="bg-secondary text-white px-4 py-2 rounded-md hover:bg-secondary-dark transition-colors duration-300">Logout</button>
+      </form>
+      {% else %}
+      <!-- If user is not authenticated, show Login and Register links -->
+      <a href="{% url 'login' %}" class="hover:text-secondary transition-colors duration-300">Login</a>
+      <a href="{% url 'register' %}" class="hover:text-secondary transition-colors duration-300">Register</a>
+      {% endif %}
+    </div>
+
+    <!-- Shopping Cart -->
+    <div class="ml-4">
+      <a href="#" class="relative inline-block">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M7 4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2h5v2H3V4h4zm11 4H6.828l-1-1H3a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM6 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm8 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" clip-rule="evenodd" />
+        </svg>
+        <span class="absolute top-0 right-0 rounded-full bg-secondary text-xs text-white w-4 h-4 flex items-center justify-center">0</span>
+      </a>
+    </div>
+  </div>
+</nav>
