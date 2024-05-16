@@ -19,7 +19,7 @@ thisShop | Is The Shop
         {% include 'inc/message.html' %}
       </div>
       {% for item in products %}
-      <div class="md:w-1/3 pr-4 pl-4 lg:w-1/4 pr-4 pl-4">
+      <div class="md:w-1/3 pr-4 pl-4 lg:w-1/4 ">
         <div class="relative flex flex-col min-w-0 rounded break-words border bg-white border-1 border-gray-300 my-3">
           <img src="{{item.product_image.url}}"  class="card-image-top" alt="Categories">
           <a href="{% url 'product_details' category_name item.name %}">

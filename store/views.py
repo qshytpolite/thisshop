@@ -95,7 +95,7 @@ def collections(request):
 def collectionsview(request, name):
     if (Catagory.objects.filter(name=name, status=0)):
         products = Product.objects.filter(category__name=name)
-        return render(request, "store/index.html", {"products": products, "category_name": name})
+        return render(request, "store/products.html", {"products": products, "category_name": name})
     else:
         messages.warning(request, "No Such Catagory Found")
         return redirect('collections')

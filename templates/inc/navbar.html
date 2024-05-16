@@ -6,9 +6,9 @@
     <!-- Navigation Links -->
     <ul class="flex items-center space-x-4">
       <li><a href="{% url 'index' %}" class="hover:text-secondary transition-colors duration-300">Home</a></li>
-      <li><a href="" class="hover:text-secondary transition-colors duration-300">Shop</a></li>
+      <li><a href="{% url 'collections' %}" class="hover:text-secondary transition-colors duration-300">Collections</a></li>
       <li><a href="" class="hover:text-secondary transition-colors duration-300">About</a></li>
-      <li><a href="" class="hover:text-secondary transition-colors duration-300">Contact</a></li>
+      <li><a href="{% url 'favviewpage' %}" class="hover:text-secondary transition-colors duration-300">Favourite</a></li>
     </ul>
 
     <!-- Auth Links -->
@@ -28,7 +28,7 @@
 
     <!-- Shopping Cart -->
     <div class="ml-4">
-      <a href="#" class="relative inline-block">
+      <a href="{% url 'cart' %}" class="relative inline-block">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M7 4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2h5v2H3V4h4zm11 4H6.828l-1-1H3a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM6 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm8 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" clip-rule="evenodd" />
         </svg>
