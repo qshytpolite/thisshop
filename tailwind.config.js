@@ -1,0 +1,17 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './templates/**/*.{html,py,js}',
+  ],
+  theme: {
+    extend: {},
+  daisyui: {
+    themes: ["light", "dark", "cupcake"],
+  },
+},
+  plugins: [
+    require('@tailwindcss/typography'),
+    require('daisyui'),
+  ],
+}
+
