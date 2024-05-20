@@ -3,6 +3,12 @@ from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from .models import Catagory, Product, Cart, Favourite
 
+from unfold.admin import ModelAdmin
+
+# admin.site.unregister(Catagory)
+# admin.site.unregister(Product)
+# admin.site.unregister(Cart)
+# admin.site.unregister(Favourite)
 
 class ProductAdmin(ModelAdmin):
     list_display = ('name', 'vendor', 'product_image', 'quantity',
