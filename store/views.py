@@ -2,6 +2,7 @@ from django.http import HttpRequest, JsonResponse
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from user.form import CustomUserForm
+from user.models import User
 from store.models import Catagory, Product, Cart, Favourite
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -102,9 +103,9 @@ def collectionsview(request, name):
 
 
 def product_details(request, cname, pname):
-    if (Catagory.objects.filter(name=cname, status=0)):
-        if (Product.objects.filter(name=pname, status=0)):
-            products = Product.objects.filter(name=pname, status=0).first()
+    if (Catagory.objects.filter(name=cname)):
+        if (Product.objects.filter(name=pname)):
+            products = Product.objects.filter(name=pname).first()
             return render(request, "store/product_details.html", {"products": products})
         else:
             messages.error(request, "No Such Produtct Found")
