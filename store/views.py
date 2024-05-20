@@ -89,12 +89,12 @@ def add_to_cart(request: HttpRequest):
 
 
 def collections(request):
-    catagory = Catagory.objects.filter(status=0)
+    catagory = Catagory.objects.filter(status=1)
     return render(request, "store/collection.html", {"catagory": catagory})
 
 
 def collectionsview(request, name):
-    if (Catagory.objects.filter(name=name, status=0)):
+    if (Catagory.objects.filter(name=name, status=1)):
         products = Product.objects.filter(category__name=name)
         return render(request, "store/products.html", {"products": products, "category_name": name})
     else:
