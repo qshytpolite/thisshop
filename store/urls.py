@@ -12,5 +12,6 @@ urlpatterns = [
     path('collections/<str:name>', views.collectionsview, name="collections"),
     path('collections/<str:cname>/<str:pname>',
          views.product_details, name="product_details"),
-    path('add_to_cart/', views.add_to_cart, name="add_to_cart"),
+    path('add_to_cart/<int:product_id>',
+         views.add_to_cart, name="add_to_cart"),
 ]

@@ -10,6 +10,7 @@ from unfold.admin import ModelAdmin
 # admin.site.unregister(Cart)
 # admin.site.unregister(Favourite)
 
+
 class ProductAdmin(ModelAdmin):
     list_display = ('name', 'vendor', 'product_image', 'quantity',
                     'original_price', 'selling_price', 'description', 'status')

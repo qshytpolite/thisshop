@@ -5,12 +5,12 @@ from user.form import CustomUserForm
 from user.models import User
 from store.models import Catagory, Product, Cart, Favourite
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 import json
 
 
 def home(request):
-    products = Product.objects.filter(trending=1)
+    products = Product.objects.all()
     return render(request, "store/index.html", {"products": products})
 
 
@@ -29,17 +29,34 @@ def remove_fav(request, fid):
 
 
 def cart_page(request):
+    cart_items = []
+
+    # Get cart items for logged-in user
     if request.user.is_authenticated:
-        cart = Cart.objects.filter(user=request.user)
-        return render(request, "store/cart.html", {"cart": cart})
+        cart_items = Cart.objects.filter(user=request.user)
     else:
-        return redirect("/")
+        # Get cart items from session (if available)
+        cart_data = request.session.get('cart', {})
+        for product_id, quantity in cart_data.items():
+            product = Product.objects.get(
+                pk=product_id)  # Assuming product exists
+            cart_items.append({'product': product, 'quantity': quantity})
+
+    context = {'cart_items': cart_items}
+    return render(request, 'store/cart.html', context)
 
 
-def remove_cart(request, cid):
-    cartitem = Cart.objects.get(id=cid)
-    cartitem.delete()
-    return redirect("/cart")
+@login_required
+def remove_cart(request, product_id):
+    if request.user.is_authenticated:
+        Cart.objects.filter(user=request.user, product__id=product_id).delete()
+    else:
+        cart_data = request.session.get('cart', {})
+        if str(product_id) in cart_data:
+            del cart_data[str(product_id)]
+            request.session['cart'] = cart_data
+
+    return redirect('cart')
 
 
 def fav_page(request: HttpRequest):
@@ -63,29 +80,35 @@ def fav_page(request: HttpRequest):
         return JsonResponse({'status': 'Invalid Access'}, status=200)
 
 
-def add_to_cart(request: HttpRequest):
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        if request.user.is_authenticated:
-            data = json.loads(request.body)
-            product_qty = data['product_qty']
-            product_id = data['pid']
-            product_status = Product.objects.filter(id=product_id).first()
-            if product_status:
-                if Cart.objects.filter(user=request.user, product_id=product_id).exists():
-                    return JsonResponse({'status': 'Product Already in Cart'}, status=200)
-                else:
-                    if product_status.quantity >= product_qty:
-                        Cart.objects.create(
-                            user=request.user, product_id=product_id, product_qty=product_qty)
-                        return JsonResponse({'status': 'Product Added to Cart'}, status=200)
-                    else:
-                        return JsonResponse({'status': 'Product Stock Not Available'}, status=200)
-            else:
-                return JsonResponse({'status': 'Product Not Found'}, status=404)
+def add_to_cart(request, product_id):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'Invalid request method'}, status=400)
+
+    try:
+        product = Product.objects.get(pk=product_id)
+    except Product.DoesNotExist:
+        return JsonResponse({'status': 'Product not found'}, status=404)
+
+    # Retrieve quantity from request body
+    quantity = int(request.POST.get('product_qty', 0))  # Handle missing value
+
+    # Check for existing cart item or create a new one based on user status
+    if request.user.is_authenticated:
+        cart_item, created = Cart.objects.get_or_create(
+            user=request.user, product=product
+        )
+        if created:
+            cart_item.product_qty = quantity
         else:
-            return JsonResponse({'status': 'Login to Add Cart'}, status=200)
+            cart_item.product_qty += quantity
+        cart_item.save()
     else:
-        return JsonResponse({'status': 'Invalid Access'}, status=200)
+        # Handle anonymous cart (using session)
+        cart_data = request.session.get('cart', {})
+        cart_data[str(product_id)] = quantity
+        request.session['cart'] = cart_data
+
+    return JsonResponse({'status': 'Item added to cart'})
 
 
 def collections(request):
