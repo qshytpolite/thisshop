@@ -58,6 +58,53 @@ def remove_cart(request, product_id):
 
     return redirect('cart')
 
+# add_to_cart view function
+
+
+def add_to_cart(request, product_id):
+    print(f"Adding product {product_id} to cart")
+
+    if request.method != 'POST':
+        print("Error: Invalid request method")
+        return JsonResponse({'status': 'Invalid request method'}, status=400)
+
+    try:
+        product = Product.objects.get(pk=product_id)
+        print(f"Retrieved product {product.name} with id {product_id}")
+    except Product.DoesNotExist:
+        print(f"Error: Product with id {product_id} not found")
+        return JsonResponse({'status': 'Product not found'}, status=404)
+
+    # Retrieve quantity from request body
+    quantity = int(request.POST.get('product_qty', 0))  # Handle missing value
+    print(f"Product quantity: {quantity}")
+
+    # Check for existing cart item or create a new one based on user status
+    if request.user.is_authenticated:
+        print("Authenticated user, checking for existing cart item")
+        cart_item, created = Cart.objects.get_or_create(
+            user=request.user, product=product
+        )
+        if created:
+            print(f"Created new cart item for {product.name}")
+            cart_item.product_qty = quantity
+        else:
+            print(
+                f"Found existing cart item for {product.name}, updating quantity")
+            cart_item.product_qty += quantity
+        cart_item.save()
+    else:
+        print("Anonymous user, using session for cart")
+        # Handle anonymous cart (using session)
+        cart_data = request.session.get('cart', {})
+        print("Current cart data: ", cart_data)
+        cart_data[str(product_id)] = quantity
+        print("Updated cart data: ", cart_data)
+        request.session['cart'] = cart_data
+
+    print("Returning success response")
+    return JsonResponse({'status': 'Item added to cart'})
+
 
 def fav_page(request: HttpRequest):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -78,37 +125,6 @@ def fav_page(request: HttpRequest):
             return JsonResponse({'status': 'Login to Add Favourite'}, status=200)
     else:
         return JsonResponse({'status': 'Invalid Access'}, status=200)
-
-
-def add_to_cart(request, product_id):
-    if request.method != 'POST':
-        return JsonResponse({'status': 'Invalid request method'}, status=400)
-
-    try:
-        product = Product.objects.get(pk=product_id)
-    except Product.DoesNotExist:
-        return JsonResponse({'status': 'Product not found'}, status=404)
-
-    # Retrieve quantity from request body
-    quantity = int(request.POST.get('product_qty', 0))  # Handle missing value
-
-    # Check for existing cart item or create a new one based on user status
-    if request.user.is_authenticated:
-        cart_item, created = Cart.objects.get_or_create(
-            user=request.user, product=product
-        )
-        if created:
-            cart_item.product_qty = quantity
-        else:
-            cart_item.product_qty += quantity
-        cart_item.save()
-    else:
-        # Handle anonymous cart (using session)
-        cart_data = request.session.get('cart', {})
-        cart_data[str(product_id)] = quantity
-        request.session['cart'] = cart_data
-
-    return JsonResponse({'status': 'Item added to cart'})
 
 
 def collections(request):

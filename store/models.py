@@ -29,8 +29,8 @@ class Product(models.Model):
     product_image = models.ImageField(
         upload_to=getFileName, null=True, blank=True)
     quantity = models.IntegerField(null=False, blank=False)
-    original_price = models.FloatField(null=False, blank=False)
-    selling_price = models.FloatField(null=False, blank=False)
+    selling_price = models.FloatField()
+    discounted_price = models.FloatField()
     description = models.TextField(max_length=500, null=False, blank=False)
     status = models.BooleanField(default=False, help_text="0-show,1-Hidden")
     trending = models.BooleanField(
@@ -47,7 +47,7 @@ class Cart(models.Model):
     # Track session for anonymous users
     session_id = models.CharField(max_length=255, null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    product_qty = models.IntegerField(null=False, blank=False)
+    product_qty = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property

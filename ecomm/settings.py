@@ -157,3 +157,6 @@ UNFOLD = {
         lambda request: static("js/script.js"),
     ],
 }
+
+# Cart session setting
+# CART_SESSION_ID = 'cart'

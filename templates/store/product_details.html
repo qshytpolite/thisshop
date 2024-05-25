@@ -23,202 +23,139 @@ thisShop | Is The Shop
 
     </div>
   </div>
-<div class="bg-gray-100 dark:bg-gray-800 py-8">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex flex-col md:flex-row -mx-4">
-      <div class="md:flex-1 px-4">
-        <div class="h-[460px] rounded-lg bg-gray-300 dark:bg-gray-700 mb-4">
-          <img class="w-full h-full object-cover" src="{{products.product_image.url}}" alt="{{products}}">
-        </div>
-        <div class="flex -mx-2 mb-4">
-          <div class="w-1/2 px-2">
-            <button
-              class="w-full bg-gray-900 dark:bg-gray-600 text-white py-2 px-4 rounded-full font-bold hover:bg-gray-800 dark:hover:bg-gray-700" id="btnCart">Add
-              to Cart</button>
+  <!-- templates/store/product_details.html -->
+  <div class="bg-gray-100 dark:bg-gray-800 py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row -mx-4">
+        <div class="md:flex-1 px-4">
+          <h1 class="text-3xl font-bold mb-4">{{ products.name }}</h1>
+          <div class="flex items-center mb-4">
+            <img src="{{ products.product_image.url }}" alt="{{ products.name }}" class="w-1/4 h-auto">
+            <div class="ml-4">
+              <p class="text-gray-600 mb-2">{{ products.description }}</p>
+              <p class="text-gray-700 text-xl font-bold">{{ products.selling_price }}</p>
+            </div>
           </div>
-          <div class="w-1/2 px-2">
-            <button
-              class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-4 rounded-full font-bold hover:bg-gray-300 dark:hover:bg-gray-600" id="btnFav">Add
-              to Wishlist</button>
+
+          {% if request.user.is_authenticated %}
+          <div class="flex items-center mb-4">
+            <button id="btnMinus" class="btn btn-primary btn-ghost">-</button>
+            <input type="number" id="txtQty" name="product_qty" min="1" value="1"
+              class="w-16 border border-gray-300 rounded-md px-2 text-center">
+            <button id="btnPlus" class="btn btn-primary btn-ghost">+</button>
+            <div class="ml-4">
+              <button id="btnCart" class="btn btn-primary">Add to Cart</button>
+              <button id="btnFav" class="btn btn-primary">Add to Wishlist</button>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="md:flex-1 px-4">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">{{products | upper}}</h2>
-        <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">
-          Vendor: {{products.vendor}}.
-        </p>
-        <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">
-          {{products.description}}.
-        </p>
-        <div class="flex mb-4">
-          <div class="mr-4">
-            <span class="font-bold text-gray-700 dark:text-gray-300">Price:</span>
-            <span class="text-gray-600 dark:text-gray-300">${{products.original_price}}</span>
-            <span class="text-gray-600 dark:text-gray-300">${{products.selling_price}}</span>
-          </div>
-          <div>
-            <span class="font-bold text-gray-700 dark:text-gray-300">Availability:</span>
-            <span class="text-gray-600 dark:text-gray-300">In Stock</span>
-          </div>
-        </div>
-        <div class="mb-4">
-          <span class="font-bold text-gray-700 dark:text-gray-300">Select Color:</span>
-          <div class="flex items-center mt-2">
-            <button class="w-6 h-6 rounded-full bg-gray-800 dark:bg-gray-200 mr-2"></button>
-            <button class="w-6 h-6 rounded-full bg-red-500 dark:bg-red-700 mr-2"></button>
-            <button class="w-6 h-6 rounded-full bg-blue-500 dark:bg-blue-700 mr-2"></button>
-            <button class="w-6 h-6 rounded-full bg-yellow-500 dark:bg-yellow-700 mr-2"></button>
-          </div>
-        </div>
-        <div class="mb-4">
-          <span class="font-bold text-gray-700 dark:text-gray-300">Select Size:</span>
-          <div class="flex items-center mt-2">
-            <button
-              class="bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-white py-2 px-4 rounded-full font-bold mr-2 hover:bg-gray-400 dark:hover:bg-gray-600">S</button>
-            <button
-              class="bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-white py-2 px-4 rounded-full font-bold mr-2 hover:bg-gray-400 dark:hover:bg-gray-600">M</button>
-            <button
-              class="bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-white py-2 px-4 rounded-full font-bold mr-2 hover:bg-gray-400 dark:hover:bg-gray-600">L</button>
-            <button
-              class="bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-white py-2 px-4 rounded-full font-bold mr-2 hover:bg-gray-400 dark:hover:bg-gray-600">XL</button>
-            <button
-              class="bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-white py-2 px-4 rounded-full font-bold mr-2 hover:bg-gray-400 dark:hover:bg-gray-600">XXL</button>
-          </div>
-        </div>
-        <div class="mb-4">
-          {% if products.quantity > 0 %}
-          <input type="hidden" value="{{products.id}}" id="pid">
-          <span class="font-bold text-gray-700 dark:text-gray-300">Quantity:</span>
-          <div class="flex items-center mt-2">
-            <button
-              class="bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-white py-2 px-4 rounded-full font-bold mr-2 hover:bg-gray-400 dark:hover:bg-gray-600"
-              id="btnMinus">-</button>
-            <input type="text"
-              class="bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-white py-2 px-4 rounded-full font-bold text-center"
-              name="qty" id="txtQty" value="1" />
-            <button
-              class="bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-white py-2 px-4 rounded-full font-bold ml-2 hover:bg-gray-400 dark:hover:bg-gray-600"
-              id="btnPlus">+</button>
-          </div>
+          <input type="hidden" id="pid" value="{{ products.id }}">
           {% else %}
-          <button
-            class="bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-white py-2 px-4 rounded-full font-bold mr-2 hover:bg-gray-400 dark:hover:bg-gray-600"
-            id="btnMinus">-</button>
-          <input type="text"
-            class="bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-white py-2 px-4 rounded-full font-bold text-center"
-            name="qty" id="txtQty" value="1" />
-          <button
-            class="bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-white py-2 px-4 rounded-full font-bold ml-2 hover:bg-gray-400 dark:hover:bg-gray-600"
-            id="btnPlus">+</button>
+          <p class="text-gray-600 mb-4">Please <a href="{% url 'login' %}" class="text-blue-500 hover:underline">log
+              in</a> to
+            add this product to your cart or wishlist.</p>
           {% endif %}
+
         </div>
-        <div>
-          <span class="font-bold text-gray-700 dark:text-gray-300">Product Description:</span>
-          <p class="text-gray-600 dark:text-gray-300 text-sm mt-2">{{products.description}}.
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-            sed ante justo. Integer euismod libero id mauris malesuada tincidunt. Vivamus commodo nulla ut
-            lorem rhoncus aliquet. Duis dapibus augue vel ipsum pretium, et venenatis sem blandit. Quisque
-            ut erat vitae nisi ultrices placerat non eget velit. Integer ornare mi sed ipsum lacinia, non
-            sagittis mauris blandit. Morbi fermentum libero vel nisl suscipit, nec tincidunt mi consectetur.
-          </p>
-        </div>
+
       </div>
+
     </div>
+
+
   </div>
-</div>
+
 </section>
 
 <script>
-function parseQuantity(value) {
-  const qty = parseInt(value, 10);
-  return isNaN(qty) ? 0 : qty;
-}
-
-document.addEventListener("DOMContentLoaded", function (event) {
-  const btnPlus = document.getElementById("btnPlus");
-  const btnMinus = document.getElementById("btnMinus");
-  const txtQty = document.getElementById("txtQty");
-  const pid = document.getElementById("pid");
-  const btnCart = document.getElementById("btnCart");
-  const btnFav = document.getElementById("btnFav");
-
-  btnPlus.addEventListener("click", function () {
-    const qty = parseQuantity(txtQty.value);
-    if (qty < 10) {
-      txtQty.value = qty + 1;
-    }
-  });
-
-  btnMinus.addEventListener("click", function () {
-    const qty = parseQuantity(txtQty.value);
-    if (qty > 1) {
-      txtQty.value = qty - 1;
-    }
-  });
-
-  function handleAddToCart() {
-    const qty = parseQuantity(txtQty.value);
-    if (qty <= 0) { // Early return for non-positive quantity
-      return;
-    }
-
-    const postObj = {
-      product_qty: qty,
-      pid: pid.value
-    };
-
-    fetch("add_to_cart/" + pid.value, { // Include product ID in URL
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: {
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRFToken': '{{ csrf_token }}',
-      },
-      body: JSON.stringify(postObj)
-    })
-    .then(response => response.json())
-    .then(data => {
-      alert(data['status']);
-      // Update cart UI based on data (optional)
-    })
-    .catch(error => {
-      console.error('Error adding to cart:', error);
-      alert('An error occurred. Please try again later.');
-    });
+  function parseQuantity(value) {
+    const qty = parseInt(value, 10);
+    return isNaN(qty) ? 0 : qty;
   }
 
-  btnCart.addEventListener("click", handleAddToCart);
+  document.addEventListener("DOMContentLoaded", function (event) {
+    const btnPlus = document.getElementById("btnPlus");
+    const btnMinus = document.getElementById("btnMinus");
+    const txtQty = document.getElementById("txtQty");
+    const pid = document.getElementById("pid");
+    const btnCart = document.getElementById("btnCart");
+    const btnFav = document.getElementById("btnFav");
 
-  function handleAddToWishlist() {
-    const postObj = {
-      pid: pid.value
-    };
-
-    fetch("/fav", {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: {
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRFToken': '{{ csrf_token }}',
-      },
-      body: JSON.stringify(postObj)
-    })
-    .then(response => response.json())
-    .then(data => {
-      alert(data['status']);
-    })
-    .catch(error => {
-      console.error('Error adding to wishlist:', error);
-      alert('An error occurred. Please try again later.');
+    btnPlus.addEventListener("click", function () {
+      const qty = parseQuantity(txtQty.value);
+      if (qty < 10) {
+        txtQty.value = qty + 1;
+      }
     });
-  }
 
-  btnFav.addEventListener("click", handleAddToWishlist);
+    btnMinus.addEventListener("click", function () {
+      const qty = parseQuantity(txtQty.value);
+      if (qty > 1) {
+        txtQty.value = qty - 1;
+      }
+    });
 
-});
+    function handleAddToCart() {
+      const qty = parseQuantity(txtQty.value);
+      if (qty <= 0) { // Early return for non-positive quantity
+        return;
+      }
+
+      const postObj = {
+        product_qty: qty,
+        pid: pid.value
+      };
+
+      fetch("/add_to_cart/" + pid.value, { // Include product ID in URL
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': '{{ csrf_token }}',
+        },
+        body: JSON.stringify(postObj)
+      })
+        .then(response => response.json())
+        .then(data => {
+          alert(data['status']);
+          // Update cart UI based on data (optional)
+        })
+        .catch(error => {
+          console.error('Error adding to cart:', error);
+          alert('An error occurred. Please try again later.');
+        });
+    }
+
+    btnCart.addEventListener("click", handleAddToCart);
+
+    function handleAddToWishlist() {
+      const postObj = {
+        pid: pid.value
+      };
+
+      fetch("/fav", {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': '{{ csrf_token }}',
+        },
+        body: JSON.stringify(postObj)
+      })
+        .then(response => response.json())
+        .then(data => {
+          alert(data['status']);
+        })
+        .catch(error => {
+          console.error('Error adding to wishlist:', error);
+          alert('An error occurred. Please try again later.');
+        });
+    }
+
+    btnFav.addEventListener("click", handleAddToWishlist);
+
+  });
 
 
 </script>

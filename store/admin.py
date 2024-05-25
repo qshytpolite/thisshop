@@ -13,7 +13,7 @@ from unfold.admin import ModelAdmin
 
 class ProductAdmin(ModelAdmin):
     list_display = ('name', 'vendor', 'product_image', 'quantity',
-                    'original_price', 'selling_price', 'description', 'status')
+                    'selling_price', 'discounted_price', 'description', 'status')
 
 
 admin.site.register(Product, ProductAdmin)
@@ -27,7 +27,7 @@ admin.site.register(Catagory, CatagoryAdmin)
 
 
 class CartAdmin(ModelAdmin):
-    # list_display = ('user', 'product', 'quantity')
+    # list_display = ('user', 'product', 'product_qty', 'created_at')
     pass
 
 
