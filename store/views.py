@@ -37,12 +37,16 @@ def cart_page(request):
     else:
         # Get cart items from session (if available)
         cart_data = request.session.get('cart', {})
-        for product_id, quantity in cart_data.items():
+        for product_id, product_qty in cart_data.items():
             product = Product.objects.get(
                 pk=product_id)  # Assuming product exists
-            cart_items.append({'product': product, 'quantity': quantity})
+            cart_items.append({'product': product, 'product_qty': product_qty})
 
-    context = {'cart_items': cart_items}
+    # Calculate total cost **within the same code block as context definition**
+    total_cost = sum(item.product.selling_price *
+                     item.product_qty for item in cart_items)
+
+    context = {'cart_items': cart_items, 'total_cost': total_cost}
     return render(request, 'store/cart.html', context)
 
 
@@ -76,7 +80,7 @@ def add_to_cart(request, product_id):
         return JsonResponse({'status': 'Product not found'}, status=404)
 
     # Retrieve quantity from request body
-    quantity = int(request.POST.get('product_qty', 0))  # Handle missing value
+    quantity = int(request.POST.get('product_qty', 1))  # Handle missing value
     print(f"Product quantity: {quantity}")
 
     # Check for existing cart item or create a new one based on user status

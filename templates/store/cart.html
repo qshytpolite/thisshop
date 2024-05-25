@@ -1,52 +1,41 @@
 {% extends 'layouts/base.html' %}
 {% block title %}
-  Registration | thisShop
+  Cart | thisShop
 {% endblock title %}
 {% block content %}
-  <section class="bg-gray-100 py-4 my-5" style="min-height:600px;">
-    <div class="container mx-auto sm:px-4">
-      <div class="flex flex-wrap ">
-        <div class="w-full">
-          <h4 class="mb-3">Cart  Items</h4>
-          <hr style="border-color:#b8bfc2;">
-        </div>
-      
-        <table>
-            <tr>
-                <th>Image</th>
-                <th>Product Name</th>
-                <th>Unit</th>
-                <th>Quantity</th>
-                <th>Amount</th>
-                <th>Remove</th>
-            </tr>
-          
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-4">Your Shopping Cart</h1>
 
-            {% for item in cart %}
-           <tr>
-              <td><img src="{{item.product.product_image.url}}" height="75px" alt="{{item.product.name}}"></td>
-              <td>{{item.product.name}}</td>
-              <td>{{item.product.selling_price | stringformat:'d'}}</td>
-              <td>{{item.product_qty}}</td>
-              <td class="amt">{{item.total_cost | stringformat:'d'}}</td>
-              <td><a href="{% url 'remove_cart' item.id %}"  onclick="return confirm('Are you sure? to Remove')"  class="inline-block align-middle text-center select-none border font-normal whitespace-no-wrap rounded  no-underline bg-red-600 text-white hover:bg-red-700 py-1 px-2 leading-tight text-xs "><i class="fa fa-trash"></i> Remove</a></td>
-            </tr>
-            {% endfor %}
-            <tr>
-              <td></td>
-              <td></td>
-              <td colspan="2"><b>Total Amount</b></td>
-              <th id="net">0</th>
-              <td><button class="inline-block align-middle text-center select-none border font-normal whitespace-no-wrap rounded  no-underline bg-blue-600 text-white hover:bg-blue-600 py-1 px-2 leading-tight text-xs ">
-                <i class="fa fa-check-circle"></i> Check Out
-              </button></td>
-            </tr>
-           
-        </table>
-       
-      </div>
-      </div>
-  </section>
+  {% if cart_items %}
+    <ul class="list-disc space-y-4">
+      {% for item in cart_items %}
+        <li class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <a href="" class="block w-16 h-16 rounded overflow-hidden">
+              <img src="{{ item.product.product_image.url }}" alt="{{ item.product.name }}" class="object-cover w-50 h-50">
+            </a>
+            <div class="text-left">
+              <a href="" class="text-lg font-medium hover:underline">{{ item.product.name }}</a>
+              <p class="text-sm text-gray-500">({{ item.product_qty }})</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-lg font-semibold" id="amt">{{ item.total_cost }}</span>
+            <form action="{% url 'remove_cart' item.product_id %}" method="post" class="inline-block ml-4">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-error">Remove</button>
+            </form>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+    <p class="text-right font-bold mt-4">Total: $ {{ total_cost }} </p>
+    {% else %}
+    <p class="text-center text-gray-500">Your cart is currently empty.</p>
+  {% endif %}
+  <!-- Proceed to Checkout -->
+  <a href="" class="btn btn-primary btn-block mt-8">Proceed to Checkout</a>
+</div>
 
   <script>
     const nodes = document.querySelectorAll('.amt');
@@ -54,7 +43,7 @@
     const res = arr.reduce((acc, curr) => {
      return acc += Number(curr.textContent)
     }, 0);
-    document.getElementById("net").innerHTML="$ : "+res;
+    document.getElementById("net").innerHTML="Total: $ "+res;
 
   </script>
 {% endblock content %}
