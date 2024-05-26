@@ -1,162 +1,108 @@
 {% extends 'layouts/base.html' %}
 {% block title %}
-  Cart | thisShop
+Cart | thisShop
 {% endblock title %}
 {% block content %}
-<div class="container mx-auto mt-10">
-  <div class="sm:flex shadow-md my-10">
-    <div class="  w-full  sm:w-3/4 bg-white px-10 py-10">
-      <div class="flex justify-between border-b pb-8">
-        <h1 class="font-semibold text-2xl">Shopping Cart</h1>
-        <h2 class="font-semibold text-2xl">3 Items</h2>
-      </div>
-      <div class="md:flex items-strech py-8 md:py-10 lg:py-8 border-t border-gray-50">
-        <div class="md:w-4/12 2xl:w-1/4 w-full">
-          <img src="https://i.ibb.co/6gzWwSq/Rectangle-20-1.png" alt="Black Leather Purse" class="h-full object-center object-cover md:block hidden" />
-          <img src="https://i.ibb.co/TTnzMTf/Rectangle-21.png" alt="Black Leather Purse" class="md:hidden w-full h-full object-center object-cover" />
-        </div>
-        <div class="md:pl-3 md:w-8/12 2xl:w-3/4 flex flex-col justify-center">
-          <p class="text-xs leading-3 text-gray-800 md:pt-0 pt-4">RF293</p>
-          <div class="flex items-center justify-between w-full">
-            <p class="text-base font-black leading-none text-gray-800">Luxe card holder</p>
-            <select aria-label="Select quantity" class="py-2 px-1 border border-gray-200 mr-6 focus:outline-none">
-                <option>01</option>
-                <option>02</option>
-                <option>03</option>
-              </select>
-          </div>
-          <p class="text-xs leading-3 text-gray-600 pt-2">Height: 10 inches</p>
-          <p class="text-xs leading-3 text-gray-600 py-4">Color: Black</p>
-          <p class="w-96 text-xs leading-3 text-gray-600">Composition: 100% calf leather</p>
-          <div class="flex items-center justify-between pt-5">
-            <div class="flex itemms-center">
-              <p class="text-xs leading-3 underline text-gray-800 cursor-pointer">Add to favorites</p>
-              <p class="text-xs leading-3 underline text-red-500 pl-5 cursor-pointer">Remove</p>
-            </div>
-            <p class="text-base font-black leading-none text-gray-800">,000</p>
-          </div>
-        </div>
-      </div>
+<div class="bg-gray-100 h-screen py-8">
+  <div class="container mx-auto px-4">
+    <h1 class="text-2xl font-semibold mb-4">Shopping Cart</h1>
+    <div class="flex flex-col md:flex-row gap-4">
+      {% if cart_items %}
+      <div class="md:w-3/4">
+        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+          
 
-      <div class="md:flex items-strech py-8 md:py-10 lg:py-8 border-t border-gray-50">
-        <div class="md:w-4/12 2xl:w-1/4 w-full">
-          <img src="https://i.ibb.co/6gzWwSq/Rectangle-20-1.png" alt="Black Leather Purse" class="h-full object-center object-cover md:block hidden" />
-          <img src="https://i.ibb.co/TTnzMTf/Rectangle-21.png" alt="Black Leather Purse" class="md:hidden w-full h-full object-center object-cover" />
+          <table class="w-full">
+            <thead>
+              <tr>
+                <th class="text-left font-semibold">Product</th>
+                <th class="text-left font-semibold">Price</th>
+                <th class="text-left font-semibold">Quantity</th>
+                <th class="text-left font-semibold">Total</th>
+                <th class="text-left font-semibold">Remove</th>
+
+              </tr>
+            </thead>
+            {% for item in cart_items %}
+            <tbody>
+              <tr>
+                <td class="py-4">
+                  <div class="flex items-center">
+                    <img class="h-16 w-16 mr-4" src="{{ item.product.product_image.url }}" alt="{{ item.product.name }}">
+                    <span class="font-semibold">{{ item.product.name }}</span>
+                  </div>
+                </td>
+                <td class="py-4">${{ item.product.selling_price }}</td>
+                <td class="py-4">
+                  <div class="flex items-center">
+                    <button class="border rounded-md py-2 px-4 mr-2">-</button>
+                    <span class="text-center w-8">{{ item.product_qty }}</span>
+                    <button class="border rounded-md py-2 px-4 ml-2">+</button>
+                  </div>
+                </td>          
+                <td class="py-4">${{ item.total_cost }}</td>
+                <td class="py-4">
+                  <form action="{% url 'remove_cart' item.product_id %}" method="post" class="inline-block ml-4">
+                    {% csrf_token %}
+                  <button class="text-red-500 hover:text-red-700">Remove</button>
+                  </form>
+                </td>
+              </tr>
+              <!-- More product rows -->
+            </tbody>
+            {% endfor %}
+          </table>
+
         </div>
-        <div class="md:pl-3 md:w-8/12 2xl:w-3/4 flex flex-col justify-center">
-          <p class="text-xs leading-3 text-gray-800 md:pt-0 pt-4">RF293</p>
-          <div class="flex items-center justify-between w-full">
-            <p class="text-base font-black leading-none text-gray-800">Luxe card holder</p>
-            <select aria-label="Select quantity" class="py-2 px-1 border border-gray-200 mr-6 focus:outline-none">
-                <option>01</option>
-                <option>02</option>
-                <option>03</option>
-              </select>
-          </div>
-          <p class="text-xs leading-3 text-gray-600 pt-2">Height: 10 inches</p>
-          <p class="text-xs leading-3 text-gray-600 py-4">Color: Black</p>
-          <p class="w-96 text-xs leading-3 text-gray-600">Composition: 100% calf leather</p>
-          <div class="flex items-center justify-between pt-5">
-            <div class="flex itemms-center">
-              <p class="text-xs leading-3 underline text-gray-800 cursor-pointer">Add to favorites</p>
-              <p class="text-xs leading-3 underline text-red-500 pl-5 cursor-pointer">Remove</p>
-            </div>
-            <p class="text-base font-black leading-none text-gray-800">,000</p>
-          </div>
-        </div>
-      </div>
-      <a href="#" class="flex font-semibold text-indigo-600 text-sm mt-10">
-        <svg class="fill-current mr-2 text-indigo-600 w-4" viewBox="0 0 448 512">
-          <path
-            d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z" />
-        </svg>
-        Continue Shopping
+        <a href="{% url 'index' %}" class="flex font-semibold text-indigo-600 text-sm mt-10">
+          <svg class="fill-current mr-2 text-indigo-600 w-4" viewBox="0 0 448 512">
+              <path
+                  d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z" />
+          </svg>
+          Continue Shopping
       </a>
-    </div>
-    <div id="summary" class=" w-full   sm:w-1/4   md:w-1/2     px-8 py-10">
-      <h1 class="font-semibold text-2xl border-b pb-8">Order Summary</h1>
-      <div class="flex justify-between mt-10 mb-5">
-        <span class="font-semibold text-sm uppercase">Items 3</span>
-        <span class="font-semibold text-sm">590$</span>
       </div>
-      <div>
-        <label class="font-medium inline-block mb-3 text-sm uppercase">
-              Shipping
-            </label>
-        <select class="block p-2 text-gray-600 w-full text-sm">
-              <option>Standard shipping - $10.00</option>
-            </select>
-      </div>
-      <div class="py-10">
-        <label
-              for="promo"
-              class="font-semibold inline-block mb-3 text-sm uppercase"
-            >
-              Promo Code
-            </label>
-        <input
-              type="text"
-              id="promo"
-              placeholder="Enter your code"
-              class="p-2 text-sm w-full"
-            />
-      </div>
-      <button class="bg-red-500 hover:bg-red-600 px-5 py-2 text-sm text-white uppercase">
-            Apply
-          </button>
-      <div class="border-t mt-8">
-        <div class="flex font-semibold justify-between py-6 text-sm uppercase">
-          <span>Total cost</span>
-          <span>$600</span>
+      {% endif %}
+      {% if cart_items %}
+      <div class="md:w-1/4">
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-lg font-semibold mb-4">Summary</h2>
+          <div class="flex justify-between mb-2">
+            <span>Subtotal</span>
+            <span>${{ total_cost }}</span>
+          </div>
+          <!-- <div class="flex justify-between mb-2">
+            <span>Taxes</span>
+            <span>$1.99</span>
+          </div> -->
+          <!-- <div class="flex justify-between mb-2">
+            <span>Shipping</span>
+            <span>$0.00</span>
+          </div> -->
+          <hr class="my-2">
+          <div class="flex justify-between mb-2">
+            <span class="font-semibold">Total</span>
+            <span class="font-semibold">${{ total_cost }}</span>
+          </div>
+          <a href="{% url 'checkout' %}" class="block text-center bg-blue-500 text-white py-2 px-4 rounded-lg mt-4 w-full">Checkout</a>
         </div>
-        <button class="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full">
-              Checkout
-            </button>
+        {% else %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-lg font-semibold mb-4">Your shopping cart is empty</h2>
+        </div>
       </div>
+      {% endif %}
     </div>
   </div>
 </div>
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-3xl font-bold mb-4">Your Shopping Cart</h1>
 
-  {% if cart_items %}
-    <ul class="list-disc space-y-4">
-      {% for item in cart_items %}
-        <li class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <a href="" class="block w-16 h-16 rounded overflow-hidden">
-              <img src="{{ item.product.product_image.url }}" alt="{{ item.product.name }}" class="object-cover w-50 h-50">
-            </a>
-            <div class="text-left">
-              <a href="" class="text-lg font-medium hover:underline">{{ item.product.name }}</a>
-              <p class="text-sm text-gray-500">({{ item.product_qty }})</p>
-            </div>
-          </div>
-          <div class="text-right">
-            <span class="text-lg font-semibold" id="amt">{{ item.total_cost }}</span>
-            <form action="{% url 'remove_cart' item.product_id %}" method="post" class="inline-block ml-4">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-sm btn-error">Remove</button>
-            </form>
-          </div>
-        </li>
-      {% endfor %}
-    </ul>
-    <p class="text-right font-bold mt-4">Total: $ {{ total_cost }} </p>
-    {% else %}
-    <p class="text-center text-gray-500">Your cart is currently empty.</p>
-  {% endif %}
-  <!-- Proceed to Checkout -->
-  <a href="{% url 'checkout' %}" class="btn btn-primary btn-block mt-8">Proceed to Checkout</a>
-</div>
+<script>
+  const nodes = document.querySelectorAll('.amt');
+  const arr = Array.from(nodes);
+  const res = arr.reduce((acc, curr) => {
+    return acc += Number(curr.textContent)
+  }, 0);
+  document.getElementById("net").innerHTML = "Total: $ " + res;
 
-  <script>
-    const nodes = document.querySelectorAll('.amt');
-    const arr = Array.from(nodes);
-    const res = arr.reduce((acc, curr) => {
-     return acc += Number(curr.textContent)
-    }, 0);
-    document.getElementById("net").innerHTML="Total: $ "+res;
-
-  </script>
+</script>
 {% endblock content %}

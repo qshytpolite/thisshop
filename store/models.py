@@ -47,12 +47,16 @@ class Cart(models.Model):
     # Track session for anonymous users
     session_id = models.CharField(max_length=255, null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    product_qty = models.IntegerField(default=1)
+    product_qty = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property
     def total_cost(self):
         return self.product_qty * self.product.selling_price
+
+    def __len__(self):
+        # count all items in the cart
+        return self.product_qty
 
     class Meta:
         # Unique constraint to ensure one item per product in a cart
