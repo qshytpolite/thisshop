@@ -1,7 +1,7 @@
 # from atexit import register
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
-from .models import Catagory, Product, Cart, Favourite
+from .models import Catagory, Product, Cart, Favourite, Order, OrderItem
 
 from unfold.admin import ModelAdmin
 
@@ -39,6 +39,22 @@ class FavouriteAdmin(ModelAdmin):
 
 
 admin.site.register(Favourite, FavouriteAdmin)
+
+
+class OrderAdmin(ModelAdmin):
+    # list_display = ('user', 'status', 'created_at')
+    pass
+
+
+admin.site.register(Order, OrderAdmin)
+
+
+class OrderItemAdmin(ModelAdmin):
+    # list_display = ('order', 'product', 'quantity')
+    pass
+
+
+admin.site.register(OrderItem, OrderItemAdmin)
 
 """
 class CategoryAdmin(admin.ModelAdmin):

@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from user.form import CustomUserForm
 from user.models import User
-from store.models import Catagory, Product, Cart, Favourite
+from store.models import Catagory, Product, Cart, Favourite, Order, OrderItem
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import json
@@ -156,3 +156,68 @@ def product_details(request, cname, pname):
     else:
         messages.error(request, "No Such Catagory Found")
         return redirect('collections')
+
+# Checkout view function
+
+
+@login_required
+def checkout(request):
+    if request.method == 'POST':
+        # Get cart items for the logged-in user
+        cart_items = Cart.objects.filter(user=request.user)
+
+        # Validate cart items (optional)
+        if not cart_items.exists():
+            messages.error(request, "Your cart is currently empty.")
+            return redirect('cart')
+
+        # Calculate total cost
+        total_cost = sum(item.product.selling_price *
+                         item.product_qty for item in cart_items)
+
+        # Create order
+        order = Order.objects.create(
+            user=request.user,
+            total_cost=total_cost,
+            # Add any additional order details (e.g., shipping address)
+        )
+
+        # Create order items
+        for item in cart_items:
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                quantity=item.product_qty,
+                price=item.product.selling_price,
+            )
+
+        # Process payment (integrate with a payment gateway)
+        # This is a placeholder, replace with your specific payment processing logic
+        payment_successful = True  # Replace with actual payment processing
+
+        if payment_successful:
+            # Clear cart after successful payment
+            Cart.objects.filter(user=request.user).delete()
+            messages.success(
+                request, "Order placed successfully! You will receive a confirmation email.")
+            # Redirect to order history or confirmation page
+            return redirect('orders')
+        else:
+            messages.error(request, "Payment failed. Please try again.")
+            # Optionally, delete the created order if payment fails
+
+    cart_items = []
+
+    # Get cart items for the logged-in user (same as before)
+    if request.user.is_authenticated:
+        cart_items = Cart.objects.filter(user=request.user)
+    else:
+        # Handle cart for anonymous users (if applicable)
+        # ...
+        pass
+
+    total_cost = sum(item.product.selling_price *
+                     item.product_qty for item in cart_items)
+
+    context = {'cart_items': cart_items, 'total_cost': total_cost}
+    return render(request, 'store/checkout.html', context)

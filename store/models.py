@@ -24,8 +24,8 @@ class Catagory(models.Model):
 
 class Product(models.Model):
     category = models.ForeignKey(Catagory, on_delete=models.CASCADE)
-    name = models.CharField(max_length=150, null=False, blank=False)
-    vendor = models.CharField(max_length=150, null=False, blank=False)
+    name = models.CharField(max_length=150, blank=False)
+    vendor = models.CharField(max_length=150, blank=False)
     product_image = models.ImageField(
         upload_to=getFileName, null=True, blank=True)
     quantity = models.IntegerField(null=False, blank=False)
@@ -65,3 +65,39 @@ class Favourite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+
+# Order model
+
+
+class Order(models.Model):
+    # Order placed by a user
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # Date and time order was placed
+    placed_at = models.DateTimeField(auto_now_add=True)
+    total_cost = models.DecimalField(
+        max_digits=10, decimal_places=2)  # Total cost of the order
+    # Payment method used (optional)
+    payment_method = models.CharField(max_length=255, null=True, blank=True)
+    # Payment status (pending, completed, failed)
+    payment_status = models.CharField(max_length=255, default="pending")
+    shipping_address = models.TextField(
+        null=True, blank=True)  # Shipping address (optional)
+    # Additional fields for tracking and fulfillment can be added
+
+    def __str__(self):
+        return f"Order #{self.pk} - {self.user.username}"
+
+# OrderItem model
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name='items')  # Belongs to an order
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE)  # Ordered product
+    quantity = models.PositiveIntegerField()  # Quantity of the product ordered
+    # Price of the product at the time of order
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"Order Item: {self.order.pk} - {self.product.name} (x{self.quantity})"
