@@ -16,19 +16,19 @@
       <link rel="stylesheet" href="{% static 'src/output.css' %}">
       <!-- <link rel="stylesheet" href="{% static 'css/style.css' %}"> -->
       {% endcompress %}
+      <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   </head>
   <body class="bg-gray-100">
     {% include 'inc/navbar.html' %}
 
       {% block content %}
       {% endblock content %}
-      <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-      <script src="https://cdn.jsdelivr.net/npm/daisyui@2/dist/daisyui.min.js"></script>
-      
-      <!-- my scripts -->
-      <script src="{% static 'src/js/myfunctions.js' %}"></script>
-
+    
       {% include 'inc/footer.html' %}
+
+      <!-- my scripts -->
+      <script src="{% static 'js/myfunctions.js' %}"></script>
+      <script src="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/src/index.min.js"></script>
     
   </body>
 </html>

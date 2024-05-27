@@ -32,7 +32,12 @@ Cart | thisShop
                     <span class="font-semibold">{{ item.product.name }}</span>
                   </div>
                 </td>
+                {% if item.product.discounted_price %}
+                <td class="py-4">${{ item.product.discounted_price }}</td>
+                <!-- <td class="py-4">{{ item.product.selling_price }}</td> -->
+                {% else %}
                 <td class="py-4">${{ item.product.selling_price }}</td>
+                {% endif %}
                 <td class="py-4">
                   <div class="flex items-center">
                     <button class="border rounded-md py-2 px-4 mr-2">-</button>

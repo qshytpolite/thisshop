@@ -27,24 +27,24 @@ thisShop | Is The Shop
       <div class="grid items-start grid-cols-1 lg:grid-cols-2 gap-10">
         <div class="space-y-4 text-center lg:sticky top-8">
           <div class="bg-gray-100 p-4 flex items-center sm:h-[380px] rounded">
-            <img src="https://readymadeui.com/images/product14.webp" alt="Product" class="w-full max-h-full object-contain object-top" />
+            <img src="{{ products.product_image.url }}" alt="{{ products.name }}" class="w-full max-h-full object-contain object-top" />
           </div>
 
           <div class="grid grid-cols-2 gap-4">
             <div class="bg-gray-100 p-4 flex items-center rounded sm:h-[182px]">
-              <img src="https://readymadeui.com/images/product12.webp" alt="Product" class="w-full max-h-full object-contain object-top" />
+              <img src="{{ products.product_image.url }}" alt="{{ products.name }}" class="w-full max-h-full object-contain object-top" />
             </div>
 
             <div class="bg-gray-100 p-4 flex items-center rounded sm:h-[182px]">
-              <img src="https://readymadeui.com/images/product9.webp" alt="Product" class="w-full max-h-full object-contain object-top" />
+              <img src="{{ products.product_image.url }}" alt="{{ products.name }}" class="w-full max-h-full object-contain object-top" />
             </div>
           </div>
         </div>
 
         <div class="max-w-xl">
           <div>
-            <h2 class="text-2xl font-extrabold text-gray-800">Dark blue sneakers with white laces</h2>
-            <p class="text-sm text-gray-600 mt-2">Well-Versed Commerce</p>
+            <h2 class="text-2xl font-extrabold text-gray-800">{{ products.name }}</h2>
+            <p class="text-sm text-gray-600 mt-2">{{ products.vendor }}</p>
           </div>
 
           <div class="flex space-x-1 mt-4">
@@ -85,7 +85,12 @@ thisShop | Is The Shop
           </div>
 
           <div class="mt-4">
-            <h3 class="text-gray-800 text-3xl font-bold">$30</h3>
+            {% if products.discounted_price %}
+            <h3 class="text-gray-800 text-3xl font-bold">${{ products.discounted_price }}</h3>
+            {% else %}
+
+            <h3 class="text-gray-800 text-3xl font-bold">${{ products.selling_price }}</h3>
+            {% endif %}
           </div>
 
           <div class="mt-8">
@@ -99,9 +104,13 @@ thisShop | Is The Shop
           </div>
 
           <div class="flex flex-wrap gap-4 mt-8">
-            <button type="button" class="min-w-[200px] px-4 py-3 bg-gray-800 hover:bg-gray-900 text-white text-sm font-semibold rounded">Buy now</button>
-            <button type="button" class="min-w-[200px] px-4 py-2.5 border border-gray-800 bg-transparent hover:bg-gray-50 text-gray-800 text-sm font-semibold rounded">Add to cart</button>
+            <button id="btnMinus"  class="btn btn-primary btn-square">-</button>
+            <input id="txtQty" type="text" value="1" class="w-12 h-12 border border-gray-800 text-center text-sm font-semibold rounded">
+            <button id="btnPlus"  class="btn btn-primary btn-square">+</button>
+            <button id="btnCart" type="button" class="min-w-[200px] px-4 py-2.5 border border-gray-800 bg-transparent hover:bg-gray-50 text-gray-800 text-sm font-semibold rounded">Add to cart</button>
           </div>
+          <input type="hidden" id="pid" value="{{ products.id }}">
+
 
           <div class="mt-8">
             <ul class="flex border-b">
@@ -113,11 +122,11 @@ thisShop | Is The Shop
 
             <div class="mt-8">
               <h3 class="text-lg font-bold text-gray-800">Product Description</h3>
-              <p class="text-sm text-gray-600 mt-4">Step up your footwear game with our premium men's shoes. Designed for comfort and crafted with a contemporary aesthetic, these versatile shoes are a must-have addition to your wardrobe. The supple and breathable materials ensure all-day comfort, making them perfect for everyday wear.</p>
+              <p class="text-sm text-gray-600 mt-4">{{ products.description }}.{% lorem 1 %}</p>
             </div>
 
             <ul class="space-y-3 list-disc mt-6 pl-4 text-sm text-gray-600">
-              <li>A pair of gray shoes is a wardrobe essential due to its versatility.</li>
+              <li>A pair of nike shoes is a wardrobe essential due to its versatility.</li>
               <li>Available in a wide range of sizes, from extra small to extra large, and even in tall and petite sizes.</li>
               <li>Easy to maintain, they can be machine-washed and dried on low heat.</li>
               <li>Personalize them with your own designs, patterns, or embellishments to make them uniquely yours.</li>
@@ -127,45 +136,7 @@ thisShop | Is The Shop
       </div>
     </div>
   <!-- templates/store/product_details.html -->
-  <div class="bg-gray-100 dark:bg-gray-800 py-8">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col md:flex-row -mx-4">
-        <div class="md:flex-1 px-4">
-          <h1 class="text-3xl font-bold mb-4">{{ products.name }}</h1>
-          <div class="flex items-center mb-4">
-            <img src="{{ products.product_image.url }}" alt="{{ products.name }}" class="w-1/4 h-auto">
-            <div class="ml-4">
-              <p class="text-gray-600 mb-2">{{ products.description }}</p>
-              <p class="text-gray-700 text-xl font-bold">{{ products.selling_price }}</p>
-            </div>
-          </div>
-
-          {% if request.user.is_authenticated %}
-          <div class="flex items-center mb-4">
-            <button id="btnMinus" class="btn btn-primary btn-ghost">-</button>
-            <input type="number" id="txtQty" name="product_qty" min="1" value="1"
-              class="w-16 border border-gray-300 rounded-md px-2 text-center">
-            <button id="btnPlus" class="btn btn-primary btn-ghost">+</button>
-            <div class="ml-4">
-              <button id="btnCart" class="btn btn-primary">Add to Cart</button>
-              <button id="btnFav" class="btn btn-primary">Add to Wishlist</button>
-            </div>
-          </div>
-          <input type="hidden" id="pid" value="{{ products.id }}">
-          {% else %}
-          <p class="text-gray-600 mb-4">Please <a href="{% url 'login' %}" class="text-blue-500 hover:underline">log
-              in</a> to
-            add this product to your cart or wishlist.</p>
-          {% endif %}
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-  </div>
+  
 
 </section>
 

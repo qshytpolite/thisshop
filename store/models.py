@@ -30,7 +30,7 @@ class Product(models.Model):
         upload_to=getFileName, null=True, blank=True)
     quantity = models.IntegerField(null=False, blank=False)
     selling_price = models.FloatField()
-    discounted_price = models.FloatField()
+    discounted_price = models.FloatField(null=True, blank=True)
     description = models.TextField(max_length=500, null=False, blank=False)
     status = models.BooleanField(default=False, help_text="0-show,1-Hidden")
     trending = models.BooleanField(
@@ -52,7 +52,10 @@ class Cart(models.Model):
 
     @property
     def total_cost(self):
-        return self.product_qty * self.product.selling_price
+        if self.product.discounted_price:
+            return self.product_qty * self.product.discounted_price
+        else:
+            return self.product_qty * self.product.selling_price
 
     def __len__(self):
         # count all items in the cart

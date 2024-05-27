@@ -5,6 +5,7 @@ Checkout | thisShop
 {% block content %}
 
 <div class="relative mx-auto w-full bg-white">
+    {% if cart_items %}
     <div class="grid min-h-screen grid-cols-10">
         <div class="col-span-full py-6 px-4 sm:py-12 lg:col-span-6 lg:py-24">
             <div class="mx-auto w-full max-w-lg">
@@ -52,10 +53,14 @@ Checkout | thisShop
                 </form>
                 <p class="mt-10 text-center text-sm font-semibold text-gray-500">By placing this order you agree to the
                     <a href="#" class="whitespace-nowrap text-teal-400 underline hover:text-teal-600">Terms and
-                        Conditions</a></p>
-                <button type="submit"
-                    class="mt-4 inline-flex w-full items-center justify-center rounded bg-teal-600 py-2.5 px-4 text-base font-semibold tracking-wide text-white text-opacity-80 outline-none ring-offset-2 transition hover:text-opacity-100 focus:ring-2 focus:ring-teal-500 sm:text-lg">Place
-                    Order</button>
+                        Conditions</a>
+                </p>
+                <form action="{% url 'checkout' %}" method="post" class="mt-8">
+
+                    <button type="submit"
+                        class="mt-4 inline-flex w-full items-center justify-center rounded bg-teal-600 py-2.5 px-4 text-base font-semibold tracking-wide text-white text-opacity-80 outline-none ring-offset-2 transition hover:text-opacity-100 focus:ring-2 focus:ring-teal-500 sm:text-lg">Place
+                        Order</button>
+                </form>
             </div>
         </div>
         <div class="relative col-span-full flex flex-col py-6 pl-8 pr-4 sm:py-12 lg:col-span-4 lg:py-24">
@@ -65,43 +70,44 @@ Checkout | thisShop
                     alt="" class="absolute inset-0 h-full w-full object-cover" />
                 <div class="absolute inset-0 h-full w-full bg-gradient-to-t from-teal-800 to-teal-400 opacity-95"></div>
             </div>
+            {% if cart_items %}
             <div class="relative">
+                {% for item in cart_items %}
                 <ul class="space-y-5">
                     <li class="flex justify-between">
                         <div class="inline-flex">
-                            <img src="https://images.unsplash.com/photo-1620331311520-246422fd82f9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fGhhaXIlMjBkcnllcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60"
-                                alt="" class="max-h-16" />
+                            <img class="h-24 w-24" src="{{ item.product.product_image.url }}"
+                                alt="{{ item.product.name }}" />
                             <div class="ml-3">
-                                <p class="text-base font-semibold text-white">Nano Titanium Hair Dryer</p>
-                                <p class="text-sm font-medium text-white text-opacity-80">Pdf, doc Kindle</p>
+                                <p class="text-base font-semibold text-white">{{ item.product.name }}</p>
+                                <p class="text-sm font-medium text-white text-opacity-80">{{ item.product.description }}
+                                </p>
                             </div>
                         </div>
-                        <p class="text-sm font-semibold text-white">$260.00</p>
-                    </li>
-                    <li class="flex justify-between">
-                        <div class="inline-flex">
-                            <img src="https://images.unsplash.com/photo-1621607512214-68297480165e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MjV8fGhhaXIlMjBkcnllcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60"
-                                alt="" class="max-h-16" />
-                            <div class="ml-3">
-                                <p class="text-base font-semibold text-white">Luisia H35</p>
-                                <p class="text-sm font-medium text-white text-opacity-80">Hair Dryer</p>
-                            </div>
-                        </div>
-                        <p class="text-sm font-semibold text-white">$350.00</p>
+                        {% if item.product.discounted_price %}
+                        <p class="text-sm font-semibold text-white">${{ item.product.discounted_price }} X {{
+                            item.product_qty }}</p>
+                        {% else %}
+                        <p class="text-sm font-semibold text-white">${{ item.product.selling_price }} X {{
+                            item.product_qty }}</p>
+                        {% endif %}
+                        <!-- <p class="text-sm font-semibold text-white">$260.00</p> -->
                     </li>
                 </ul>
+                {% endfor %}
                 <div class="my-5 h-0.5 w-full bg-white bg-opacity-30"></div>
                 <div class="space-y-2">
                     <p class="flex justify-between text-lg font-bold text-white"><span>Total
-                            price:</span><span>$510.00</span></p>
-                    <p class="flex justify-between text-sm font-medium text-white"><span>Vat:
-                            10%</span><span>$55.00</span></p>
+                            price:</span><span>${{ total_cost }}</span></p>
+                    <!-- <p class="flex justify-between text-sm font-medium text-white"><span>Vat:
+                            10%</span><span>$55.00</span></p> -->
                 </div>
             </div>
+            {% endif %}
             <div class="relative mt-10 text-white">
                 <h3 class="mb-5 text-lg font-bold">Support</h3>
-                <p class="text-sm font-semibold">+01 653 235 211 <span class="font-light">(International)</span></p>
-                <p class="mt-1 text-sm font-semibold">support@nanohair.com <span class="font-light">(Email)</span></p>
+                <p class="text-sm font-semibold">+254 768 655577 <span class="font-light">(International)</span></p>
+                <p class="mt-1 text-sm font-semibold">support@thisshop.com <span class="font-light">(Email)</span></p>
                 <p class="mt-2 text-xs font-medium">Call us now for payment related issues</p>
             </div>
             <div class="relative mt-10 flex">
@@ -110,40 +116,13 @@ Checkout | thisShop
             </div>
         </div>
     </div>
-</div>
-
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-4">Checkout</h1>
-
-    {% if cart_items %}
-    <div class="flex flex-col space-y-4">
-        {% for item in cart_items %}
-        <div class="flex items-center justify-between border rounded-lg p-4">
-            <div class="flex items-center space-x-4">
-                <a href="" class="block w-16 h-16 rounded overflow-hidden">
-                    <img src="{{ item.product.product_image.url }}" alt="{{ item.product.name }}"
-                        class="object-cover w-50 h-50">
-                </a>
-                <div class="text-left">
-                    <a href="" class="text-lg font-medium hover:underline">{{ item.product.name }}</a>
-                    <p class="text-sm text-gray-500">({{ item.product_qty }} x {{ item.product.selling_price }})</p>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <div class="flex justify-end mt-4">
-        <p class="text-right font-bold text-lg">Total: {{ total_cost }}</p>
-    </div>
-
-    <form action="{% url 'checkout' %}" method="post" class="mt-8">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">Place Order</button>
-    </form>
-
     {% else %}
-    <p class="text-center text-gray-500">Your cart is currently empty.</p>
+    <!-- display alert if cart is empty -->
+    <div class="container mx-auto w-full p-4">
+        <p class="text-center text-red-700 text-lg font-semibold">Your cart is empty. Please add some items to your cart.</p>
+    </div>
     {% endif %}
 </div>
+
+
 {% endblock content %}
