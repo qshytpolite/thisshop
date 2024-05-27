@@ -4,139 +4,114 @@ Checkout | thisShop
 {% endblock title %}
 {% block content %}
 
-
-<div class="container mx-auto mt-10">
-    <div class="sm:flex shadow-md my-10">
-        <div class="  w-full  sm:w-3/4 bg-white px-10 py-10">
-
-            <div class="bg-gray-100 dark:bg-gray-900">
-                <div class="w-full max-w-3xl mx-auto p-8">
-                    <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md border dark:border-gray-700">
-                        <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Checkout</h1>
-
-                        <!-- Shipping Address -->
-                        <div class="mb-6">
-                            <h2 class="text-xl font-semibold text-gray-700 dark:text-white mb-2">Shipping Address</h2>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label for="first_name" class="block text-gray-700 dark:text-white mb-1">First
-                                        Name</label>
-                                    <input type="text" id="first_name"
-                                        class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none">
-                                </div>
-                                <div>
-                                    <label for "last_name" class="block text-gray-700 dark:text-white mb-1">Last
-                                        Name</label>
-                                    <input type="text" id="last_name"
-                                        class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none">
-                                </div>
+<div class="relative mx-auto w-full bg-white">
+    <div class="grid min-h-screen grid-cols-10">
+        <div class="col-span-full py-6 px-4 sm:py-12 lg:col-span-6 lg:py-24">
+            <div class="mx-auto w-full max-w-lg">
+                <h1 class="relative text-2xl font-medium text-gray-700 sm:text-3xl">Secure Checkout<span
+                        class="mt-2 block h-1 w-10 bg-teal-600 sm:w-20"></span></h1>
+                <form action="" class="mt-10 flex flex-col space-y-4">
+                    <div><label for="email" class="text-xs font-semibold text-gray-500">Email</label><input type="email"
+                            id="email" name="email" placeholder="john.capler@fang.com"
+                            class="mt-1 block w-full rounded border-gray-300 bg-gray-50 py-3 px-4 text-sm placeholder-gray-300 shadow-sm outline-none transition focus:ring-2 focus:ring-teal-500" />
+                    </div>
+                    <div class="relative"><label for="card-number" class="text-xs font-semibold text-gray-500">Card
+                            number</label><input type="text" id="card-number" name="card-number"
+                            placeholder="1234-5678-XXXX-XXXX"
+                            class="block w-full rounded border-gray-300 bg-gray-50 py-3 px-4 pr-10 text-sm placeholder-gray-300 shadow-sm outline-none transition focus:ring-2 focus:ring-teal-500" /><img
+                            src="/images/uQUFIfCYVYcLK0qVJF5Yw.png" alt="" class="absolute bottom-3 right-3 max-h-4" />
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold text-gray-500">Expiration date</p>
+                        <div class="mr-6 flex flex-wrap">
+                            <div class="my-1">
+                                <label for="month" class="sr-only">Select expiration month</label><select name="month"
+                                    id="month"
+                                    class="cursor-pointer rounded border-gray-300 bg-gray-50 py-3 px-2 text-sm shadow-sm outline-none transition focus:ring-2 focus:ring-teal-500">
+                                    <option value="">Month</option>
+                                </select>
                             </div>
-
-                            <div class="mt-4">
-                                <label for="address" class="block text-gray-700 dark:text-white mb-1">Address</label>
-                                <input type="text" id="address"
-                                    class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none">
+                            <div class="my-1 ml-3 mr-6">
+                                <label for="year" class="sr-only">Select expiration year</label><select name="year"
+                                    id="year"
+                                    class="cursor-pointer rounded border-gray-300 bg-gray-50 py-3 px-2 text-sm shadow-sm outline-none transition focus:ring-2 focus:ring-teal-500">
+                                    <option value="">Year</option>
+                                </select>
                             </div>
-
-                            <div class="mt-4">
-                                <label for="city" class="block text-gray-700 dark:text-white mb-1">City</label>
-                                <input type="text" id="city"
-                                    class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none">
+                            <div class="relative my-1"><label for="security-code" class="sr-only">Security
+                                    code</label><input type="text" id="security-code" name="security-code"
+                                    placeholder="Security code"
+                                    class="block w-36 rounded border-gray-300 bg-gray-50 py-3 px-4 text-sm placeholder-gray-300 shadow-sm outline-none transition focus:ring-2 focus:ring-teal-500" />
                             </div>
-
-                            <div class="grid grid-cols-2 gap-4 mt-4">
-                                <div>
-                                    <label for="state" class="block text-gray-700 dark:text-white mb-1">State</label>
-                                    <input type="text" id="state"
-                                        class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none">
-                                </div>
-                                <div>
-                                    <label for="zip" class="block text-gray-700 dark:text-white mb-1">ZIP Code</label>
-                                    <input type="text" id="zip"
-                                        class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Payment Information -->
-                        <div>
-                            <h2 class="text-xl font-semibold text-gray-700 dark:text-white mb-2">Payment Information
-                            </h2>
-                            <div class="mt-4">
-                                <label for="card_number" class="block text-gray-700 dark:text-white mb-1">Card
-                                    Number</label>
-                                <input type="text" id="card_number"
-                                    class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none">
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4 mt-4">
-                                <div>
-                                    <label for="exp_date" class="block text-gray-700 dark:text-white mb-1">Expiration
-                                        Date</label>
-                                    <input type="text" id="exp_date"
-                                        class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none">
-                                </div>
-                                <div>
-                                    <label for="cvv" class="block text-gray-700 dark:text-white mb-1">CVV</label>
-                                    <input type="text" id="cvv"
-                                        class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-8 flex justify-end">
-                            <button
-                                class="bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-700 dark:bg-teal-600 dark:text-white dark:hover:bg-teal-900">Place
-                                Order</button>
                         </div>
                     </div>
-                </div>
+                    <div><label for="card-name" class="sr-only">Card name</label><input type="text" id="card-name"
+                            name="card-name" placeholder="Name on the card"
+                            class="mt-1 block w-full rounded border-gray-300 bg-gray-50 py-3 px-4 text-sm placeholder-gray-300 shadow-sm outline-none transition focus:ring-2 focus:ring-teal-500" />
+                    </div>
+                </form>
+                <p class="mt-10 text-center text-sm font-semibold text-gray-500">By placing this order you agree to the
+                    <a href="#" class="whitespace-nowrap text-teal-400 underline hover:text-teal-600">Terms and
+                        Conditions</a></p>
+                <button type="submit"
+                    class="mt-4 inline-flex w-full items-center justify-center rounded bg-teal-600 py-2.5 px-4 text-base font-semibold tracking-wide text-white text-opacity-80 outline-none ring-offset-2 transition hover:text-opacity-100 focus:ring-2 focus:ring-teal-500 sm:text-lg">Place
+                    Order</button>
             </div>
-
-            <a href="#" class="flex font-semibold text-indigo-600 text-sm mt-10">
-                <svg class="fill-current mr-2 text-indigo-600 w-4" viewBox="0 0 448 512">
-                    <path
-                        d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z" />
-                </svg>
-                Continue Shopping
-            </a>
         </div>
-        <div id="summary" class=" w-full   sm:w-1/4   md:w-1/2     px-8 py-10">
-            <h1 class="font-semibold text-2xl border-b pb-8">Order Summary</h1>
-            <div class="flex justify-between mt-10 mb-5">
-                <span class="font-semibold text-sm uppercase">Items 3</span>
-                <span class="font-semibold text-sm">590$</span>
-            </div>
+        <div class="relative col-span-full flex flex-col py-6 pl-8 pr-4 sm:py-12 lg:col-span-4 lg:py-24">
+            <h2 class="sr-only">Order summary</h2>
             <div>
-                <label class="font-medium inline-block mb-3 text-sm uppercase">
-                    Shipping
-                </label>
-                <select class="block p-2 text-gray-600 w-full text-sm">
-                    <option>Standard shipping - $10.00</option>
-                </select>
+                <img src="https://images.unsplash.com/photo-1581318694548-0fb6e47fe59b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80"
+                    alt="" class="absolute inset-0 h-full w-full object-cover" />
+                <div class="absolute inset-0 h-full w-full bg-gradient-to-t from-teal-800 to-teal-400 opacity-95"></div>
             </div>
-            <div class="py-10">
-                <label for="promo" class="font-semibold inline-block mb-3 text-sm uppercase">
-                    Promo Code
-                </label>
-                <input type="text" id="promo" placeholder="Enter your code" class="p-2 text-sm w-full" />
-            </div>
-            <button class="bg-red-500 hover:bg-red-600 px-5 py-2 text-sm text-white uppercase">
-                Apply
-            </button>
-            <div class="border-t mt-8">
-                <div class="flex font-semibold justify-between py-6 text-sm uppercase">
-                    <span>Total cost</span>
-                    <span>$600</span>
+            <div class="relative">
+                <ul class="space-y-5">
+                    <li class="flex justify-between">
+                        <div class="inline-flex">
+                            <img src="https://images.unsplash.com/photo-1620331311520-246422fd82f9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fGhhaXIlMjBkcnllcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60"
+                                alt="" class="max-h-16" />
+                            <div class="ml-3">
+                                <p class="text-base font-semibold text-white">Nano Titanium Hair Dryer</p>
+                                <p class="text-sm font-medium text-white text-opacity-80">Pdf, doc Kindle</p>
+                            </div>
+                        </div>
+                        <p class="text-sm font-semibold text-white">$260.00</p>
+                    </li>
+                    <li class="flex justify-between">
+                        <div class="inline-flex">
+                            <img src="https://images.unsplash.com/photo-1621607512214-68297480165e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MjV8fGhhaXIlMjBkcnllcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60"
+                                alt="" class="max-h-16" />
+                            <div class="ml-3">
+                                <p class="text-base font-semibold text-white">Luisia H35</p>
+                                <p class="text-sm font-medium text-white text-opacity-80">Hair Dryer</p>
+                            </div>
+                        </div>
+                        <p class="text-sm font-semibold text-white">$350.00</p>
+                    </li>
+                </ul>
+                <div class="my-5 h-0.5 w-full bg-white bg-opacity-30"></div>
+                <div class="space-y-2">
+                    <p class="flex justify-between text-lg font-bold text-white"><span>Total
+                            price:</span><span>$510.00</span></p>
+                    <p class="flex justify-between text-sm font-medium text-white"><span>Vat:
+                            10%</span><span>$55.00</span></p>
                 </div>
-                <button
-                    class="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full">
-                    Checkout
-                </button>
+            </div>
+            <div class="relative mt-10 text-white">
+                <h3 class="mb-5 text-lg font-bold">Support</h3>
+                <p class="text-sm font-semibold">+01 653 235 211 <span class="font-light">(International)</span></p>
+                <p class="mt-1 text-sm font-semibold">support@nanohair.com <span class="font-light">(Email)</span></p>
+                <p class="mt-2 text-xs font-medium">Call us now for payment related issues</p>
+            </div>
+            <div class="relative mt-10 flex">
+                <p class="flex flex-col"><span class="text-sm font-bold text-white">Money Back Guarantee</span><span
+                        class="text-xs font-medium text-white">within 30 days of purchase</span></p>
             </div>
         </div>
     </div>
 </div>
+
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold mb-4">Checkout</h1>
 
