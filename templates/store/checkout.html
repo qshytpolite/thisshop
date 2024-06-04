@@ -55,7 +55,7 @@ Checkout | thisShop
                     <a href="#" class="whitespace-nowrap text-teal-400 underline hover:text-teal-600">Terms and
                         Conditions</a>
                 </p>
-                <form action="{% url 'checkout' %}" method="post" class="mt-8">
+                <form action="" method="post" class="mt-8">
 
                     <button type="submit"
                         class="mt-4 inline-flex w-full items-center justify-center rounded bg-teal-600 py-2.5 px-4 text-base font-semibold tracking-wide text-white text-opacity-80 outline-none ring-offset-2 transition hover:text-opacity-100 focus:ring-2 focus:ring-teal-500 sm:text-lg">Place
@@ -65,11 +65,11 @@ Checkout | thisShop
         </div>
         <div class="relative col-span-full flex flex-col py-6 pl-8 pr-4 sm:py-12 lg:col-span-4 lg:py-24">
             <h2 class="sr-only">Order summary</h2>
-            <div>
+            <!-- <div>
                 <img src="https://images.unsplash.com/photo-1581318694548-0fb6e47fe59b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80"
                     alt="" class="absolute inset-0 h-full w-full object-cover" />
                 <div class="absolute inset-0 h-full w-full bg-gradient-to-t from-teal-800 to-teal-400 opacity-95"></div>
-            </div>
+            </div> -->
             {% if cart_items %}
             <div class="relative">
                 {% for item in cart_items %}
@@ -79,26 +79,20 @@ Checkout | thisShop
                             <img class="h-24 w-24" src="{{ item.product.product_image.url }}"
                                 alt="{{ item.product.name }}" />
                             <div class="ml-3">
-                                <p class="text-base font-semibold text-white">{{ item.product.name }}</p>
-                                <p class="text-sm font-medium text-white text-opacity-80">{{ item.product.description }}
+                                <p class="text-base font-semibold text-black">{{ item.product.name }}</p>
+                                <p class="text-sm font-medium text-black text-opacity-80">{{ item.product.description }}
                                 </p>
                             </div>
                         </div>
-                        {% if item.product.discounted_price %}
-                        <p class="text-sm font-semibold text-white">${{ item.product.discounted_price }} X {{
-                            item.product_qty }}</p>
-                        {% else %}
-                        <p class="text-sm font-semibold text-white">${{ item.product.selling_price }} X {{
-                            item.product_qty }}</p>
-                        {% endif %}
-                        <!-- <p class="text-sm font-semibold text-white">$260.00</p> -->
+                        <p class="text-lg font-semibold text-black">{{ item.product_qty }}</p>
+                        <p class="text-lg font-semibold text-black">${{ item.item_total}}</p>
                     </li>
                 </ul>
                 {% endfor %}
-                <div class="my-5 h-0.5 w-full bg-white bg-opacity-30"></div>
+                <div class="my-5 h-0.5 w-full bg-blue-600 bg-opacity-30"></div>
                 <div class="space-y-2">
-                    <p class="flex justify-between text-lg font-bold text-white"><span>Total
-                            price:</span><span>${{ total_cost }}</span></p>
+                    <p class="flex justify-between text-lg font-bold text-black"><span>Total
+                            price:</span><span>${{ total }}</span></p>
                     <!-- <p class="flex justify-between text-sm font-medium text-white"><span>Vat:
                             10%</span><span>$55.00</span></p> -->
                 </div>
@@ -119,7 +113,8 @@ Checkout | thisShop
     {% else %}
     <!-- display alert if cart is empty -->
     <div class="container mx-auto w-full p-4">
-        <p class="text-center text-red-700 text-lg font-semibold">Your cart is empty. Please add some items to your cart.</p>
+        <p class="text-center text-red-700 text-lg font-semibold">Your cart is empty. Please add some items to your
+            cart.</p>
     </div>
     {% endif %}
 </div>

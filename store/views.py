@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from user.form import CustomUserForm
 from user.models import User
+from store.form import CheckoutForm
 from store.models import Catagory, Product, Cart, Favourite, Order, OrderItem
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -31,25 +32,15 @@ def remove_fav(request, fid):
 def cart_page(request):
     cart_items = []
 
-    # Get cart items for logged-in user
     if request.user.is_authenticated:
         cart_items = Cart.objects.filter(user=request.user)
     else:
-        # Get cart items from session (if available)
         cart_data = request.session.get('cart', {})
         for product_id, product_qty in cart_data.items():
-            product = Product.objects.get(
-                pk=product_id)  # Assuming product exists
-            cart_items.append({'product': product, 'product_qty': product_qty})
+            product = Product.objects.get(pk=product_id)
+            cart_items.append(Cart(product=product, product_qty=product_qty))
 
-    # Calculate total cost
-    cart_items = Cart.objects.filter(user=request.user)
-    total = 0
-    for item in cart_items:
-        if item.product.discounted_price:
-            total += item.product.discounted_price * item.product_qty
-        else:
-            total += item.product.selling_price * item.product_qty
+    total = sum(item.item_total for item in cart_items)
     context = {'cart_items': cart_items, 'total': total}
     return render(request, 'store/cart.html', context)
 
@@ -165,63 +156,43 @@ def product_details(request, cname, pname):
 
 
 @login_required
-def checkout(request):
+def checkout_page(request):
+    cart_items = Cart.objects.filter(user=request.user)
+    total = sum(item.item_total for item in cart_items)
+
     if request.method == 'POST':
-        # Get cart items for the logged-in user
-        cart_items = Cart.objects.filter(user=request.user)
-
-        # Validate cart items (optional)
-        if not cart_items.exists():
-            messages.error(request, "Your cart is currently empty.")
-            return redirect('cart')
-
-        # Calculate total cost
-        total_cost = sum(item.product.selling_price *
-                         item.product_qty for item in cart_items)
-
-        # Create order
-        order = Order.objects.create(
-            user=request.user,
-            total_cost=total_cost,
-            # Add any additional order details (e.g., shipping address)
-        )
-
-        # Create order items
-        for item in cart_items:
-            OrderItem.objects.create(
-                order=order,
-                product=item.product,
-                quantity=item.product_qty,
-                price=item.product.selling_price,
+        form = CheckoutForm(request.POST)
+        if form.is_valid():
+            # Create Order
+            order = Order.objects.create(
+                user=request.user,
+                total_amount=total,
+                is_paid=False
             )
+            # Create Order Items
+            for item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    product=item.product,
+                    quantity=item.product_qty,
+                    price=item.item_total
+                )
+            # Clear the cart
+            cart_items.delete()
 
-        # Process payment (integrate with a payment gateway)
-        # This is a placeholder, replace with your specific payment processing logic
-        payment_successful = True  # Replace with actual payment processing
-
-        if payment_successful:
-            # Clear cart after successful payment
-            Cart.objects.filter(user=request.user).delete()
-            messages.success(
-                request, "Order placed successfully! You will receive a confirmation email.")
-            # Redirect to order history or confirmation page
-            return redirect('orders')
-        else:
-            messages.error(request, "Payment failed. Please try again.")
-            # Optionally, delete the created order if payment fails
-
-    cart_items = []
-
-    # Get cart items for the logged-in user (same as before)
-    if request.user.is_authenticated:
-        cart_items = Cart.objects.filter(user=request.user)
+            # Redirect to a success page
+            return redirect('checkout_success')
     else:
-        # Handle cart for anonymous users (if applicable)
-        # ...
-        pass
+        form = CheckoutForm()
 
-    total_cost = sum(item.product.selling_price *
-                     item.product_qty for item in cart_items)
-
-    context = {'cart_items': cart_items, 'total_cost': total_cost}
+    context = {
+        'cart_items': cart_items,
+        'total': total,
+        'form': form
+    }
     return render(request, 'store/checkout.html', context)
+
+
+@login_required
+def checkout_success(request):
+    return render(request, 'store/checkout_success.html')

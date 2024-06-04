@@ -44,12 +44,10 @@ Cart | thisShop
                     <span class="text-center w-8">{{ item.product_qty }}</span>
                     <button class="border rounded-md py-2 px-4 ml-2">+</button>
                   </div>
-                </td>          
-                <td class="py-4">${{ item.total }}
-                  {% comment %}
-                  {% set item_total = item.product.discounted_price if item.product.discounted_price else item.product.selling_price %}
-                  ${{ item_total * item.product_qty }}
-                  {% endcomment %}
+                </td> 
+                         
+                <td class="py-4">${{ item.item_total }}
+                 
                 </td>
                 <td class="py-4">
                   <form action="{% url 'remove_cart' item.product_id %}" method="post" class="inline-block ml-4">
@@ -80,15 +78,7 @@ Cart | thisShop
           <div class="flex justify-between mb-2">
             <span>Subtotal</span>
             <span>${{ total }}</span>
-          </div>
-          <!-- <div class="flex justify-between mb-2">
-            <span>Taxes</span>
-            <span>$1.99</span>
-          </div> -->
-          <!-- <div class="flex justify-between mb-2">
-            <span>Shipping</span>
-            <span>$0.00</span>
-          </div> -->
+          </div>          
           <hr class="my-2">
           <div class="flex justify-between mb-2">
             <span class="font-semibold">Total</span>

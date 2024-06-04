@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from itertools import product
 from django.db import models
 from user.models import User
@@ -42,28 +43,27 @@ class Product(models.Model):
 
 
 class Cart(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='carts',
-                             null=True, blank=True)  # Allow for anonymous carts
-    # Track session for anonymous users
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='carts', null=True, blank=True)
     session_id = models.CharField(max_length=255, null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     product_qty = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property
+    def item_total(self):
+        if self.product.discounted_price:
+            return self.product.discounted_price * self.product_qty
+        else:
+            return self.product.selling_price * self.product_qty
+
+    @property
     def total_cost(self):
         items = Cart.objects.all()
         total = 0
         for item in items:
-            if item.product.discounted_price:
-                total += item.product.discounted_price * item.product_qty
-            else:
-                total += item.product.selling_price * item.product_qty
+            total += item.item_total
         return total
-        # if self.product.discounted_price:
-        #     return self.product_qty * self.product.discounted_price
-        # else:
-        #     return self.product_qty * self.product.selling_price
 
     def __len__(self):
         # count all items in the cart
@@ -81,38 +81,18 @@ class Favourite(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
-# Order model
-
 
 class Order(models.Model):
-    # Order placed by a user
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    # Date and time order was placed
-    placed_at = models.DateTimeField(auto_now_add=True)
-    total = models.DecimalField(
-        max_digits=10, decimal_places=2)  # Total cost of the order
-    # Payment method used (optional)
-    payment_method = models.CharField(max_length=255, null=True, blank=True)
-    # Payment status (pending, completed, failed)
-    payment_status = models.CharField(max_length=255, default="pending")
-    shipping_address = models.TextField(
-        null=True, blank=True)  # Shipping address (optional)
-    # Additional fields for tracking and fulfillment can be added
-
-    def __str__(self):
-        return f"Order #{self.pk} - {self.user.username}"
-
-# OrderItem model
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='orders')
+    created_at = models.DateTimeField(auto_now_add=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    is_paid = models.BooleanField(default=False)
 
 
 class OrderItem(models.Model):
     order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name='items')  # Belongs to an order
-    product = models.ForeignKey(
-        Product, on_delete=models.CASCADE)  # Ordered product
-    quantity = models.PositiveIntegerField()  # Quantity of the product ordered
-    # Price of the product at the time of order
+        Order, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return f"Order Item: {self.order.pk} - {self.product.name} (x{self.quantity})"
