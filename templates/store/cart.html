@@ -45,7 +45,12 @@ Cart | thisShop
                     <button class="border rounded-md py-2 px-4 ml-2">+</button>
                   </div>
                 </td>          
-                <td class="py-4">${{ item.total_cost }}</td>
+                <td class="py-4">${{ item.total }}
+                  {% comment %}
+                  {% set item_total = item.product.discounted_price if item.product.discounted_price else item.product.selling_price %}
+                  ${{ item_total * item.product_qty }}
+                  {% endcomment %}
+                </td>
                 <td class="py-4">
                   <form action="{% url 'remove_cart' item.product_id %}" method="post" class="inline-block ml-4">
                     {% csrf_token %}
@@ -74,7 +79,7 @@ Cart | thisShop
           <h2 class="text-lg font-semibold mb-4">Summary</h2>
           <div class="flex justify-between mb-2">
             <span>Subtotal</span>
-            <span>${{ total_cost }}</span>
+            <span>${{ total }}</span>
           </div>
           <!-- <div class="flex justify-between mb-2">
             <span>Taxes</span>
@@ -87,7 +92,7 @@ Cart | thisShop
           <hr class="my-2">
           <div class="flex justify-between mb-2">
             <span class="font-semibold">Total</span>
-            <span class="font-semibold">${{ total_cost }}</span>
+            <span class="font-semibold">${{ total }}</span>
           </div>
           <a href="{% url 'checkout' %}" class="block text-center bg-blue-500 text-white py-2 px-4 rounded-lg mt-4 w-full">Checkout</a>
         </div>
@@ -100,7 +105,7 @@ Cart | thisShop
     </div>
   </div>
 </div>
-
+<!-- 
 <script>
   const nodes = document.querySelectorAll('.amt');
   const arr = Array.from(nodes);
@@ -109,5 +114,5 @@ Cart | thisShop
   }, 0);
   document.getElementById("net").innerHTML = "Total: $ " + res;
 
-</script>
+</script> -->
 {% endblock content %}

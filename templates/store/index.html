@@ -22,8 +22,8 @@ thisShop | Is The Shop
           <p class="card-text">{{ item.description }}</p>
           {% if item.discounted_price %}
           <p class="card-text">
-            <span class="float-start old_price text-black"><s>${{ item.discounted_price | stringformat:'d'}}</s></span>
-            <span class="float-end new_price text-blue-500">${{ item.selling_price | stringformat:'d' }}</span>
+            <span class="float-start old_price text-black"><s>${{ item.selling_price| stringformat:'d'}}</s></span>
+            <span class="float-end new_price text-blue-500">${{ item.discounted_price | stringformat:'d' }}</span>
           </p>
           {% else %}
           <p class="card-text">${{ item.selling_price | stringformat:'d' }}</p>

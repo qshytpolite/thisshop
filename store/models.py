@@ -52,10 +52,18 @@ class Cart(models.Model):
 
     @property
     def total_cost(self):
-        if self.product.discounted_price:
-            return self.product_qty * self.product.discounted_price
-        else:
-            return self.product_qty * self.product.selling_price
+        items = Cart.objects.all()
+        total = 0
+        for item in items:
+            if item.product.discounted_price:
+                total += item.product.discounted_price * item.product_qty
+            else:
+                total += item.product.selling_price * item.product_qty
+        return total
+        # if self.product.discounted_price:
+        #     return self.product_qty * self.product.discounted_price
+        # else:
+        #     return self.product_qty * self.product.selling_price
 
     def __len__(self):
         # count all items in the cart
@@ -81,7 +89,7 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     # Date and time order was placed
     placed_at = models.DateTimeField(auto_now_add=True)
-    total_cost = models.DecimalField(
+    total = models.DecimalField(
         max_digits=10, decimal_places=2)  # Total cost of the order
     # Payment method used (optional)
     payment_method = models.CharField(max_length=255, null=True, blank=True)

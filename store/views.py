@@ -42,19 +42,15 @@ def cart_page(request):
                 pk=product_id)  # Assuming product exists
             cart_items.append({'product': product, 'product_qty': product_qty})
 
-    # Calculate total cost **within the same code block as context definition**
-    # if discounted_price exists, use it, otherwise use selling_price
-    # total_cost = 0
-    # item = Cart.objects.all()
-    # for i in item:
-    #     if i.product.discounted_price:
-    #         total_cost += i.product.discounted_price * i.product_qty
-    #     else:
-    #         total_cost += i.product.selling_price * i.product_qty
-    total_cost = sum(item.product.selling_price *
-                     item.product_qty for item in cart_items)
-
-    context = {'cart_items': cart_items, 'total_cost': total_cost}
+    # Calculate total cost
+    cart_items = Cart.objects.filter(user=request.user)
+    total = 0
+    for item in cart_items:
+        if item.product.discounted_price:
+            total += item.product.discounted_price * item.product_qty
+        else:
+            total += item.product.selling_price * item.product_qty
+    context = {'cart_items': cart_items, 'total': total}
     return render(request, 'store/cart.html', context)
 
 
