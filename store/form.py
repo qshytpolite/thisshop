@@ -8,3 +8,4 @@ class CheckoutForm(forms.Form):
     city = forms.CharField(max_length=100)
     postal_code = forms.CharField(max_length=20)
     country = forms.CharField(max_length=100)
+    username = forms.CharField(max_length=100)
