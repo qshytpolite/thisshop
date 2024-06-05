@@ -96,3 +96,15 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
+
+# Payment Models
+
+
+class Payment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    reference = models.CharField(max_length=100, unique=True)
+    verified = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user} - {self.amount}"

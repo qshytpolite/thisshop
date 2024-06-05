@@ -1,0 +1,9 @@
+{% if response.status %}
+    <h1>Payment {{ response.data.status }}</h1>
+    <p>Reference: {{ response.data.reference }}</p>
+    <p>Amount: {{ response.data.amount / 100 }}</p>
+    <p>Message: {{ response.data.gateway_response }}</p>
+{% else %}
+    <h1>Payment Failed</h1>
+    <p>{{ response.message }}</p>
+{% endif %}

@@ -10,10 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from django.templatetags.static import static
 from pathlib import Path
 import os
+import dotenv
 
-from django.templatetags.static import static
+dotenv.load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -157,6 +160,10 @@ UNFOLD = {
         lambda request: static("js/script.js"),
     ],
 }
+
+# Paystack api settings
+PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY')
+PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
 
 # Cart session setting
 # CART_SESSION_ID = 'cart'

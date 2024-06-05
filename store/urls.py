@@ -16,4 +16,6 @@ urlpatterns = [
          views.add_to_cart, name="add_to_cart"),
     path('checkout/', views.checkout_page, name='checkout_page'),
     path('checkout/success', views.checkout_success, name='checkout_success'),
+    path('initiate_payment', views.initiate_payment, name='initiate_payment'),
+    path('verify_payment', views.verify_payment, name='verify_payment'),
 ]

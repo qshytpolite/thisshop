@@ -4,9 +4,11 @@ from django.shortcuts import redirect, render
 from user.form import CustomUserForm
 from user.models import User
 from store.form import CheckoutForm
-from store.models import Catagory, Product, Cart, Favourite, Order, OrderItem
+from store.models import Catagory, Product, Cart, Favourite, Order, OrderItem, Payment
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+import requests
+from django.conf import settings
 import json
 
 
@@ -196,3 +198,57 @@ def checkout_page(request):
 @login_required
 def checkout_success(request):
     return render(request, 'store/checkout_success.html')
+
+# Payment view function (Paystack)
+
+
+def initiate_payment(request):
+    if request.method == "POST":
+        user = request.user
+        amount = int(request.POST['amount']) * 100  # Convert amount to kobo
+
+        headers = {
+            "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}",
+            "Content-Type": "application/json",
+        }
+        data = {
+            "email": user.email,
+            "amount": amount,
+            "callback_url": "http://your-domain.com/verify_payment/",
+        }
+
+        response = requests.post(
+            "https://api.paystack.co/transaction/initialize", headers=headers, json=data)
+        response_data = response.json()
+
+        if response_data['status']:
+            payment = Payment.objects.create(
+                user=user, amount=amount / 100, reference=response_data['data']['reference'])
+            return redirect(response_data['data']['authorization_url'])
+        else:
+            # Handle error
+            pass
+
+    return render(request, 'store/initiate_payment.html')
+
+
+def verify_payment(request):
+    reference = request.GET.get('reference')
+    headers = {
+        "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}",
+    }
+
+    response = requests.get(
+        f"https://api.paystack.co/transaction/verify/{reference}", headers=headers)
+    response_data = response.json()
+
+    if response_data['status'] and response_data['data']['status'] == 'success':
+        payment = Payment.objects.get(reference=reference)
+        payment.verified = True
+        payment.save()
+        # Payment was successful
+    else:
+        # Payment failed
+        pass
+
+    return render(request, 'store/verify_payment.html', {'response': response_data})
