@@ -1,15 +1,15 @@
-from django.http import HttpRequest, JsonResponse
-from django.http import JsonResponse
-from django.shortcuts import redirect, render
-from user.form import CustomUserForm
-from user.models import User
-from store.form import CheckoutForm
-from store.models import Catagory, Product, Cart, Favourite, Order, OrderItem, Payment
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+import json
 import requests
 from django.conf import settings
-import json
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.csrf import csrf_exempt
+
+from .form import CheckoutForm
+from .models import Cart, Catagory, Favourite, Order, OrderItem, Payment, Product
+from .utils import generate_reference
 
 
 def home(request):
@@ -47,7 +47,7 @@ def cart_page(request):
     return render(request, 'store/cart.html', context)
 
 
-@login_required
+# remove_cart view function
 def remove_cart(request, product_id):
     if request.user.is_authenticated:
         Cart.objects.filter(user=request.user, product__id=product_id).delete()
@@ -143,15 +143,21 @@ def collectionsview(request, name):
 
 
 def product_details(request, cname, pname):
+    # Check if the provided category name exists in the database
     if (Catagory.objects.filter(name=cname)):
+        # If the category name exists, check if the product name exists in the database
         if (Product.objects.filter(name=pname)):
+            # If the product name exists, retrieve the first occurrence of the product
             products = Product.objects.filter(name=pname).first()
+            # Render the product details page with the retrieved product data
             return render(request, "store/product_details.html", {"products": products})
         else:
-            messages.error(request, "No Such Produtct Found")
+            # If the product name does not exist, display an error message and redirect to the collections page
+            messages.error(request, "No Such Product Found")
             return redirect('collections')
     else:
-        messages.error(request, "No Such Catagory Found")
+        # If the category name does not exist, display an error message and redirect to the collections page
+        messages.error(request, "No Such Category Found")
         return redirect('collections')
 
 # Checkout view function
@@ -182,8 +188,17 @@ def checkout_page(request):
             # Clear the cart
             cart_items.delete()
 
-            # Redirect to a success page
-            return redirect('checkout_success')
+            # Create Payment
+            payment = Payment.objects.create(
+                user=request.user,
+                order=order,
+                amount=total,
+                reference=generate_reference(),
+                status='pending'
+            )
+
+            # Redirect to the payment view
+            return redirect('payment', payment_id=payment.pk)
     else:
         form = CheckoutForm()
 
@@ -196,59 +211,62 @@ def checkout_page(request):
 
 
 @login_required
-def checkout_success(request):
-    return render(request, 'store/checkout_success.html')
+def payment(request, payment_id):
+    payment = get_object_or_404(Payment, id=payment_id, user=request.user)
+    total = payment.amount
+    paystack_secret_key = settings.PAYSTACK_SECRET_KEY
+    paystack_public_key = settings.PAYSTACK_PUBLIC_KEY
 
-# Payment view function (Paystack)
-
-
-def initiate_payment(request):
-    if request.method == "POST":
-        user = request.user
-        amount = int(request.POST['amount']) * 100  # Convert amount to kobo
-
-        headers = {
-            "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}",
-            "Content-Type": "application/json",
-        }
-        data = {
-            "email": user.email,
-            "amount": amount,
-            "callback_url": "http://your-domain.com/verify_payment/",
-        }
-
-        response = requests.post(
-            "https://api.paystack.co/transaction/initialize", headers=headers, json=data)
-        response_data = response.json()
-
-        if response_data['status']:
-            payment = Payment.objects.create(
-                user=user, amount=amount / 100, reference=response_data['data']['reference'])
-            return redirect(response_data['data']['authorization_url'])
-        else:
-            # Handle error
-            pass
-
-    return render(request, 'store/initiate_payment.html')
-
-
-def verify_payment(request):
-    reference = request.GET.get('reference')
     headers = {
-        "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}",
+        "Authorization": f"Bearer {paystack_secret_key}",
+        "Content-Type": "application/json",
     }
 
-    response = requests.get(
-        f"https://api.paystack.co/transaction/verify/{reference}", headers=headers)
+    data = {
+        "email": request.user.email,
+        "amount": int(total * 100),  # Paystack amount is in kobo
+        "reference": payment.reference,  # Use the payment reference
+    }
+
+    response = requests.post(
+        "https://api.paystack.co/transaction/initialize", headers=headers, json=data)
     response_data = response.json()
 
-    if response_data['status'] and response_data['data']['status'] == 'success':
-        payment = Payment.objects.get(reference=reference)
-        payment.verified = True
-        payment.save()
-        # Payment was successful
+    if response_data['status']:
+        authorization_url = response_data['data']['authorization_url']
+        return redirect(authorization_url)
     else:
-        # Payment failed
-        pass
+        payment.status = 'failed'
+        payment.save()
+        return render(request, 'store/payment_failed.html', {"message": response_data['message']})
 
-    return render(request, 'store/verify_payment.html', {'response': response_data})
+
+@csrf_exempt
+def paystack_webhook(request):
+    paystack_secret_key = settings.PAYSTACK_SECRET_KEY
+    payload = json.loads(request.body)
+    event = payload['event']
+
+    if event == 'charge.success':
+        reference = payload['data']['reference']
+        payment = get_object_or_404(Payment, reference=reference)
+
+        headers = {
+            "Authorization": f"Bearer {paystack_secret_key}",
+            "Content-Type": "application/json",
+        }
+        url = f"https://api.paystack.co/transaction/verify/{reference}"
+        response = requests.get(url, headers=headers)
+        response_data = response.json()
+
+        if response_data['status'] and response_data['data']['status'] == 'success':
+            payment.status = 'completed'
+            payment.save()
+
+            # Update the order status
+            order = payment.order
+            order.is_paid = True
+            order.save()
+            return HttpResponse(status=200)
+
+    return HttpResponse(status=400)

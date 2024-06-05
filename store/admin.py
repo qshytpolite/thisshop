@@ -1,7 +1,7 @@
 # from atexit import register
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
-from .models import Catagory, Product, Cart, Favourite, Order, OrderItem
+from .models import Catagory, Product, Cart, Favourite, Order, OrderItem, Payment
 
 from unfold.admin import ModelAdmin
 
@@ -13,7 +13,7 @@ from unfold.admin import ModelAdmin
 
 class ProductAdmin(ModelAdmin):
     list_display = ('name', 'vendor', 'product_image', 'quantity',
-                    'selling_price', 'discounted_price', 'description', 'status')
+                    'selling_price', 'discounted_price', 'description', 'status', 'trending', 'featured')
 
 
 admin.site.register(Product, ProductAdmin)
@@ -27,8 +27,7 @@ admin.site.register(Catagory, CatagoryAdmin)
 
 
 class CartAdmin(ModelAdmin):
-    # list_display = ('user', 'product', 'product_qty', 'created_at')
-    pass
+    list_display = ('user', 'product', 'product_qty', 'created_at')
 
 
 admin.site.register(Cart, CartAdmin)
@@ -55,6 +54,13 @@ class OrderItemAdmin(ModelAdmin):
 
 
 admin.site.register(OrderItem, OrderItemAdmin)
+
+
+class PaymentAdmin(ModelAdmin):
+    pass
+
+
+admin.site.register(Payment, PaymentAdmin)
 
 """
 class CategoryAdmin(admin.ModelAdmin):
