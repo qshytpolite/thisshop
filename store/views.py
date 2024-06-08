@@ -1,15 +1,19 @@
-from django.http import HttpRequest, JsonResponse
-from django.http import JsonResponse
-from django.shortcuts import redirect, render
-from user.form import CustomUserForm
-from store.models import Catagory, Product, Cart, Favourite
-from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
 import json
+import requests
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.csrf import csrf_exempt
+
+from .form import CheckoutForm
+from .models import Cart, Catagory, Favourite, Order, OrderItem, Payment, Product
+from .utils import generate_reference
 
 
 def home(request):
-    products = Product.objects.filter(trending=1)
+    products = Product.objects.all()
     return render(request, "store/index.html", {"products": products})
 
 
@@ -28,17 +32,79 @@ def remove_fav(request, fid):
 
 
 def cart_page(request):
+    cart_items = []
+
     if request.user.is_authenticated:
-        cart = Cart.objects.filter(user=request.user)
-        return render(request, "store/cart.html", {"cart": cart})
+        cart_items = Cart.objects.filter(user=request.user)
     else:
-        return redirect("/")
+        cart_data = request.session.get('cart', {})
+        for product_id, product_qty in cart_data.items():
+            product = Product.objects.get(pk=product_id)
+            cart_items.append(Cart(product=product, product_qty=product_qty))
+
+    total = sum(item.item_total for item in cart_items)
+    context = {'cart_items': cart_items, 'total': total}
+    return render(request, 'store/cart.html', context)
 
 
-def remove_cart(request, cid):
-    cartitem = Cart.objects.get(id=cid)
-    cartitem.delete()
-    return redirect("/cart")
+# remove_cart view function
+def remove_cart(request, product_id):
+    if request.user.is_authenticated:
+        Cart.objects.filter(user=request.user, product__id=product_id).delete()
+    else:
+        cart_data = request.session.get('cart', {})
+        if str(product_id) in cart_data:
+            del cart_data[str(product_id)]
+            request.session['cart'] = cart_data
+
+    return redirect('cart')
+
+# add_to_cart view function
+
+
+def add_to_cart(request, product_id):
+    print(f"Adding product {product_id} to cart")
+
+    if request.method != 'POST':
+        print("Error: Invalid request method")
+        return JsonResponse({'status': 'Invalid request method'}, status=400)
+
+    try:
+        product = Product.objects.get(pk=product_id)
+        print(f"Retrieved product {product.name} with id {product_id}")
+    except Product.DoesNotExist:
+        print(f"Error: Product with id {product_id} not found")
+        return JsonResponse({'status': 'Product not found'}, status=404)
+
+    # Retrieve quantity from request body
+    quantity = int(request.POST.get('product_qty', 1))  # Handle missing value
+    print(f"Product quantity: {quantity}")
+
+    # Check for existing cart item or create a new one based on user status
+    if request.user.is_authenticated:
+        print("Authenticated user, checking for existing cart item")
+        cart_item, created = Cart.objects.get_or_create(
+            user=request.user, product=product
+        )
+        if created:
+            print(f"Created new cart item for {product.name}")
+            cart_item.product_qty = quantity
+        else:
+            print(
+                f"Found existing cart item for {product.name}, updating quantity")
+            cart_item.product_qty += quantity
+        cart_item.save()
+    else:
+        print("Anonymous user, using session for cart")
+        # Handle anonymous cart (using session)
+        cart_data = request.session.get('cart', {})
+        print("Current cart data: ", cart_data)
+        cart_data[str(product_id)] = quantity
+        print("Updated cart data: ", cart_data)
+        request.session['cart'] = cart_data
+
+    print("Returning success response")
+    return JsonResponse({'status': 'Item added to cart'})
 
 
 def fav_page(request: HttpRequest):
@@ -62,38 +128,13 @@ def fav_page(request: HttpRequest):
         return JsonResponse({'status': 'Invalid Access'}, status=200)
 
 
-def add_to_cart(request: HttpRequest):
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        if request.user.is_authenticated:
-            data = json.loads(request.body)
-            product_qty = data['product_qty']
-            product_id = data['pid']
-            product_status = Product.objects.filter(id=product_id).first()
-            if product_status:
-                if Cart.objects.filter(user=request.user, product_id=product_id).exists():
-                    return JsonResponse({'status': 'Product Already in Cart'}, status=200)
-                else:
-                    if product_status.quantity >= product_qty:
-                        Cart.objects.create(
-                            user=request.user, product_id=product_id, product_qty=product_qty)
-                        return JsonResponse({'status': 'Product Added to Cart'}, status=200)
-                    else:
-                        return JsonResponse({'status': 'Product Stock Not Available'}, status=200)
-            else:
-                return JsonResponse({'status': 'Product Not Found'}, status=404)
-        else:
-            return JsonResponse({'status': 'Login to Add Cart'}, status=200)
-    else:
-        return JsonResponse({'status': 'Invalid Access'}, status=200)
-
-
 def collections(request):
-    catagory = Catagory.objects.filter(status=0)
+    catagory = Catagory.objects.filter(status=1)
     return render(request, "store/collection.html", {"catagory": catagory})
 
 
 def collectionsview(request, name):
-    if (Catagory.objects.filter(name=name, status=0)):
+    if (Catagory.objects.filter(name=name, status=1)):
         products = Product.objects.filter(category__name=name)
         return render(request, "store/products.html", {"products": products, "category_name": name})
     else:
@@ -102,13 +143,196 @@ def collectionsview(request, name):
 
 
 def product_details(request, cname, pname):
-    if (Catagory.objects.filter(name=cname, status=0)):
-        if (Product.objects.filter(name=pname, status=0)):
-            products = Product.objects.filter(name=pname, status=0).first()
+    # Check if the provided category name exists in the database
+    if (Catagory.objects.filter(name=cname)):
+        # If the category name exists, check if the product name exists in the database
+        if (Product.objects.filter(name=pname)):
+            # If the product name exists, retrieve the first occurrence of the product
+            products = Product.objects.filter(name=pname).first()
+            # Render the product details page with the retrieved product data
             return render(request, "store/product_details.html", {"products": products})
         else:
-            messages.error(request, "No Such Produtct Found")
+            # If the product name does not exist, display an error message and redirect to the collections page
+            messages.error(request, "No Such Product Found")
             return redirect('collections')
     else:
-        messages.error(request, "No Such Catagory Found")
+        # If the category name does not exist, display an error message and redirect to the collections page
+        messages.error(request, "No Such Category Found")
         return redirect('collections')
+
+# Checkout view function
+
+
+@login_required
+def checkout_page(request):
+    # Retrieve all Cart items belonging to the logged-in user
+    cart_items = Cart.objects.filter(user=request.user)
+    # Calculate the total price of all items in the cart
+    total = sum(item.item_total for item in cart_items)
+
+    # Check if the request is a POST request (i.e., form submission)
+    if request.method == 'POST':
+        # Create a form instance using the POST data
+        form = CheckoutForm(request.POST)
+        # Check if the form is valid (i.e., all required fields are filled)
+        if form.is_valid():
+            # Create a new Order object
+            order = Order.objects.create(
+                user=request.user,  # Associate the order with the logged-in user
+                total_amount=total,  # Set the total amount of the order
+                is_paid=False  # Mark the order as unpaid initially
+            )
+            # Create OrderItems for each item in the cart
+            for item in cart_items:
+                OrderItem.objects.create(
+                    order=order,  # Associate the OrderItem with the order
+                    product=item.product,  # Associate the OrderItem with the product
+                    quantity=item.product_qty,  # Set the quantity of the product
+                    price=item.item_total  # Set the price of the product
+                )
+            # Delete all Cart items belonging to the logged-in user
+            cart_items.delete()
+
+            # Create a new Payment object
+            payment = Payment.objects.create(
+                user=request.user,  # Associate the payment with the logged-in user
+                order=order,  # Associate the payment with the order
+                amount=total,  # Set the amount of the payment
+                reference=generate_reference(),  # Generate a unique reference for the payment
+                status='pending'  # Mark the payment as pending initially
+            )
+
+            # Redirect to the payment view, passing the payment ID as a parameter
+            return redirect('payment', payment_id=payment.pk)
+    else:
+        # If the request is not a POST request, create a new form instance
+        form = CheckoutForm()
+
+    # Prepare the context to be passed to the template
+    context = {
+        'cart_items': cart_items,  # Pass the cart items to the template
+        'total': total,  # Pass the total price to the template
+        'form': form  # Pass the form instance to the template
+    }
+    # Render the checkout page template with the prepared context
+    return render(request, 'store/checkout.html', context)
+
+@login_required
+def delete_cart_items(request):
+    # Retrieve all Cart items belonging to the logged-in user
+    cart_items = Cart.objects.filter(user=request.user)
+    # Delete all Cart items
+    cart_items.delete()
+    # Redirect back to the checkout page or any other desired page
+    return redirect('checkout_page')
+
+@login_required
+def payment(request, payment_id):
+    """
+    This function is responsible for handling the payment process.
+
+    It retrieves the payment object associated with the given payment ID and the
+    currently logged-in user. It then retrieves the total amount of the payment
+    and the Paystack secret key from the settings.
+
+    It creates a dictionary with the email of the logged-in user, the total amount
+    of the payment multiplied by 100 (since Paystack uses kobo as the unit of
+    currency), and the reference of the payment.
+
+    It sends a POST request to the Paystack API to initialize a transaction.
+    It includes the Paystack secret key in the Authorization header and sets the
+    Content-Type header to application/json. It also includes the data dictionary
+    in the request body.
+
+    If the response from the Paystack API is successful, it retrieves the
+    authorization URL from the response data and redirects the user to that URL.
+    Otherwise, it updates the status of the payment to 'failed' and saves the
+    payment object. It then renders the 'store/payment_failed.html' template with
+    the failure message from the Paystack API response.
+    """
+    # Retrieve the payment object associated with the given payment ID and the currently logged-in user
+    payment = get_object_or_404(Payment, id=payment_id, user=request.user)
+    # Retrieve the total amount of the payment
+    total = payment.amount
+    # Retrieve the Paystack secret key from the settings
+    paystack_secret_key = settings.PAYSTACK_SECRET_KEY
+    # Retrieve the Paystack public key from the settings (not used in this function)
+    paystack_public_key = settings.PAYSTACK_PUBLIC_KEY
+
+    # Create the headers dictionary with the Paystack secret key and the Content-Type header
+    headers = {
+        "Authorization": f"Bearer {paystack_secret_key}",
+        "Content-Type": "application/json",
+    }
+
+    # Create the data dictionary with the email of the logged-in user, the total amount of the payment, and the reference of the payment
+    data = {
+        "email": request.user.email,
+        "amount": int(total * 100),  # Paystack amount is in kobo
+        "reference": payment.reference,  # Use the payment reference
+    }
+
+    # Send a POST request to the Paystack API to initialize a transaction
+    response = requests.post(
+        "https://api.paystack.co/transaction/initialize", headers=headers, json=data)
+    # Parse the response data as JSON
+    response_data = response.json()
+
+    # Check if the response from the Paystack API is successful
+    if response_data['status']:
+        # Retrieve the authorization URL from the response data
+        authorization_url = response_data['data']['authorization_url']
+        # Redirect the user to the authorization URL
+        return redirect(authorization_url)
+    else:
+        # Update the status of the payment to 'failed' and save the payment object
+        payment.status = 'failed'
+        payment.save()
+        # Render the 'store/payment_failed.html' template with the failure message from the Paystack API response
+        return render(request, 'store/payment_failed.html', {"message": response_data['message']})
+
+
+@csrf_exempt
+def paystack_webhook(request):
+    # Retrieve the Paystack secret key from the settings
+    paystack_secret_key = settings.PAYSTACK_SECRET_KEY
+    # Parse the request body as JSON
+    payload = json.loads(request.body)
+    # Retrieve the event from the request payload
+    event = payload['event']
+
+    # Check if the event is 'charge.success'
+    if event == 'charge.success':
+        # Retrieve the reference from the request payload
+        reference = payload['data']['reference']
+        # Retrieve the Payment object associated with the given reference
+        payment = get_object_or_404(Payment, reference=reference)
+
+        # Create the headers dictionary with the Paystack secret key and the Content-Type header
+        headers = {
+            "Authorization": f"Bearer {paystack_secret_key}",
+            "Content-Type": "application/json",
+        }
+        # Construct the URL to verify the transaction
+        url = f"https://api.paystack.co/transaction/verify/{reference}"
+        # Send a GET request to the Paystack API to verify the transaction
+        response = requests.get(url, headers=headers)
+        # Parse the response data as JSON
+        response_data = response.json()
+
+        # Check if the response from the Paystack API is successful and the transaction status is 'success'
+        if response_data['status'] and response_data['data']['status'] == 'success':
+            # Update the status of the payment to 'completed' and save the payment object
+            payment.status = 'completed'
+            payment.save()
+
+            # Update the order status to 'paid'
+            order = payment.order
+            order.is_paid = True
+            order.save()
+
+            # Return a HTTP 200 OK response
+            return HttpResponse(status=200)
+
+    # Return a HTTP 400 Bad Request response if the event is not 'charge.success' or the transaction verification fails
+    return HttpResponse(status=400)

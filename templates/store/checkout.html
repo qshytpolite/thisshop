@@ -1,0 +1,62 @@
+{% extends 'layouts/base.html' %}
+{% block title %}
+Checkout | thisShop
+{% endblock title %}
+{% block content %}
+
+{% load crispy_forms_tags %}
+
+<div class="relative mx-auto w-full ">
+    {% if cart_items %}
+    <div class="container mx-auto p-6">
+        <div class="bg-white rounded shadow-lg p-6">
+            <h2 class="text-2xl font-semibold mb-6">Checkout</h2>
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold mb-3">Cart Items</h3>
+                <ul class="divide-y divide-gray-200">
+                    {% for item in cart_items %}
+                    <li class="py-4 flex justify-between">
+                        <div>
+                            <h4 class="font-medium">{{ item.product.name }}</h4>
+                            <p class="text-gray-500">Quantity: {{ item.product_qty }}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-medium">{{ item.item_total }} USD</p>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold mb-3">Total: {{ total }} USD</h3>
+            </div>
+            <form method="POST" class="space-y-6">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div>
+                    <button type="submit"
+                        class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+                        Proceed to Payment
+                    </button>
+                </div>
+            </form>
+
+            <!-- Delete Cart Items Button -->
+            <form method="POST" action="{% url 'delete_cart_items' %}" class="mt-4">
+                {% csrf_token %}
+                <div class="flex justify-end">
+                <button type="submit"
+                    class="text-black-600 btn btn-sm btn-glass btn-secondary hover:text-red-800 font-medium">Delete Cart Items</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="container mx-auto w-full p-4">
+        <p class="text-center text-red-700 text-lg font-semibold">Your cart is empty. Please add some items to your
+            cart.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock content %}
