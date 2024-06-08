@@ -22,20 +22,21 @@
           },
           "start": {
             "commands": [
-              "gunicorn my_project.wsgi --log-file -"
+              "gunicorn ecomm.wsgi --log-file -"
             ]
           },
           "post-deploy": {
             "commands": [
               "python manage.py migrate",
-              "python manage.py collectstatic --noinput"
+              "python manage.py collectstatic --noinput",
+              "python manage.py runserver 0.0.0.0:$PORT"
             ]
           }
         }
       }
     },
     "deploy": {
-      "runtime": "python",
+      "runtime": "UNSPECIFIED",
       "numReplicas": 1,
       "sleepApplication": false,
       "restartPolicyType": "ON_FAILURE",

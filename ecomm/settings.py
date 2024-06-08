@@ -183,9 +183,26 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = 'tailwind'
 CRISPY_TEMPLATE_PACK = 'tailwind'
 
 # dj_database_url settings for db
+# This block of code is used to configure the database settings based on the
+# environment the application is running in. If the environment is set to
+# 'production', it will read the database configuration from the
+# DATABASE_URL environment variable.
+#
+# The DATABASES dictionary is updated with the configuration from the
+# DATABASE_URL environment variable. The conn_max_age parameter is set to 1800
+# seconds (30 minutes) to specify the maximum time a connection should persist.
 
-db_from_env = dj_database_url.config(conn_max_age=500)
-DATABASES['default'].update(db_from_env)
-# Cart session setting
-# CART_SESSION_ID = 'cart'
-CSRF_TRUSTED_ORIGINS = ['https://web-production-7ba5.up.railway.app']
+# Get the environment from the environment variable. If the variable is not set,
+# default to 'development'.
+Environment = os.getenv('ENVIRONMENT', 'development')
+
+# If the environment is set to 'production', update the database configuration.
+if Environment == 'production':
+    # Read the database configuration from the DATABASE_URL environment variable.
+    # The conn_max_age parameter specifies the maximum time a connection should
+    # persist.
+    db_from_env = dj_database_url.config(conn_max_age=1800)
+
+    # Update the default database configuration with the configuration from the
+    # DATABASE_URL environment variable.
+    DATABASES['default'].update(db_from_env)
