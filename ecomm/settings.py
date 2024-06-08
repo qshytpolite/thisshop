@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['web-production-7ba5.up.railway.app', '127.0.0.1']
 
 
 # Application definition
@@ -186,3 +186,4 @@ db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
 # Cart session setting
 # CART_SESSION_ID = 'cart'
+CSRF_TRUSTED_ORIGINS = ['https://web-production-7ba5.up.railway.app']
