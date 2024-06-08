@@ -1,0 +1,25 @@
+[build]
+builder = "NIXPACKS"
+
+[build.nixpacksPlan]
+
+[build.nixpacksPlan.phases]
+
+[build.nixpacksPlan.phases.install]
+nixpkgs = ["python3", "pip", "nodejs", "tailwindcss"]
+commands = ["pip install -r requirements.txt", "npm install"]
+
+[build.nixpacksPlan.phases.build]
+
+[build.nixpacksPlan.phases.start]
+commands = ["python manage.py migrate", "python manage.py collectstatic --noinput", "python manage.py runserver 0.0.0.0:$PORT"]
+
+[build.nixpacksPlan.phases.post-deploy]
+commands = ["python manage.py migrate", "python manage.py collectstatic --noinput", "python manage.py runserver 0.0.0.0:$PORT"]
+
+[deploy]
+runtime = "UNSPECIFIED"
+numReplicas = 1
+sleepApplication = false
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
