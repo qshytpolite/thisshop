@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from django.templatetags.static import static
 from pathlib import Path
 import os
+import dj_database_url
 import dotenv
 
 dotenv.load_dotenv()
@@ -178,6 +179,13 @@ PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'tailwind'
 
 CRISPY_TEMPLATE_PACK = 'tailwind'
+
+# dj_database_url settings for db
+if 'DATABASE_URL' in os.environ:
+    DATABASES['default'] = dj_database_url.config(
+        conn_max_age=500,
+        conn_health_checks=True,
+    )
 
 # Cart session setting
 # CART_SESSION_ID = 'cart'
