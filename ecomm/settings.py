@@ -10,8 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from django.templatetags.static import static
 from pathlib import Path
 import os
+import dotenv
+
+dotenv.load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,10 +26,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(+y^n(mg!$*(#u^v@@-*z29#an(1wl7*e&z4)pj=+5u(ocmk7@'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG') == 'True'
 
 ALLOWED_HOSTS = []
 
@@ -32,7 +37,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',
+    'unfold',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,6 +47,10 @@ INSTALLED_APPS = [
 
     # 3rd party apps
     'compressor',
+    'crispy_forms',
+    'crispy_tailwind',
+    'whitenoise.runserver_nostatic',
+
 
     # local apps
     'user',
@@ -50,6 +59,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -138,6 +148,10 @@ STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Whitenoise forever cache settings
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+ 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -145,3 +159,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # custom user settings
 AUTH_USER_MODEL = 'user.User'
+
+# Django-unfold settings
+UNFOLD = {
+    "STYLES": [
+        lambda request: static("css/style.css"),
+    ],
+    "SCRIPTS": [
+        lambda request: static("js/script.js"),
+    ],
+}
+
+# Paystack api settings
+PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY')
+PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
+
+# # crispy_tailwind settings
+CRISPY_ALLOWED_TEMPLATE_PACKS = 'tailwind'
+
+CRISPY_TEMPLATE_PACK = 'tailwind'
+
+# Cart session setting
+# CART_SESSION_ID = 'cart'

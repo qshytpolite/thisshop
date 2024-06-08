@@ -7,10 +7,16 @@ urlpatterns = [
     path('fav', views.fav_page, name="fav"),
     path('favviewpage', views.favviewpage, name="favviewpage"),
     path('remove_fav/<str:fid>', views.remove_fav, name="remove_fav"),
-    path('remove_cart/<str:cid>', views.remove_cart, name="remove_cart"),
+    path('remove_cart/<str:product_id>', views.remove_cart, name="remove_cart"),
     path('collections', views.collections, name="collections"),
     path('collections/<str:name>', views.collectionsview, name="collections"),
     path('collections/<str:cname>/<str:pname>',
          views.product_details, name="product_details"),
-    path('add_to_cart/', views.add_to_cart, name="add_to_cart"),
+    path('add_to_cart/<int:product_id>',
+         views.add_to_cart, name="add_to_cart"),
+    path('checkout/', views.checkout_page, name='checkout_page'),
+    path('payment/<int:payment_id>/', views.payment, name='payment'),
+    path('paystack-webhook/', views.paystack_webhook, name='paystack_webhook'),
+    path('delete-cart-items/', views.delete_cart_items, name='delete_cart_items'),
+
 ]

@@ -1,12 +1,19 @@
 # from atexit import register
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
-from .models import Catagory, Product, Cart, Favourite
+from .models import Catagory, Product, Cart, Favourite, Order, OrderItem, Payment
+
+from unfold.admin import ModelAdmin
+
+# admin.site.unregister(Catagory)
+# admin.site.unregister(Product)
+# admin.site.unregister(Cart)
+# admin.site.unregister(Favourite)
 
 
 class ProductAdmin(ModelAdmin):
     list_display = ('name', 'vendor', 'product_image', 'quantity',
-                    'original_price', 'selling_price', 'description', 'status')
+                    'selling_price', 'discounted_price', 'description', 'status', 'trending', 'featured')
 
 
 admin.site.register(Product, ProductAdmin)
@@ -20,8 +27,7 @@ admin.site.register(Catagory, CatagoryAdmin)
 
 
 class CartAdmin(ModelAdmin):
-    # list_display = ('user', 'product', 'quantity')
-    pass
+    list_display = ('user', 'product', 'product_qty', 'created_at')
 
 
 admin.site.register(Cart, CartAdmin)
@@ -32,6 +38,29 @@ class FavouriteAdmin(ModelAdmin):
 
 
 admin.site.register(Favourite, FavouriteAdmin)
+
+
+class OrderAdmin(ModelAdmin):
+    # list_display = ('user', 'status', 'created_at')
+    pass
+
+
+admin.site.register(Order, OrderAdmin)
+
+
+class OrderItemAdmin(ModelAdmin):
+    # list_display = ('order', 'product', 'quantity')
+    pass
+
+
+admin.site.register(OrderItem, OrderItemAdmin)
+
+
+class PaymentAdmin(ModelAdmin):
+    pass
+
+
+admin.site.register(Payment, PaymentAdmin)
 
 """
 class CategoryAdmin(admin.ModelAdmin):

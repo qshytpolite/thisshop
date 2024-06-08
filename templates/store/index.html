@@ -5,25 +5,41 @@ thisShop | Is The Shop
 
 {% block content %}
 {% include 'inc/hero.html' %}
-<div class="container mx-auto sm:px-4" style="margin-top:70px;" >
-    <div class="flex flex-wrap ">
-      <div class="w-full">
-        <h4 class="mb-3"> Latest Offfers</h4>
-        <hr style="border-color:#b8bfc2;">
-      </div>
-      {% for item in products %}
-      <div class="card card-compact w-96 glass duration-500 hover:scale-105 hover:shadow-xl">
-        <figure><img src="{{item.product_image.url}}" alt="Shoes" /></figure>
+<div class="2xl:container 2xl:mx-auto px-2 md:px-12  my-5">
+  <div class="flex flex-wrap ">
+    <div class="w-full">
+      <h4 class="mb-3"> Latest Offfers</h4>
+      <hr style="border-color:#b8bfc2;">
+    </div>
+
+    {% for item in products %}
+    <a href="{% url 'product_details' item.category.name item.name %}">
+
+    <div class="card lg:card-compact w-72 h-72 duration-500 hover:scale-105 hover:shadow-xl">
+      <figure><img src="{{item.product_image.url}}" alt="Shoes" /></figure>
         <div class="card-body">
-          <h2 class="card-title">{{ item.name }}</h2>
-          <p>{{ item.description }}</p>
-          <div class="card-actions justify-end">
-            <button class="btn btn-primary">Add to Cart</button>
-          </div>
+          <h2 class="card-title text-red-500">{{ item.name }}</h2>
+          <p class="card-text">{{ item.description }}</p>
+          {% if item.discounted_price %}
+          <p class="card-text">
+            <span class="float-start old_price text-black"><s>${{ item.selling_price| stringformat:'d'}}</s></span>
+            <span class="float-end new_price text-blue-500">${{ item.discounted_price | stringformat:'d' }}</span>
+          </p>
+          {% else %}
+          <p class="card-text">${{ item.selling_price | stringformat:'d' }}</p>
+          {% endif %}
+            <!-- <div class="card-actions justify-end">
+              <button class="btn btn-primary">Add to Cart</button>
+            </div> -->
         </div>
-      </div>
-      {% endfor %}
     </div>
-    </div>
+
+    </a>
+
+    <div class="divider-horizontal"></div>
+
+    {% endfor %}
   </div>
-  {% endblock content %}
+</div>
+</div>
+{% endblock content %}

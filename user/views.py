@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 
-from .form import CustomUserForm
+from user.form import CustomUserForm
 
 
 def logout_page(request):
@@ -17,9 +17,9 @@ def login_page(request):
         return redirect("/")
     else:
         if request.method == 'POST':
-            name = request.POST.get('username')
-            pwd = request.POST.get('password')
-            user = authenticate(request, username=name, password=pwd)
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
                 messages.success(request, "Logged in Successfully")
@@ -38,5 +38,5 @@ def register(request):
             form.save()
             messages.success(
                 request, "Registration Success You can Login Now..!")
-            return redirect('/login')
+            return redirect('/')
     return render(request, "auths/register.html", {'form': form})

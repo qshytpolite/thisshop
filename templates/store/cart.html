@@ -1,60 +1,108 @@
 {% extends 'layouts/base.html' %}
 {% block title %}
-  Registration | thisShop
+Cart | thisShop
 {% endblock title %}
 {% block content %}
-  <section class="bg-gray-100 py-4 my-5" style="min-height:600px;">
-    <div class="container mx-auto sm:px-4">
-      <div class="flex flex-wrap ">
-        <div class="w-full">
-          <h4 class="mb-3">Cart  Items</h4>
-          <hr style="border-color:#b8bfc2;">
-        </div>
-      
-        <table>
-            <tr>
-                <th>Image</th>
-                <th>Product Name</th>
-                <th>Unit</th>
-                <th>Quantity</th>
-                <th>Amount</th>
-                <th>Remove</th>
-            </tr>
+<div class="bg-gray-100 h-screen py-8">
+  <div class="container mx-auto px-4">
+    <h1 class="text-2xl font-semibold mb-4">Shopping Cart</h1>
+    <div class="flex flex-col md:flex-row gap-4">
+      {% if cart_items %}
+      <div class="md:w-3/4">
+        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
           
 
-            {% for item in cart %}
-           <tr>
-              <td><img src="{{item.product.product_image.url}}" height="75px" alt="{{item.product.name}}"></td>
-              <td>{{item.product.name}}</td>
-              <td>{{item.product.selling_price | stringformat:'d'}}</td>
-              <td>{{item.product_qty}}</td>
-              <td class="amt">{{item.total_cost | stringformat:'d'}}</td>
-              <td><a href="{% url 'remove_cart' item.id %}"  onclick="return confirm('Are you sure? to Remove')"  class="inline-block align-middle text-center select-none border font-normal whitespace-no-wrap rounded  no-underline bg-red-600 text-white hover:bg-red-700 py-1 px-2 leading-tight text-xs "><i class="fa fa-trash"></i> Remove</a></td>
-            </tr>
+          <table class="w-full">
+            <thead>
+              <tr>
+                <th class="text-left font-semibold">Product</th>
+                <th class="text-left font-semibold">Price</th>
+                <th class="text-left font-semibold">Quantity</th>
+                <th class="text-left font-semibold">Total</th>
+                <th class="text-left font-semibold">Remove</th>
+
+              </tr>
+            </thead>
+            {% for item in cart_items %}
+            <tbody>
+              <tr>
+                <td class="py-4">
+                  <div class="flex items-center">
+                    <img class="h-16 w-16 mr-4" src="{{ item.product.product_image.url }}" alt="{{ item.product.name }}">
+                    <span class="font-semibold">{{ item.product.name }}</span>
+                  </div>
+                </td>
+                {% if item.product.discounted_price %}
+                <td class="py-4">${{ item.product.discounted_price }}</td>
+                <!-- <td class="py-4">{{ item.product.selling_price }}</td> -->
+                {% else %}
+                <td class="py-4">${{ item.product.selling_price }}</td>
+                {% endif %}
+                <td class="py-4">
+                  <div class="flex items-center">
+                    <button class="border rounded-md py-2 px-4 mr-2">-</button>
+                    <span class="text-center w-8">{{ item.product_qty }}</span>
+                    <button class="border rounded-md py-2 px-4 ml-2">+</button>
+                  </div>
+                </td> 
+                         
+                <td class="py-4">${{ item.item_total }}
+                 
+                </td>
+                <td class="py-4">
+                  <form action="{% url 'remove_cart' item.product_id %}" method="post" class="inline-block ml-4">
+                    {% csrf_token %}
+                  <button class="text-red-500 hover:text-red-700">Remove</button>
+                  </form>
+                </td>
+              </tr>
+              <!-- More product rows -->
+            </tbody>
             {% endfor %}
-            <tr>
-              <td></td>
-              <td></td>
-              <td colspan="2"><b>Total Amount</b></td>
-              <th id="net">0</th>
-              <td><button class="inline-block align-middle text-center select-none border font-normal whitespace-no-wrap rounded  no-underline bg-blue-600 text-white hover:bg-blue-600 py-1 px-2 leading-tight text-xs ">
-                <i class="fa fa-check-circle"></i> Check Out
-              </button></td>
-            </tr>
-           
-        </table>
-       
-      </div>
-      </div>
-  </section>
+          </table>
 
-  <script>
-    const nodes = document.querySelectorAll('.amt');
-    const arr = Array.from(nodes);
-    const res = arr.reduce((acc, curr) => {
-     return acc += Number(curr.textContent)
-    }, 0);
-    document.getElementById("net").innerHTML="Rs : "+res;
+        </div>
+        <a href="{% url 'index' %}" class="flex font-semibold text-indigo-600 text-sm mt-10">
+          <svg class="fill-current mr-2 text-indigo-600 w-4" viewBox="0 0 448 512">
+              <path
+                  d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z" />
+          </svg>
+          Continue Shopping
+      </a>
+      </div>
+      {% endif %}
+      {% if cart_items %}
+      <div class="md:w-1/4">
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-lg font-semibold mb-4">Summary</h2>
+          <div class="flex justify-between mb-2">
+            <span>Subtotal</span>
+            <span>${{ total }}</span>
+          </div>          
+          <hr class="my-2">
+          <div class="flex justify-between mb-2">
+            <span class="font-semibold">Total</span>
+            <span class="font-semibold">${{ total }}</span>
+          </div>
+          <a href="{% url 'checkout_page' %}" class="block text-center bg-blue-500 text-white py-2 px-4 rounded-lg mt-4 w-full">Checkout</a>
+        </div>
+        {% else %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-lg font-semibold mb-4">Your shopping cart is empty</h2>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<!-- 
+<script>
+  const nodes = document.querySelectorAll('.amt');
+  const arr = Array.from(nodes);
+  const res = arr.reduce((acc, curr) => {
+    return acc += Number(curr.textContent)
+  }, 0);
+  document.getElementById("net").innerHTML = "Total: $ " + res;
 
-  </script>
+</script> -->
 {% endblock content %}
