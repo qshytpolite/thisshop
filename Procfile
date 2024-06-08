@@ -1,3 +1,1 @@
-web: gunicorn ecomm.wsgi --log-file - 
-#or works good with external database
-web: python manage.py migrate && gunicorn ecomm.wsgi
+web: python manage.py runserver 0.0.0.0:$PORT
