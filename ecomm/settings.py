@@ -181,4 +181,4 @@ CRISPY_TEMPLATE_PACK = 'tailwind'
 
 # Cart session setting
 # CART_SESSION_ID = 'cart'
-CSRF_TRUSTED_ORIGINS = ['https://web-production-7ba5.up.railway.app', 'http://web-production-7ba5.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://web-production-7ba5.up.railway.app']
