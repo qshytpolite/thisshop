@@ -17,4 +17,6 @@ urlpatterns = [
     path('checkout/', views.checkout_page, name='checkout_page'),
     path('payment/<int:payment_id>/', views.payment, name='payment'),
     path('paystack-webhook/', views.paystack_webhook, name='paystack_webhook'),
+    path('delete-cart-items/', views.delete_cart_items, name='delete_cart_items'),
+
 ]

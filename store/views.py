@@ -217,6 +217,14 @@ def checkout_page(request):
     # Render the checkout page template with the prepared context
     return render(request, 'store/checkout.html', context)
 
+@login_required
+def delete_cart_items(request):
+    # Retrieve all Cart items belonging to the logged-in user
+    cart_items = Cart.objects.filter(user=request.user)
+    # Delete all Cart items
+    cart_items.delete()
+    # Redirect back to the checkout page or any other desired page
+    return redirect('checkout_page')
 
 @login_required
 def payment(request, payment_id):

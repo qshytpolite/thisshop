@@ -47,6 +47,8 @@ INSTALLED_APPS = [
 
     # 3rd party apps
     'compressor',
+    'crispy_forms',
+    'crispy_tailwind',
 
     # local apps
     'user',
@@ -164,6 +166,11 @@ UNFOLD = {
 # Paystack api settings
 PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY')
 PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
+
+# # crispy_tailwind settings
+CRISPY_ALLOWED_TEMPLATE_PACKS = 'tailwind'
+
+CRISPY_TEMPLATE_PACK = 'tailwind'
 
 # Cart session setting
 # CART_SESSION_ID = 'cart'

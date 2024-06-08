@@ -4,6 +4,8 @@ Checkout | thisShop
 {% endblock title %}
 {% block content %}
 
+{% load crispy_forms_tags %}
+
 <div class="relative mx-auto w-full ">
     {% if cart_items %}
     <div class="container mx-auto p-6">
@@ -30,16 +32,7 @@ Checkout | thisShop
             </div>
             <form method="POST" class="space-y-6">
                 {% csrf_token %}
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    {% for field in form.visible_fields %}
-                        <div>
-                            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                                {{ field.label }}
-                            </label>
-                            {{ field }}
-                        </div>
-                    {% endfor %}
-                </div>
+                {{ form|crispy }}
                 <div>
                     <button type="submit"
                         class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
@@ -47,16 +40,23 @@ Checkout | thisShop
                     </button>
                 </div>
             </form>
+
+            <!-- Delete Cart Items Button -->
+            <form method="POST" action="{% url 'delete_cart_items' %}" class="mt-4">
+                {% csrf_token %}
+                <div class="flex justify-end">
+                <button type="submit"
+                    class="text-black-600 btn btn-sm btn-glass btn-secondary hover:text-red-800 font-medium">Delete Cart Items</button>
+                </div>
+            </form>
         </div>
     </div>
     {% else %}
-    <!-- display alert if cart is empty -->
     <div class="container mx-auto w-full p-4">
         <p class="text-center text-red-700 text-lg font-semibold">Your cart is empty. Please add some items to your
             cart.</p>
     </div>
     {% endif %}
 </div>
-
 
 {% endblock content %}
