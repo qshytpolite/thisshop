@@ -13,5 +13,11 @@ module.exports = {
     require('@tailwindcss/typography'),
     require('daisyui'),
   ],
+  safelist: [
+  'alert-info',
+  'alert-success',
+  'alert-warning',
+  'alert-error',
+  ],
 }
 

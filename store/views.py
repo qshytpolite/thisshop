@@ -165,108 +165,166 @@ def product_details(request, cname, pname):
 
 @login_required
 def checkout_page(request):
+    # Retrieve all Cart items belonging to the logged-in user
     cart_items = Cart.objects.filter(user=request.user)
+    # Calculate the total price of all items in the cart
     total = sum(item.item_total for item in cart_items)
 
+    # Check if the request is a POST request (i.e., form submission)
     if request.method == 'POST':
+        # Create a form instance using the POST data
         form = CheckoutForm(request.POST)
+        # Check if the form is valid (i.e., all required fields are filled)
         if form.is_valid():
-            # Create Order
+            # Create a new Order object
             order = Order.objects.create(
-                user=request.user,
-                total_amount=total,
-                is_paid=False
+                user=request.user,  # Associate the order with the logged-in user
+                total_amount=total,  # Set the total amount of the order
+                is_paid=False  # Mark the order as unpaid initially
             )
-            # Create Order Items
+            # Create OrderItems for each item in the cart
             for item in cart_items:
                 OrderItem.objects.create(
-                    order=order,
-                    product=item.product,
-                    quantity=item.product_qty,
-                    price=item.item_total
+                    order=order,  # Associate the OrderItem with the order
+                    product=item.product,  # Associate the OrderItem with the product
+                    quantity=item.product_qty,  # Set the quantity of the product
+                    price=item.item_total  # Set the price of the product
                 )
-            # Clear the cart
+            # Delete all Cart items belonging to the logged-in user
             cart_items.delete()
 
-            # Create Payment
+            # Create a new Payment object
             payment = Payment.objects.create(
-                user=request.user,
-                order=order,
-                amount=total,
-                reference=generate_reference(),
-                status='pending'
+                user=request.user,  # Associate the payment with the logged-in user
+                order=order,  # Associate the payment with the order
+                amount=total,  # Set the amount of the payment
+                reference=generate_reference(),  # Generate a unique reference for the payment
+                status='pending'  # Mark the payment as pending initially
             )
 
-            # Redirect to the payment view
+            # Redirect to the payment view, passing the payment ID as a parameter
             return redirect('payment', payment_id=payment.pk)
     else:
+        # If the request is not a POST request, create a new form instance
         form = CheckoutForm()
 
+    # Prepare the context to be passed to the template
     context = {
-        'cart_items': cart_items,
-        'total': total,
-        'form': form
+        'cart_items': cart_items,  # Pass the cart items to the template
+        'total': total,  # Pass the total price to the template
+        'form': form  # Pass the form instance to the template
     }
+    # Render the checkout page template with the prepared context
     return render(request, 'store/checkout.html', context)
 
 
 @login_required
 def payment(request, payment_id):
+    """
+    This function is responsible for handling the payment process.
+
+    It retrieves the payment object associated with the given payment ID and the
+    currently logged-in user. It then retrieves the total amount of the payment
+    and the Paystack secret key from the settings.
+
+    It creates a dictionary with the email of the logged-in user, the total amount
+    of the payment multiplied by 100 (since Paystack uses kobo as the unit of
+    currency), and the reference of the payment.
+
+    It sends a POST request to the Paystack API to initialize a transaction.
+    It includes the Paystack secret key in the Authorization header and sets the
+    Content-Type header to application/json. It also includes the data dictionary
+    in the request body.
+
+    If the response from the Paystack API is successful, it retrieves the
+    authorization URL from the response data and redirects the user to that URL.
+    Otherwise, it updates the status of the payment to 'failed' and saves the
+    payment object. It then renders the 'store/payment_failed.html' template with
+    the failure message from the Paystack API response.
+    """
+    # Retrieve the payment object associated with the given payment ID and the currently logged-in user
     payment = get_object_or_404(Payment, id=payment_id, user=request.user)
+    # Retrieve the total amount of the payment
     total = payment.amount
+    # Retrieve the Paystack secret key from the settings
     paystack_secret_key = settings.PAYSTACK_SECRET_KEY
+    # Retrieve the Paystack public key from the settings (not used in this function)
     paystack_public_key = settings.PAYSTACK_PUBLIC_KEY
 
+    # Create the headers dictionary with the Paystack secret key and the Content-Type header
     headers = {
         "Authorization": f"Bearer {paystack_secret_key}",
         "Content-Type": "application/json",
     }
 
+    # Create the data dictionary with the email of the logged-in user, the total amount of the payment, and the reference of the payment
     data = {
         "email": request.user.email,
         "amount": int(total * 100),  # Paystack amount is in kobo
         "reference": payment.reference,  # Use the payment reference
     }
 
+    # Send a POST request to the Paystack API to initialize a transaction
     response = requests.post(
         "https://api.paystack.co/transaction/initialize", headers=headers, json=data)
+    # Parse the response data as JSON
     response_data = response.json()
 
+    # Check if the response from the Paystack API is successful
     if response_data['status']:
+        # Retrieve the authorization URL from the response data
         authorization_url = response_data['data']['authorization_url']
+        # Redirect the user to the authorization URL
         return redirect(authorization_url)
     else:
+        # Update the status of the payment to 'failed' and save the payment object
         payment.status = 'failed'
         payment.save()
+        # Render the 'store/payment_failed.html' template with the failure message from the Paystack API response
         return render(request, 'store/payment_failed.html', {"message": response_data['message']})
 
 
 @csrf_exempt
 def paystack_webhook(request):
+    # Retrieve the Paystack secret key from the settings
     paystack_secret_key = settings.PAYSTACK_SECRET_KEY
+    # Parse the request body as JSON
     payload = json.loads(request.body)
+    # Retrieve the event from the request payload
     event = payload['event']
 
+    # Check if the event is 'charge.success'
     if event == 'charge.success':
+        # Retrieve the reference from the request payload
         reference = payload['data']['reference']
+        # Retrieve the Payment object associated with the given reference
         payment = get_object_or_404(Payment, reference=reference)
 
+        # Create the headers dictionary with the Paystack secret key and the Content-Type header
         headers = {
             "Authorization": f"Bearer {paystack_secret_key}",
             "Content-Type": "application/json",
         }
+        # Construct the URL to verify the transaction
         url = f"https://api.paystack.co/transaction/verify/{reference}"
+        # Send a GET request to the Paystack API to verify the transaction
         response = requests.get(url, headers=headers)
+        # Parse the response data as JSON
         response_data = response.json()
 
+        # Check if the response from the Paystack API is successful and the transaction status is 'success'
         if response_data['status'] and response_data['data']['status'] == 'success':
+            # Update the status of the payment to 'completed' and save the payment object
             payment.status = 'completed'
             payment.save()
 
-            # Update the order status
+            # Update the order status to 'paid'
             order = payment.order
             order.is_paid = True
             order.save()
+
+            # Return a HTTP 200 OK response
             return HttpResponse(status=200)
 
+    # Return a HTTP 400 Bad Request response if the event is not 'charge.success' or the transaction verification fails
     return HttpResponse(status=400)
