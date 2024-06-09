@@ -12,7 +12,7 @@ commands = ["pip install -r requirements.txt", "npm install"]
 [build.nixpacksPlan.phases.build]
 
 [build.nixpacksPlan.phases.start]
-commands = ["web: python manage.py migrate && python manage.py collectstatic --noinput --clear && python manage.py runserver 0.0.0.0:$PORT && gunicorn ecomm.wsgi"]
+commands = ["python manage.py migrate && python manage.py collectstatic --noinput --clear && python manage.py runserver 0.0.0.0:$PORT && gunicorn ecomm.wsgi"]
 
 [build.nixpacksPlan.phases.post-deploy]
 commands = ["python manage.py migrate", "python manage.py collectstatic --noinput", "python manage.py runserver 0.0.0.0:$PORT"]
