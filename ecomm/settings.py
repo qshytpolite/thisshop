@@ -153,7 +153,11 @@ COMPRESS_OFFLINE_MANIFEST_STORAGE = STATICFILES_DIRS
 COMPRESS_URL = STATIC_URL
 
 
+<<<<<<< HEAD
 # STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
+=======
+#STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
+>>>>>>> 99ad5e7f068071a9dd18201da55ebfbbac9cd789
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
