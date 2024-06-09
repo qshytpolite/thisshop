@@ -33,9 +33,9 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # check if DEBUG is set in env as False or true DEBUG = True in env
 DEBUG = os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'thisshop.up.railway.app']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'thisshop.vercel.app']
 
-CSRF_TRUSTED_ORIGINS = ['https://thisshop.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://thisshop.vercel.app']
 
 
 # Application definition

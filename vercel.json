@@ -1,14 +1,28 @@
 {
+    "version": 2,
     "builds": [
       {
         "src": "ecomm/wsgi.py",
-        "use": "@vercel/python"
+        "use": "@vercel/python",
+        "config": {
+          "runtime": "python3.11.9"
+        }
       }
     ],
     "routes": [
       {
+        "src": "/static/(.*)",
+        "dest": "ecomm/static/$1"
+      },
+      {
         "src": "/(.*)",
         "dest": "ecomm/wsgi.py"
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/static/(.*)",
+        "destination": "/ecomm/static/$1"
       }
     ]
 }
