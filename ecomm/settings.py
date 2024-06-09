@@ -33,7 +33,8 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # check if DEBUG is set in env as False or true DEBUG = True in env
 DEBUG = os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'thisshop.vercel.app',
+                 'thisshop-8vttimm55-stans-projects-578f53dd.vercel.app']
 
 CSRF_TRUSTED_ORIGINS = ['https://thisshop.vercel.app']
 
