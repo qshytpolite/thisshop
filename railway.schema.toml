@@ -20,6 +20,6 @@ commands = ["python manage.py migrate", "python manage.py collectstatic --noinpu
 [deploy]
 runtime = "Legacy"
 numReplicas = 1
-sleepApplication = false
+sleepApplication = true
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
