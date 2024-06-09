@@ -141,11 +141,25 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # compressor settings
-COMPRESS_ROOT = BASE_DIR / 'static'
+COMPRESS_ROOT = STATIC_ROOT
 
 COMPRESS_ENABLED = True
 
-STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
+COMPRESS_STORAGE = STATICFILES_DIRS
+
+COMPRESS_OFFLINE_MANIFEST_STORAGE = STATICFILES_DIRS
+
+COMPRESS_URL = STATIC_URL
+
+
+#STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    # other finders..
+    'compressor.finders.CompressorFinder',
+)
 
 
 MEDIA_URL = 'media/'
