@@ -21,16 +21,16 @@
   <body class="bg-gray-100">
     {% include 'inc/navbar.html' %}
 
-    <div class="container mx-auto py-8">
-      {% block content %}
-      {% endblock content %}
-    </div>
+   
+    {% block content %}
+    {% endblock content %}
+  
+    {% include 'inc/footer.html' %}
     
-      {% include 'inc/footer.html' %}
 
-      <!-- my scripts -->
-      <script src="{% static 'js/myfunctions.js' %}"></script>
-      <script src="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/src/index.min.js"></script>
+    <!-- my scripts -->
+    <script src="{% static 'js/myfunctions.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/src/index.min.js"></script>
     
   </body>
 </html>
