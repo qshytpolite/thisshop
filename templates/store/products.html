@@ -5,7 +5,7 @@ thisShop | Is The Shop
 
 {% block content %}
 <section class="bg-gray-100 py-4 my-5" style="min-height:600px;">
-    
+
   <div class="font-[sans-serif] bg-gray-100">
     <div class="p-4 mx-auto lg:max-w-7xl sm:max-w-full">
       <nav aria-label="breadcrumb">
@@ -15,8 +15,8 @@ thisShop | Is The Shop
         </ol>
       </nav>
       <h2 class="text-4xl font-extrabold text-gray-800 mb-12">{{ category_name }} Products</h2>
-      
-  
+
+
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-xl:gap-4 gap-6">
 
         {% for item in products %}
@@ -31,17 +31,17 @@ thisShop | Is The Shop
             </svg>
           </div>
           <div class="w-11/12 h-[210px] overflow-hidden mx-auto aspect-w-16 aspect-h-8 md:mb-2 mb-4">
-            <img src="{{item.product_image.url}}" alt="{{ item.name }}"
-              class="h-full w-full object-contain" />
+            <img src="{{item.product_image.url}}" alt="{{ item.name }}" class="h-full w-full object-contain" />
           </div>
           <div>
             <a href="{% url 'product_details' item.category.name item.name %}">
-            <h3 class="text-lg font-extrabold text-cyan-800 duration-500 hover:scale-105 hover:shadow-xl">{{ item.name }}</h3>
-          </a>
+              <h3 class="text-lg font-extrabold text-cyan-800 duration-500 hover:scale-105 hover:shadow-xl">
+                {{ item.name }}</h3>
+            </a>
             <p class="text-gray-600 text-sm mt-2">{{ item.description|truncatewords:10 }}</p>
             {% if item.discounted_price %}
             <h4 class="text-lg text-red-800 font-bold mt-4"><strike
-              class="text-gray-400 ml-2 font-medium">${{ item.selling_price| stringformat:'d'}}</strike></h4>
+                class="text-gray-400 ml-2 font-medium">${{ item.selling_price| stringformat:'d'}}</strike></h4>
             <h4 class="text-lg text-blue-800 font-bold mt-4">${{ item.discounted_price| stringformat:'d'}}</h4>
             {% else %}
             <h4 class="text-lg text-blue-800 font-bold mt-4">${{ item.selling_price| stringformat:'d'}}</h4>
@@ -84,5 +84,5 @@ thisShop | Is The Shop
     </div>
   </div>-->
 </section>
- 
+
 {% endblock content %}
