@@ -209,10 +209,10 @@ CRISPY_TEMPLATE_PACK = 'tailwind'
 
 # Get the environment from the environment variable. If the variable is not set,
 # default to 'development'.
-Environment = os.getenv('ENVIRONMENT', 'development')
+Environment = os.getenv('ENVIRONMENT', 'production')
 
 # If the environment is set to 'production', update the database configuration.
-if Environment == 'production':
+if Environment == 'development':
     # Read the database configuration from the DATABASE_URL environment variable.
     # The conn_max_age parameter specifies the maximum time a connection should
     # persist.
