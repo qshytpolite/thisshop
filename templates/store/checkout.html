@@ -48,19 +48,18 @@ Checkout | thisShop
     </div>
   </div>
 
-  {% if cart_items %}
+  {% if cart_items and user.is_authenticated %}
   <div class="max-w-4xl mx-auto w-full h-max rounded-md p-4 sticky top-0">
     <h2 class="text-xl font-bold text-gray-800">Complete your order</h2>
     <form method='POST' class="mt-8">
       {% csrf_token %}
       {% crispy form form.helper %}
-
-      <!-- <div class="flex gap-4 max-md:flex-col mt-8">
-               
-                <button type="submit" class="rounded-md px-4 py-3 w-full text-sm font-semibold bg-transparent hover:bg-gray-100 border-2 text-gray-800 max-md:order-1">Reset</button>
-                <button type="submit" name="submit" class="rounded-md px-4 py-3 w-full text-sm font-semibold bg-gray-800 text-white hover:bg-gray-900">Proceed to Payment</button>
-              </div> -->
     </form>
+  </div>
+  {% elif not user.is_authenticated %}
+  <div class="container mx-auto w-full p-4">
+    <p class="text-center text-red-700 text-lg font-semibold">Please log in to complete your order.</p>
+    <p class="text-center"><a href="{% url 'login' %}" class="text-blue-500">Log in</a></p>
   </div>
   {% endif %}
 

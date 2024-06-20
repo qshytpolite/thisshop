@@ -224,3 +224,6 @@ if Environment == 'development':
     # Update the default database configuration with the configuration from the
     # DATABASE_URL environment variable.
     DATABASES['default'].update(db_from_env)
+
+# LOGINURL SETTINGS
+LOGIN_URL = 'user/login/'
