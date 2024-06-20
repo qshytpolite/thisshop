@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 from .form import CheckoutForm
 from .models import Cart, Catagory, Favourite, Order, OrderItem, Payment, Product
@@ -62,49 +63,80 @@ def remove_cart(request, product_id):
 # add_to_cart view function
 
 
+@csrf_exempt
+@require_POST
 def add_to_cart(request, product_id):
-    print(f"Adding product {product_id} to cart")
-
-    if request.method != 'POST':
-        print("Error: Invalid request method")
-        return JsonResponse({'status': 'Invalid request method'}, status=400)
-
     try:
         product = Product.objects.get(pk=product_id)
-        print(f"Retrieved product {product.name} with id {product_id}")
     except Product.DoesNotExist:
-        print(f"Error: Product with id {product_id} not found")
         return JsonResponse({'status': 'Product not found'}, status=404)
 
-    # Retrieve quantity from request body
-    quantity = int(request.POST.get('product_qty', 1))  # Handle missing value
-    print(f"Product quantity: {quantity}")
+    try:
+        data = json.loads(request.body)
+        quantity = int(data.get('product_qty', 1))
+    except (ValueError, KeyError):
+        return JsonResponse({'status': 'Invalid quantity'}, status=400)
 
-    # Check for existing cart item or create a new one based on user status
     if request.user.is_authenticated:
-        print("Authenticated user, checking for existing cart item")
         cart_item, created = Cart.objects.get_or_create(
-            user=request.user, product=product
-        )
+            user=request.user, product=product)
         if created:
-            print(f"Created new cart item for {product.name}")
             cart_item.product_qty = quantity
         else:
-            print(
-                f"Found existing cart item for {product.name}, updating quantity")
             cart_item.product_qty += quantity
         cart_item.save()
     else:
-        print("Anonymous user, using session for cart")
-        # Handle anonymous cart (using session)
-        cart_data = request.session.get('cart', {})
-        print("Current cart data: ", cart_data)
-        cart_data[str(product_id)] = quantity
-        print("Updated cart data: ", cart_data)
-        request.session['cart'] = cart_data
+        session_cart = request.session.get('cart', {})
+        if str(product_id) in session_cart:
+            session_cart[str(product_id)] += quantity
+        else:
+            session_cart[str(product_id)] = quantity
+        request.session['cart'] = session_cart
 
-    print("Returning success response")
     return JsonResponse({'status': 'Item added to cart'})
+# def add_to_cart(request, product_id):
+#     print(f"Adding product {product_id} to cart")
+
+#     if request.method != 'POST':
+#         print("Error: Invalid request method")
+#         return JsonResponse({'status': 'Invalid request method'}, status=400)
+
+#     try:
+#         product = Product.objects.get(pk=product_id)
+#         print(f"Retrieved product {product.name} with id {product_id}")
+#     except Product.DoesNotExist:
+#         print(f"Error: Product with id {product_id} not found")
+#         return JsonResponse({'status': 'Product not found'}, status=404)
+
+#     # Retrieve quantity from request body
+#     quantity = int(request.POST.get('product_qty', 1))  # Handle missing value
+#     print(f"Product quantity: {quantity}")
+
+#     # Check for existing cart item or create a new one based on user status
+#     if request.user.is_authenticated:
+#         print("Authenticated user, checking for existing cart item")
+#         cart_item, created = Cart.objects.get_or_create(
+#             user=request.user, product=product
+#         )
+#         if created:
+#             print(f"Created new cart item for {product.name}")
+#             cart_item.product_qty = quantity
+#         else:
+#             print(
+#                 f"Found existing cart item for {product.name}, updating quantity")
+#             cart_item.product_qty += quantity
+#         cart_item.save()
+#     else:
+#         print("Anonymous user, using session for cart")
+#         # Handle anonymous cart (using session)
+#         cart_data = request.session.get('cart', {})
+#         print("Current cart data: ", cart_data)
+#         cart_data[str(product_id)] = quantity
+#         print("Updated cart data: ", cart_data)
+#         request.session['cart'] = cart_data
+
+#     print("Returning success response")
+#     return JsonResponse({'status': 'Item added to cart'})
 
 
 def fav_page(request: HttpRequest):

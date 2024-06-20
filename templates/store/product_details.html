@@ -167,7 +167,6 @@ thisShop | Is The Shop
     const txtQty = document.getElementById("txtQty");
     const pid = document.getElementById("pid");
     const btnCart = document.getElementById("btnCart");
-    const btnFav = document.getElementById("btnFav");
 
     btnPlus.addEventListener("click", function () {
       const qty = parseQuantity(txtQty.value);
@@ -183,31 +182,35 @@ thisShop | Is The Shop
       }
     });
 
+    function parseQuantity(value) {
+      const qty = parseInt(value, 10);
+      return isNaN(qty) ? 0 : qty;
+    }
+
     function handleAddToCart() {
       const qty = parseQuantity(txtQty.value);
-      if (qty <= 0) { // Early return for non-positive quantity // changed this to check qty
+      if (qty <= 0) {
         return;
       }
 
       const postObj = {
         product_qty: qty,
-        pid: pid.value
       };
 
-      fetch("/add_to_cart/" + pid.value, { // Include product ID in URL
+      fetch(`/add_to_cart/${pid.value}`, {
         method: 'POST',
         credentials: 'same-origin',
         headers: {
           'Accept': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
           'X-CSRFToken': '{{ csrf_token }}',
+          'Content-Type': 'application/json'  // Ensure content-type is correct
         },
         body: JSON.stringify(postObj)
       })
         .then(response => response.json())
         .then(data => {
           alert(data['status']);
-          // Update cart UI based on data (optional)
         })
         .catch(error => {
           console.error('Error adding to cart:', error);
