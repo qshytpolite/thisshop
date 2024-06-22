@@ -1,11 +1,11 @@
 # from atexit import register
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
-from .models import Catagory, Product, Cart, Favourite, Order, OrderItem, Payment
+from .models import Category, Product, Cart, Favourite, Order, OrderItem, Payment
 
 from unfold.admin import ModelAdmin
 
-# admin.site.unregister(Catagory)
+# admin.site.unregister(Category)
 # admin.site.unregister(Product)
 # admin.site.unregister(Cart)
 # admin.site.unregister(Favourite)
@@ -19,11 +19,11 @@ class ProductAdmin(ModelAdmin):
 admin.site.register(Product, ProductAdmin)
 
 
-class CatagoryAdmin(ModelAdmin):
+class CategoryAdmin(ModelAdmin):
     list_display = ('name', 'image', 'description', 'status')
 
 
-admin.site.register(Catagory, CatagoryAdmin)
+admin.site.register(Category, CategoryAdmin)
 
 
 class CartAdmin(ModelAdmin):
@@ -65,10 +65,10 @@ admin.site.register(Payment, PaymentAdmin)
 """
 class CategoryAdmin(admin.ModelAdmin):
   list_display = ('name', 'image', 'description')
-admin.site.register(Catagory,CategoryAdmin)
+admin.site.register(Category,CategoryAdmin)
 """
 
-# admin.site.register(Catagory)
+# admin.site.register(Category)
 # admin.site.register(Product)
 # admin.site.register(Cart)
 # admin.site.register(Favourite)

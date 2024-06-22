@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from .form import CheckoutForm
-from .models import Cart, Catagory, Favourite, Order, OrderItem, Payment, Product
+from .models import Cart, Category, Favourite, Order, OrderItem, Payment, Product
 from .utils import generate_reference
 
 
@@ -95,6 +95,31 @@ def add_to_cart(request, product_id):
 
     return JsonResponse({'status': 'Item added to cart'})
 
+# Update cart
+
+@require_POST
+def update_cart(request, product_id):
+    quantity = int(request.POST.get('quantity'))
+    user = request.user if request.user.is_authenticated else None
+    product = Product.objects.get(id=product_id)
+
+    if user:
+        cart_item, created = Cart.objects.get_or_create(user=user, product=product)
+        if quantity > 0:
+            cart_item.product_qty = quantity
+            cart_item.save()
+        else:
+            cart_item.delete()
+    else:
+        cart_data = request.session.get('cart', {})
+        if quantity > 0:
+            cart_data[product_id] = quantity
+        else:
+            cart_data.pop(product_id, None)
+        request.session['cart'] = cart_data
+
+    return redirect('cart')
+
 
 def fav_page(request: HttpRequest):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -118,22 +143,22 @@ def fav_page(request: HttpRequest):
 
 
 def collections(request):
-    catagory = Catagory.objects.filter(status=1)
-    return render(request, "store/collection.html", {"catagory": catagory})
+    category = Category.objects.filter(status=1)
+    return render(request, "store/collection.html", {"category": category})
 
 
 def collectionsview(request, name):
-    if (Catagory.objects.filter(name=name, status=1)):
+    if (Category.objects.filter(name=name, status=1)):
         products = Product.objects.filter(category__name=name)
         return render(request, "store/products.html", {"products": products, "category_name": name})
     else:
-        messages.warning(request, "No Such Catagory Found")
+        messages.warning(request, "No Such Category Found")
         return redirect('collections')
 
 
 def product_details(request, cname, pname):
     # Check if the provided category name exists in the database
-    if (Catagory.objects.filter(name=cname)):
+    if (Category.objects.filter(name=cname)):
         # If the category name exists, check if the product name exists in the database
         if (Product.objects.filter(name=pname)):
             # If the product name exists, retrieve the first occurrence of the product
@@ -152,8 +177,21 @@ def product_details(request, cname, pname):
 # Checkout view function
 
 
+def save_cart_and_redirect_to_login(request):
+    # Save cart data to the session
+    cart_data = {}
+    for item in request.cart.items.values():
+        cart_data[item.product.id] = item.product_qty
+    request.session['cart'] = cart_data
+
+    # Redirect to the login page
+    return redirect('login')
+
 @login_required
 def checkout_page(request):
+    if not request.user.is_authenticated:
+        return save_cart_and_redirect_to_login(request)
+
     # Retrieve all Cart items belonging to the logged-in user
     cart_items = Cart.objects.filter(user=request.user)
     # Calculate the total price of all items in the cart

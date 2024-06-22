@@ -13,19 +13,22 @@ def getFileName(requset, filename):
     return os.path.join('uploads/', new_filename)
 
 
-class Catagory(models.Model):
+class Category(models.Model):
     name = models.CharField(max_length=150, null=False, blank=False)
     image = models.ImageField(upload_to=getFileName, null=True, blank=True)
     description = models.TextField(max_length=500, null=False, blank=False)
     status = models.BooleanField(default=False, help_text="0-show,1-Hidden")
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name_plural = 'Categories'
+
     def __str__(self):
         return self.name
 
 
 class Product(models.Model):
-    category = models.ForeignKey(Catagory, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     name = models.CharField(max_length=150, blank=False)
     vendor = models.CharField(max_length=150, blank=False)
     product_image = models.ImageField(
