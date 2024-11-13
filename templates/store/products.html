@@ -30,6 +30,7 @@ thisShop | Is The Shop
                 data-original="#000000"></path>
             </svg>
           </div>
+          <a href="{% url 'product_details' item.category.name item.name %}">
           <div class="w-11/12 h-[210px] overflow-hidden mx-auto aspect-w-16 aspect-h-8 md:mb-2 mb-4">
             <img src="{{item.product_image.url}}" alt="{{ item.name }}" class="h-full w-full object-contain" />
           </div>
@@ -47,6 +48,7 @@ thisShop | Is The Shop
             <h4 class="text-lg text-blue-800 font-bold mt-4">${{ item.selling_price| stringformat:'d'}}</h4>
             {% endif %}
           </div>
+          </a>
         </div>
         {% endfor %}
       </div>
