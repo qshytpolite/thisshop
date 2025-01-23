@@ -14,7 +14,7 @@ from .utils import generate_reference
 
 
 def home(request):
-    products = Product.objects.all()
+    products = Product.objects.filter(featured=True).order_by('-id')
     return render(request, "store/index.html", {"products": products})
 
 

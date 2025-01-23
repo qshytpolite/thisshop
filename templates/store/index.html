@@ -5,10 +5,10 @@ thisShop | Is The Shop
 
 {% block content %}
 {% include 'inc/hero.html' %}
-    <!-- Featured Sneakers -->
+    <!-- Featured Products -->
     <section class="py-10">
       <div class="container mx-auto px-6">
-        <h2 class="text-2xl font-bold mb-6">Featured Sneakers</h2>
+        <h2 class="text-2xl font-bold mb-6">Featured Products</h2>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           {% for item in products %}
           <!-- Sneaker Card -->
@@ -23,9 +23,9 @@ thisShop | Is The Shop
             {% if item.discounted_price %}
             <h4 class="text-lg text-center text-red-800 font-bold mt-4"><strike
                 class="text-gray-400 ml-2 font-medium">${{ item.selling_price| stringformat:'d'}}</strike></h4>
-            <h4 class="text-lg text-center text-blue-800 font-bold mt-4">${{ item.discounted_price| stringformat:'d'}}</h4>
+            <h4 class="text-md text-center text-blue-800 font-bold mt-4">${{ item.discounted_price| stringformat:'d'}}</h4>
             {% else %}
-            <h4 class="text-lg text-center text-blue-800 font-bold mt-4">${{ item.selling_price| stringformat:'d'}}</h4>
+            <h4 class="text-md text-center text-blue-800 font-bold mt-4">${{ item.selling_price| stringformat:'d'}}</h4>
             {% endif %}
           </div>
           {% endfor %}
