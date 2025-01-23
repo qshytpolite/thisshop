@@ -1,0 +1,44 @@
+<h1>Checkout</h1>
+<div class="order-info">
+    <h3>Your order</h3>
+    <ul>
+        {% for item in cart %}
+        <li>
+            {{ item.product_qty }}x {{ item.product.name }}
+            <span>${{ item.total_cost }} {{email}}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    <p>Total: ${{ total_cost}}</p>
+</div>
+
+<form id="paymentForm">
+
+    <div class="form-submit">
+        <button type="submit" onclick="payWithPaystack()"> Pay </button>
+    </div>
+</form>
+<!-- Paystack setup -->
+<script>
+    const paymentForm = document.getElementById('paymentForm');
+    paymentForm.addEventListener("submit", payWithPaystack, false);
+    function payWithPaystack(e) {
+        e.preventDefault();
+
+        let handler = PaystackPop.setup({
+            key: 'pk_test_c49d1fb722c3485239fbd8105cead9f2f0e9af00', // Replace with your public key
+            email: "{{email}}",
+            amount: {{ total_cost }} * 100,
+                ref: '' + Math.floor((Math.random() * 1000000000) + 1), // generates a pseudo-unique reference. Please replace with a reference you generated. Or remove the line entirely so our API will generate one for you
+                    // label: "Optional string that replaces customer email"
+                    onClose: function() {
+                        alert('Window closed.');
+                    },
+    callback: function(response) {
+        window.location = "{% url 'orders:save_item' id %}";
+    }
+      });
+
+    handler.openIframe();
+    }
+</script>

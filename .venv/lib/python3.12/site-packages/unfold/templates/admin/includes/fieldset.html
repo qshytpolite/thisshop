@@ -1,0 +1,51 @@
+{% load unfold %}
+
+<fieldset class="module{% if fieldset.classes %} {{ fieldset.classes }}{% endif %}">
+    {% if fieldset.name and "tab" not in fieldset.classes %}
+        <h2 class="bg-gray-100 border border-transparent font-semibold mb-6 px-4 py-3 rounded-md text-gray-700 text-sm lg:-mx-4 dark:bg-white/[.02] dark:border dark:border-gray-800 dark:text-gray-200">
+            {{ fieldset.name }}
+        </h2>
+    {% endif %}
+
+    {% if fieldset.description %}
+        <div class="leading-relaxed mb-4 max-w-4xl text-sm">
+            {{ fieldset.description|safe }}
+        </div>
+    {% endif %}
+
+    <div class="aligned border border-gray-200 mb-8 rounded-md pt-3 px-3 shadow-sm dark:border-gray-800">
+        {% for line in fieldset %}
+            <div class="form-row block {% if not line.fields|length_is:'1' %}flex flex-row flex-wrap gap-x-8{% endif %}{% if not line.has_visible_field %} hidden{% endif %}{% for field in line %}{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% endfor %}">
+                {% for field in line %}
+                    <div class="flex group {% if field.errors %}errors {% endif %}{% if not line.fields|length_is:1 %}lg:max-w-xs w-full {% endif %}{% if not forloop.parentloop.last %} mb-6 {% else %} mb-3{% endif %} {% if row %}flex-row items-center{% else %}flex-col{% endif %}">
+                        {% if field.is_checkbox %}
+                            <div class="flex flex-row items-center">
+                                {{ field.field }}{{ field.label_tag }}
+                            </div>
+                        {% else %}
+                            <div class="{% if row %} w-48{% endif %}">
+                                {{ field.label_tag }}
+                            </div>
+
+                            {% if field.is_readonly %}
+                                <div class="readonly bg-gray-50 border font-medium max-w-2xl px-3 py-2 rounded-md shadow-sm text-gray-500 text-sm dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800 {% if field.is_json %}truncate whitespace-pre-wrap{% endif %}">{% if field.contents %}{{ field.contents }}{% else %}-{% endif %}</div>
+                            {% else %}
+                                {{ field.field }}
+                            {% endif %}
+                        {% endif %}
+
+                        {% if field.errors %}
+                            <span class="mt-1 text-red-600 text-sm dark:text-red-500">
+                                {{ field.errors }}
+                            </span>
+                        {% endif %}
+
+                        {% if field.field.help_text %}
+                            {% include "unfold/helpers/help_text.html" with help_text=field.field.help_text %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+</fieldset>

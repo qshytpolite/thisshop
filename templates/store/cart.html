@@ -1,0 +1,140 @@
+{% extends 'layouts/base.html' %}
+{% block title %}
+Cart | thisShop
+{% endblock title %}
+{% block content %}
+<div class="bg-gray-100 h-screen py-8">
+  <div class="container mx-auto px-4">
+    <h1 class="text-2xl font-semibold mb-4">Shopping Cart</h1>
+    <div class="flex flex-col md:flex-row gap-4">
+      {% if cart_items %}
+      <div class="md:w-3/4">
+        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+          <table class="w-full">
+            <thead>
+              <tr>
+                <th class="text-left font-semibold">Product</th>
+                <th class="text-left font-semibold">Price</th>
+                <th class="text-left font-semibold">Quantity</th>
+                <th class="text-left font-semibold">Total</th>
+                <th class="text-left font-semibold">Remove</th>
+              </tr>
+            </thead>
+            {% for item in cart_items %}
+            <tbody>
+              <tr>
+                <td class="py-4">
+                  <div class="flex items-center">
+                    <img class="h-16 w-16 mr-4" src="{{ item.product.product_image.url }}" alt="{{ item.product.name }}">
+                    <span class="font-semibold">{{ item.product.name }}</span>
+                  </div>
+                </td>
+                {% if item.product.discounted_price %}
+                <td class="py-4">${{ item.product.discounted_price }}</td>
+                {% else %}
+                <td class="py-4">${{ item.product.selling_price }}</td>
+                {% endif %}
+                <td class="py-4">
+                  <div class="flex items-center">
+                    <form method="POST" action="{% url 'update_cart' item.product.id %}">
+                      {% csrf_token %}
+                      <input type="number" name="quantity" value="{{ item.product_qty }}" min="1" class="w-16 text-center border rounded">
+                      <button type="submit" class="ml-2 bg-gray-800 text-white px-2 py-1 rounded">Update</button>
+                    </form>
+                  </div>
+                </td>
+                <td class="py-4">${{ item.item_total }}</td>
+                <td class="py-4">
+                  <form action="{% url 'remove_cart' item.product_id %}" method="post" class="inline-block ml-4">
+                    {% csrf_token %}
+                    <button class="text-red-500 hover:text-red-700">Remove</button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+            {% endfor %}
+          </table>
+        </div>
+        <a href="{% url 'index' %}" class="flex font-semibold text-indigo-600 text-sm mt-10">
+          <svg class="fill-current mr-2 text-indigo-600 w-4" viewBox="0 0 448 512">
+            <path
+              d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z" />
+          </svg>
+          Continue Shopping
+        </a>
+      </div>
+      {% endif %}
+      {% if cart_items %}
+      <div class="md:w-1/4">
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-lg font-semibold mb-4">Summary</h2>
+          <div class="flex justify-between mb-2">
+            <span>Subtotal</span>
+            <span>${{ total }}</span>
+          </div>
+          <hr class="my-2">
+          <div class="flex justify-between mb-2">
+            <span class="font-semibold">Total</span>
+            <span class="font-semibold">${{ total }}</span>
+          </div>
+          <button id="btnCheckout" type="button"
+            class="min-w-[200px] px-4 py-2.5 border border-gray-800 bg-transparent hover:bg-gray-50 text-gray-800 text-sm font-semibold rounded">Checkout</button>
+        </div>
+      </div>
+      {% else %}
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold mb-4">Your shopping cart is empty</h2>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Modal for login prompt -->
+<div id="loginModal"
+  class="fixed inset-0 z-50 overflow-auto bg-smoke-light items-center justify-center hidden">
+  <div class="relative p-8 bg-white w-full max-w-md m-auto flex-col flex rounded-lg">
+    <div class="modal-header">
+      <h5 class="text-lg font-bold">Login Required</h5>
+      <button id="btnCloseModal"
+        class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">✕</button>
+    </div>
+    <div class="modal-body mt-4">
+      <p>Please log in to continue to the checkout page.</p>
+    </div>
+    <div class="modal-footer mt-4 flex justify-end">
+      <button id="btnClose" class="btn btn-outline mr-2">Close</button>
+      <a href="{% url 'login' %}" class="btn btn-primary">Log In</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const btnCheckout = document.getElementById("btnCheckout");
+    const loginModal = document.getElementById("loginModal");
+    const btnClose = document.getElementById("btnClose");
+    const btnCloseModal = document.getElementById("btnCloseModal");
+
+    btnCheckout.addEventListener("click", function () {
+      const isAuthenticated = "{{ request.user.is_authenticated|yesno:'true,false' }}";
+      console.log("User is authenticated: " + isAuthenticated);
+      if (isAuthenticated === "false") {
+        loginModal.classList.remove("hidden");
+        loginModal.classList.add("flex");
+      } else {
+        window.location.href = "{% url 'checkout_page' %}";
+      }
+    });
+
+    function closeModal() {
+      loginModal.classList.add("hidden");
+      loginModal.classList.remove("flex");
+    }
+
+    btnClose.addEventListener("click", closeModal);
+    btnCloseModal.addEventListener("click", closeModal);
+  });
+</script>
+
+{% endblock content %}
