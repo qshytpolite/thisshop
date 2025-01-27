@@ -14,8 +14,13 @@ from .utils import generate_reference
 
 
 def home(request):
+    category = Category.objects.filter(status=1)
     products = Product.objects.filter(featured=True).order_by('-id')
-    return render(request, "store/index.html", {"products": products})
+    context = {
+        'category': category,
+        'products': products
+    }
+    return render(request, "store/index.html", context)
 
 
 def favviewpage(request):

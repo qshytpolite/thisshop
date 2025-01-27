@@ -5,64 +5,127 @@ thisShop | Is The Shop
 
 {% block content %}
 {% include 'inc/hero.html' %}
-<div class="font-[sans-serif] bg-gray-100">
-    <!-- Featured Products -->
-    <section class="py-10">
-      <div class="container mx-auto px-6">
-        <h2 class="text-2xl font-bold mb-0 text-center">Featured Products</h2>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {% for item in products %}
-          <div class="relative m-10 flex w-full max-w-xs flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md">
-            <a class="relative mx-3 mt-3 flex h-60 overflow-hidden rounded-xl" href="#">
-              <img class="object-cover" src="{{item.product_image.url}}" alt="{{ item.name }}" />
-              <span class="absolute top-0 left-0 m-2 rounded-full bg-black px-2 text-center text-sm font-medium text-white">39% OFF</span>
-            </a>
-            <div class="mt-4 px-5 pb-5">
-              <a href="#">
-                <h5 class="text-xl tracking-tight text-slate-900">{{ item.name }}</h5>
-              </a>
-              <div class="mt-2 mb-5 flex items-center justify-between">
-                {% if item.discounted_price %}
-                <p>
-                  <span class="text-3xl font-bold text-slate-900">${{ item.discounted_price| stringformat:'d'}}</span>
-                  <span class="text-sm text-slate-900 line-through">${{ item.selling_price| stringformat:'d'}}</span>
-                </p>
-                {% else %}
-                <p>
-                  <span class="text-3xl font-bold text-slate-900">${{ item.selling_price| stringformat:'d'}}</span>
-                </p>
-                {% endif %}
-                <div class="flex items-center">
-                  <svg aria-hidden="true" class="h-5 w-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                  <svg aria-hidden="true" class="h-5 w-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                  <svg aria-hidden="true" class="h-5 w-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                  <svg aria-hidden="true" class="h-5 w-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                  <svg aria-hidden="true" class="h-5 w-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                  <span class="mr-2 ml-3 rounded bg-yellow-200 px-2.5 py-0.5 text-xs font-semibold">5.0</span>
-                </div>
-              </div>
-              <a href="#" class="flex items-center justify-center rounded-md bg-slate-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                Add to cart</a
-              >
-            </div> 
-          </div>
-          {% endfor %} 
-        </div>
+<!-- Featured Start -->
+<div class="container mx-auto px-4 pt-5">
+  <div class="flex flex-wrap -mx-2 px-xl-5 pb-3">
+    <div class="lg:w-3/12 md:w-6/12 sm:w-full px-2 pb-1">
+      <div class="flex items-center bg-gray-200 mb-4" style="padding: 30px;">
+        <h1 class="fa fa-check text-blue-500 m-0 mr-3"></h1>
+        <h5 class="font-weight-semi-bold m-0">Quality Product</h5>
       </div>
-    </section>
+    </div>
+    <div class="lg:w-3/12 md:w-6/12 sm:w-full px-2 pb-1">
+      <div class="flex items-center bg-gray-200 mb-4" style="padding: 30px;">
+        <h1 class="fa fa-shipping-fast text-blue-500 m-0 mr-2"></h1>
+        <h5 class="font-weight-semi-bold m-0">Free Shipping</h5>
+      </div>
+    </div>
+    <div class="lg:w-3/12 md:w-6/12 sm:w-full px-2 pb-1">
+      <div class="flex items-center bg-gray-200 mb-4" style="padding: 30px;">
+        <h1 class="fas fa-exchange-alt text-blue-500 m-0 mr-3"></h1>
+        <h5 class="font-weight-semi-bold m-0">14-Day Return</h5>
+      </div>
+    </div>
+    <div class="lg:w-3/12 md:w-6/12 sm:w-full px-2 pb-1">
+      <div class="flex items-center bg-gray-200 mb-4" style="padding: 30px;">
+        <h1 class="fa fa-phone-volume text-blue-500 m-0 mr-3"></h1>
+        <h5 class="font-weight-semi-bold m-0">24/7 Support</h5>
+      </div>
+    </div>
+  </div>
 </div>
+<!-- Featured End -->
+<!-- Category Start -->
+<div class="p-4 mx-auto lg:max-w-7xl sm:max-w-full">
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 max-xl:gap-4 gap-6">
+
+    {% for item in category %}
+
+    <div class="bg-white rounded-2xl p-5 cursor-pointer hover:-translate-y-2 transition-all relative">
+
+      <!-- for wishlist
+      <div
+        class="bg-gray-100 w-10 h-10 flex items-center justify-center rounded-full cursor-pointer absolute top-4 right-4">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18px" class="fill-gray-800 inline-block" viewBox="0 0 64 64">
+          <path
+            d="M45.5 4A18.53 18.53 0 0 0 32 9.86 18.5 18.5 0 0 0 0 22.5C0 40.92 29.71 59 31 59.71a2 2 0 0 0 2.06 0C34.29 59 64 40.92 64 22.5A18.52 18.52 0 0 0 45.5 4ZM32 55.64C26.83 52.34 4 36.92 4 22.5a14.5 14.5 0 0 1 26.36-8.33 2 2 0 0 0 3.27 0A14.5 14.5 0 0 1 60 22.5c0 14.41-22.83 29.83-28 33.14Z"
+            data-original="#000000"></path>
+        </svg>
+      </div> -->
+      <div class="w-11/12 h-[210px] overflow-hidden mx-auto aspect-w-16 aspect-h-8 md:mb-2 mb-4">
+        <img src="{{item.image.url}}" class="h-full w-full object-contain" alt="{{ item.name }}">
+      </div>
+      <div>
+        <a href="{% url 'collections' item.name %}">
+          <h3 class="text-lg font-extrabold text-cyan-800 duration-500 hover:scale-105 hover:shadow-xl">{{ item.name }}
+          </h3>
+          <!-- <p class="text-gray-600 text-sm mt-2">{{ item.description|truncatewords:10 }}</p> -->
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+<!-- Category End -->
+<!-- Featured Products -->
+<div class="font-[sans-serif] bg-gray-100">
+  <!-- Featured Products -->
+  <section class="py-10">
+    <div class="container mx-auto px-6">
+      <h2 class="text-2xl font-bold mb-0 text-center">Featured Products</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {% for item in products %}
+        <div class="relative m-10 flex w-full max-w-xs flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md duration-500 hover:scale-105 hover:shadow-xl">
+          <a class="relative mx-3 mt-3 flex h-60 overflow-hidden rounded-xl" href="{% url 'product_details' item.category.name item.name %}">
+            <img class="object-cover" src="{{item.product_image.url}}" alt="{{ item.name }}" />
+            <span class="absolute top-0 left-0 m-2 rounded-full bg-black px-2 text-center text-sm font-medium text-white">39% OFF</span>
+          </a>
+          <div class="mt-4 px-5 pb-5">
+            <a href="{% url 'product_details' item.category.name item.name %}">
+              <h5 class="text-xl tracking-tight text-slate-900">{{ item.name }}</h5>
+            </a>
+            <div class="mt-2 mb-5 flex items-center justify-between">
+              {% if item.discounted_price %}
+              <p>
+                <span class="text-3xl font-bold text-slate-900">${{ item.discounted_price| stringformat:'d'}}</span>
+                <span class="text-sm text-slate-900 line-through">${{ item.selling_price| stringformat:'d'}}</span>
+              </p>
+              {% else %}
+              <p>
+                <span class="text-3xl font-bold text-slate-900">${{ item.selling_price| stringformat:'d'}}</span>
+              </p>
+              {% endif %}
+              <div class="flex items-center">
+                <svg aria-hidden="true" class="h-5 w-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                </svg>
+                <svg aria-hidden="true" class="h-5 w-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                </svg>
+                <svg aria-hidden="true" class="h-5 w-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                </svg>
+                <svg aria-hidden="true" class="h-5 w-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                </svg>
+                <svg aria-hidden="true" class="h-5 w-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                </svg>
+                <span class="mr-2 ml-3 rounded bg-yellow-200 px-2.5 py-0.5 text-xs font-semibold">5.0</span>
+              </div>
+            </div>
+            <a href="#" class="flex items-center justify-center rounded-md bg-slate-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-blue-300">
+              <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              Add to cart</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+</div>
+<!-- Featured Products End -->
 
 {% endblock content %}
