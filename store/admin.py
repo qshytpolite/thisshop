@@ -1,8 +1,8 @@
 # from atexit import register
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
-from .models import Category, Product, Cart, Favourite, Order, OrderItem, Payment
-
+from .models import Category, Product, Cart, Favourite, Order, OrderItem, Payment, HeroSlide
+from django.utils.html import format_html
 from unfold.admin import ModelAdmin
 
 # admin.site.unregister(Category)
@@ -10,6 +10,21 @@ from unfold.admin import ModelAdmin
 # admin.site.unregister(Cart)
 # admin.site.unregister(Favourite)
 
+# @admin.register(Banner)
+# class BannerAdmin(admin.ModelAdmin):
+#     list_display = ('title', 'is_active', 'order', 'created_at', 'image_preview')
+#     list_editable = ('is_active', 'order')
+
+#     def image_preview(self, obj):
+#         if obj.desktop_image:
+#             return format_html('<img src="{}" style="width: 100px; height: auto;" />', obj.desktop_image.url)
+#         return "-"
+#     image_preview.short_description = "Preview"
+
+#  Register HeroSlide model
+@admin.register(HeroSlide)
+class HeroSlideAdmin(ModelAdmin):
+    list_display = ('title', 'subtitle', 'button_text', 'button_link')
 
 class ProductAdmin(ModelAdmin):
     list_display = ('name', 'vendor', 'product_image', 'quantity',

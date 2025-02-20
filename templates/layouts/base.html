@@ -15,17 +15,16 @@
       <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
       <link rel="stylesheet" href="{% static 'src/output.css' %}">
       <!-- <link rel="stylesheet" href="{% static 'css/style.css' %}"> -->
+      <link rel="stylesheet" href="{% static 'src/swiper-bundle.min.css' %}" />
+
       {% endcompress %}
       <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   </head>
-  <body class="bg-gray-100">
-    <div class="max-w-[1440px] mx-auto">
+  <body class="bg-gray-100 text-gray-900">
     {% include 'inc/navbar.html' %}
-
-   
-    {% block content %}
-    {% endblock content %}
-   </div>
+    <main class="container mx-auto py-6">
+        {% block content %}{% endblock %}
+    </main>
 
   
     {% include 'inc/footer.html' %}
@@ -34,6 +33,7 @@
 
     <!-- my scripts -->
     <script src="{% static 'js/myfunctions.js' %}"></script>
+
     <!-- <script src="https://cdn.jsdelivr.net/npm/daisyui@4.12.2/src/index.min.js"></script> -->
     
   </body>

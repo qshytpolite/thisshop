@@ -1,0 +1,39 @@
+<section class="relative w-full h-80 md:h-96 overflow-hidden">
+
+{% for banner in banners %}
+<div class="relative bg-gray-900 text-white">
+  <!-- Background -->
+  <div class="absolute inset-0">
+    <!-- Desktop Image -->
+    <img
+      src="{{ banner.desktop_image.url }}"
+      alt="{{ banner.title }}"
+      class="hidden md:block w-full h-full object-cover opacity-50"
+    />
+    <!-- Mobile Image -->
+    {% if banner.mobile_image %}
+    <img
+      src="{{ banner.mobile_image.url }}"
+      alt="{{ banner.title }}"
+      class="block md:hidden w-full h-full object-cover opacity-50"
+    />
+    {% endif %}
+  </div>
+  <!-- Content -->
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+    <h1 class="text-4xl font-extrabold sm:text-5xl lg:text-6xl">
+      {{ banner.title }}
+    </h1>
+    <h2 class="mt-4 text-2xl sm:text-3xl lg:text-4xl">
+      {{ banner.subtitle }}
+    </h2>
+    {% if banner.description %}
+    <p class="mt-4 text-lg sm:text-xl">
+      {{ banner.description }}
+    </p>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+
+</section>

@@ -8,19 +8,59 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from .form import CheckoutForm
-from .models import Cart, Category, Favourite, Order, OrderItem, Payment, Product
+from .form import CheckoutForm, ReviewForm
+from .models import Cart, Category, Favourite, Order, OrderItem, Payment, Product,HeroSlide, Review
 from .utils import generate_reference
+from django.db.models import Q
 
 
 def home(request):
+    slides = HeroSlide.objects.all()   
     category = Category.objects.filter(status=1)
     products = Product.objects.filter(featured=True).order_by('-id')
     context = {
         'category': category,
-        'products': products
+        'products': products,
+        'slides': slides,
     }
     return render(request, "store/index.html", context)
+
+# Shop view with filters
+def shop(request):
+    # Get all categories to display in the filter options
+    categories = Category.objects.all()
+
+    # Start the query to fetch products
+    products = Product.objects.all()
+
+    # Filtering by category (if category is selected)
+    category_filter = request.GET.get('category')
+    if category_filter:
+        products = products.filter(category__slug=category_filter)
+
+    # Filtering by price range (if price is selected)
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+    if min_price and max_price:
+        products = products.filter(selling_price__gte=min_price, selling_price__lte=max_price)
+
+    # Filtering by latest (if 'latest' is selected)
+    latest = request.GET.get('latest')
+    if latest == '1':
+        products = products.order_by('-created_at')  # Order by latest products
+
+     # Handling search query
+    search_query = request.GET.get('search')
+    if search_query:
+        products = products.filter(
+            Q(name__icontains=search_query) | Q(description__icontains=search_query)
+        )
+
+    return render(request, 'store/shop.html', {
+        'products': products,
+        'categories': categories,
+        'search_query': search_query,
+    })
 
 
 def favviewpage(request):
@@ -90,6 +130,9 @@ def add_to_cart(request, product_id):
         else:
             cart_item.product_qty += quantity
         cart_item.save()
+
+        # Fetch the updated cart count
+        cart_count = Cart.objects.filter(user=request.user).count()
     else:
         session_cart = request.session.get('cart', {})
         if str(product_id) in session_cart:
@@ -98,7 +141,15 @@ def add_to_cart(request, product_id):
             session_cart[str(product_id)] = quantity
         request.session['cart'] = session_cart
 
-    return JsonResponse({'status': 'Item added to cart'})
+        # Count items in the session cart
+        cart_count = sum(session_cart.values())
+
+    # Return the updated cart count in the response
+    return JsonResponse({
+        'status': 'Item added to cart',
+        'cart_count': cart_count
+    })
+
 
 # Update cart
 
@@ -160,24 +211,51 @@ def collectionsview(request, name):
         messages.warning(request, "No Such Category Found")
         return redirect('collections')
 
+def product_details(request, slug):
+    product = get_object_or_404(Product, slug=slug)
+    reviews = product.reviews.all()  # Fetch related reviews
+    review_form = ReviewForm()
 
-def product_details(request, cname, pname):
-    # Check if the provided category name exists in the database
-    if (Category.objects.filter(name=cname)):
-        # If the category name exists, check if the product name exists in the database
-        if (Product.objects.filter(name=pname)):
-            # If the product name exists, retrieve the first occurrence of the product
-            products = Product.objects.filter(name=pname).first()
-            # Render the product details page with the retrieved product data
-            return render(request, "store/product_details.html", {"products": products})
-        else:
-            # If the product name does not exist, display an error message and redirect to the collections page
-            messages.error(request, "No Such Product Found")
-            return redirect('collections')
-    else:
-        # If the category name does not exist, display an error message and redirect to the collections page
-        messages.error(request, "No Such Category Found")
-        return redirect('collections')
+    return render(request, 'store/product_details.html', {
+        'product': product,
+        'reviews': reviews,
+        'review_form': review_form
+    })
+
+@login_required
+def submit_review(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.product = product
+            review.user = request.user
+            review.save()
+            return redirect('product_details', slug=product.slug)
+
+    return redirect('product_details', slug=product.slug)
+
+# def product_details(request, cname, pname):
+#     # Check if the provided category name exists in the database
+#     if (Category.objects.filter(name=cname)):
+#         # If the category name exists, check if the product name exists in the database
+#         if (Product.objects.filter(name=pname)):
+#             # If the product name exists, retrieve the first occurrence of the product
+#             products = Product.objects.filter(name=pname).first()
+#             reviews = products.reviews.all()  # Retrieve all reviews for the product
+#             review_form = ReviewForm()
+#             # Render the product details page with the retrieved product data
+#             return render(request, "store/product_details.html", {"products": products, "reviews": reviews, "review_form": review_form})
+#         else:
+#             # If the product name does not exist, display an error message and redirect to the collections page
+#             messages.error(request, "No Such Product Found")
+#             return redirect('collections')
+#     else:
+#         # If the category name does not exist, display an error message and redirect to the collections page
+#         messages.error(request, "No Such Category Found")
+#         return redirect('collections')
 
 # Checkout view function
 

@@ -73,15 +73,17 @@ thisShop | Is The Shop
   <section class="py-10">
     <div class="container mx-auto px-6">
       <h2 class="text-2xl font-bold mb-0 text-center">Featured Products</h2>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {% for product in products %}
-        <div class="card-compact relative m-10 flex w-full max-w-xs flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md duration-500 hover:scale-105 hover:shadow-xl">
-          <a class="relative mx-3 mt-3 flex h-60 overflow-hidden rounded-xl" href="{% url 'product_details' product.category.name product.name %}">
-            <img class="object-cover" src="{{product.product_image.url}}" alt="{{ product.name }}" />
-            <span class="absolute top-0 left-0 m-2 rounded-full bg-black px-2 text-center text-sm font-medium text-white">39% OFF</span>
+        <div class="card-compact relative m-10 flex w-full max-w-xs flex-col overflow-hidden rounded-lg  bg-white shadow-md duration-500 hover:scale-105 hover:shadow-xl">
+          <a class="relative mx-3 mt-3 flex h-60 overflow-hidden rounded-xl" href="{% url 'product_details' slug=product.slug %}">
+            <img class="object-cover w-full h-48" src="{{product.product_image.url}}" alt="{{ product.name }}" />
+            {% if product.discount_percentage %}
+            <span class="absolute top-0 left-0 m-2 rounded-full bg-black px-2 text-center text-sm font-medium text-white">{{ product.discount_percentage| stringformat:'d' }} %</span>
+            {% endif %}
           </a>
           <div class="mt-4 px-5 pb-5">
-            <a href="{% url 'product_details' product.category.name product.name %}">
+            <a href="{% url 'product_details' slug=product.slug %}">
               <h5 class="text-xl tracking-tight text-slate-900">{{ product.name }}</h5>
             </a>
             <div class="mt-2 mb-5 flex items-center justify-between">
@@ -166,6 +168,10 @@ thisShop | Is The Shop
                         } else {
                             alert("Error: " + data.status);
                         }
+                        if (data.cart_count !== undefined) {
+                    // Update cart count dynamically in the navbar
+                    document.getElementById('cart-count').textContent = data.cart_count;
+                }
                     })
                     .catch(error => {
                         console.error("Error:", error);

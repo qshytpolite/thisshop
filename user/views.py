@@ -1,14 +1,30 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.sessions.models import Session
 from django.contrib import messages
 from user.form import CustomUserForm
 from store.models import Cart, Product
 
 def logout_page(request):
     if request.user.is_authenticated:
+        # Get the current session key
+        current_session_key = request.session.session_key
+
+        # Logout the user
         logout(request)
+
+        # Delete only the current session key
+        Session.objects.filter(session_key=current_session_key).delete()
+
         messages.success(request, "Logged out Successfully")
     return redirect("/")
+
+# Dedicated Admin Logout View
+# def admin_logout(request):
+#     if request.user.is_authenticated:
+#         logout(request)
+#         messages.success(request, "Logged out Successfully")
+#     return redirect("/")
 
 def login_page(request):
     if request.user.is_authenticated:

@@ -12,7 +12,7 @@ thisShop | Is The Shop
           <ol class="flex flex-wrap list-reset pt-3 pb-3 py-4 px-4 mb-4 bg-gray-200 rounded">
             <li class="inline-block px-2 py-2 text-gray-700"><a href="{% url 'index' %}">Home</a></li>
             <li class="inline-block px-2 py-2 text-gray-700"><a
-                href="{% url 'collections' products.category.name  %}">Collections</a></li>
+                href="{% url 'collections' product.category.name %}">Collections</a></li>
             <li class="inline-block px-2 py-2 text-gray-700 active" aria-current="page">{{products}}</li>
           </ol>
         </nav>
@@ -27,27 +27,30 @@ thisShop | Is The Shop
     <div class="grid items-start grid-cols-1 lg:grid-cols-2 gap-10">
       <div class="space-y-4 text-center lg:sticky top-8">
         <div class="bg-gray-100 p-4 flex items-center sm:h-[380px] rounded">
-          <img src="{{ products.product_image.url }}" alt="{{ products.name }}"
-            class="w-full max-h-full object-contain object-top" />
+          {% if product.discount_percentage %}
+          <span class="absolute right-11 top-3 m-0 rounded-full bg-black px-2 text-center text-md font-medium text-white">{{ product.discount_percentage| stringformat:'d' }} %</span>
+          {% endif %}
+          <img src="{{ product.product_image.url }}" alt="{{ product.name }}"
+            class="w-full max-h-full object-contain object-top" id="mainImage" />
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-gray-100 p-4 flex items-center rounded sm:h-[182px]">
-            <img src="{{ products.product_image.url }}" alt="{{ products.name }}"
-              class="w-full max-h-full object-contain object-top" />
+            <img src="{{ product.product_image.url }}" alt="{{ product.name }}"
+              class="w-full max-h-full object-contain object-top cursor-pointer opacity-60 hover:opacity-100 transition duration-300" onclick="changeImage(this.src)"/>
           </div>
 
           <div class="bg-gray-100 p-4 flex items-center rounded sm:h-[182px]">
-            <img src="{{ products.product_image.url }}" alt="{{ products.name }}"
-              class="w-full max-h-full object-contain object-top" />
+            <img src="{{ product.product_image.url }}" alt="{{ product.name }}"
+              class="w-full max-h-full object-contain object-top cursor-pointer opacity-60 hover:opacity-100 transition duration-300" onclick="changeImage(this.src)" />
           </div>
         </div>
       </div>
 
       <div class="max-w-xl">
         <div>
-          <h2 class="text-2xl font-extrabold text-gray-800">{{ products.name }}</h2>
-          <p class="text-sm text-gray-600 mt-2">{{ products.vendor }}</p>
+          <h2 class="text-2xl font-extrabold text-gray-800">{{ product.name }}</h2>
+          <p class="text-sm text-gray-600 mt-2">{{ product.vendor }}</p>
         </div>
 
         <div class="flex space-x-1 mt-4">
@@ -90,17 +93,18 @@ thisShop | Is The Shop
         </div>
 
         <div class="mt-4">
-          {% if products.discounted_price %}
-          <h3 class="text-red-800 text-3xl font-bold"><strike
-              class="text-blue-400 ml-2 font-medium">${{ products.selling_price }}</strike></h3>
-          <h3 class="text-gray-800 text-3xl font-bold">${{ products.discounted_price }}</h3>
+          {% if product.discounted_price %}
+          <!-- <h3 class="text-red-800 text-3xl font-bold"><strike
+              class="text-blue-400 ml-2 font-medium">${{ products.selling_price }}</strike></h3> -->
+              <p><strong>Discount: {{ product.discount_percentage| stringformat:'d' }}%</strong></p>
+          <h3 class="text-gray-800 text-3xl font-bold">${{ product.discounted_price }}</h3>
           {% else %}
 
-          <h3 class="text-blue-800 text-3xl font-bold">${{ products.selling_price }}</h3>
+          <h3 class="text-blue-800 text-3xl font-bold">${{ product.selling_price }}</h3>
           {% endif %}
         </div>
 
-        <div class="mt-8">
+        <!-- <div class="mt-8">
           <h3 class="text-lg font-bold text-gray-800">Choose a Size</h3>
           <div class="flex flex-wrap gap-4 mt-4">
             <button type="button"
@@ -112,18 +116,18 @@ thisShop | Is The Shop
             <button type="button"
               class="w-12 h-12 border-2 hover:border-gray-800 font-semibold text-sm rounded-full flex items-center justify-center shrink-0">XL</button>
           </div>
-        </div>
+        </div> -->
 
         <div class="flex flex-wrap gap-4 mt-8">
           <button id="btnMinus" class="btn btn-primary btn-square">-</button>
           <input id="txtQty" type="text" value="1"
-            class="w-12 h-12 border border-gray-800 text-center text-sm font-semibold rounded">
+            class="w-12 h-12 border border-gray-800 text-center text-sm font-semibold rounded text-white">
           <button id="btnPlus" class="btn btn-primary btn-square">+</button>
           <button id="btnCart" type="button"
-            class="min-w-[200px] px-4 py-2.5 border border-gray-800 bg-transparent hover:bg-gray-50 text-gray-800 text-sm font-semibold rounded">Add
+            class="min-w-[200px] px-4 py-2.5 border border-gray-800 bg-transparent hover:bg-blue-500 text-gray-800 hover:text-slate-100 text-sm font-semibold rounded">Add
             to cart</button>
         </div>
-        <input type="hidden" id="pid" value="{{ products.id }}">
+        <input type="hidden" id="pid" value="{{ product.id }}">
 
 
         <div class="mt-8">
@@ -140,6 +144,35 @@ thisShop | Is The Shop
             <p class="text-sm text-gray-600 mt-4">{{ products.description }}.{% lorem 1 %}</p>
           </div>
 
+          <div class="mt-8">
+            <h3 class="text-lg font-bold text-gray-800">Reviews</h3>
+            {% if reviews %}
+            <ul>
+                {% for review in reviews %}
+                    <li>
+                        <strong>{{ review.user.username }}</strong> - Rated: {{ review.rating }}/5
+                        <p>{{ review.comment }}</p>
+                        <small>Reviewed on: {{ review.created_at|date:"M d, Y" }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No reviews yet. Be the first to review this product!</p>
+        {% endif %}
+            <!-- Add a New Review -->
+    {% if user.is_authenticated %}
+    <h3>Submit Your Review</h3>
+    <form method="post" action="{% url 'submit_review' product.id %}">
+        {% csrf_token %}
+        {{ review_form.as_p }}
+        <button type="submit" class="btn btn-primary">Submit Review</button>
+    </form>
+{% else %}
+    <p><a href="{% url 'login' %}">Log in</a> to submit a review.</p>
+{% endif %}
+</div>
+          </div>
+
           <!-- <ul class="space-y-3 list-disc mt-6 pl-4 text-sm text-gray-600">
               <li>A pair of nike shoes is a wardrobe essential due to its versatility.</li>
               <li>Available in a wide range of sizes, from extra small to extra large, and even in tall and petite sizes.</li>
@@ -154,8 +187,95 @@ thisShop | Is The Shop
 
 
 </section>
-
 <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // For quantity increment and decrement
+    const btnPlus = document.getElementById("btnPlus");
+    const btnMinus = document.getElementById("btnMinus");
+    const txtQty = document.getElementById("txtQty");
+    const pid = document.getElementById("pid");
+    const btnCart = document.getElementById("btnCart");
+
+    if (btnPlus && btnMinus && txtQty) {
+      btnPlus.addEventListener("click", function () {
+        const qty = parseQuantity(txtQty.value);
+        if (qty < 10) {
+          txtQty.value = qty + 1;
+        }
+      });
+
+      btnMinus.addEventListener("click", function () {
+        const qty = parseQuantity(txtQty.value);
+        if (qty > 1) {
+          txtQty.value = qty - 1;
+        }
+      });
+
+      function parseQuantity(value) {
+        const qty = parseInt(value, 10);
+        return isNaN(qty) ? 0 : qty;
+      }
+    }
+
+    // For adding to cart
+    if (btnCart) {
+      btnCart.addEventListener("click", function () {
+        const qty = txtQty ? parseInt(txtQty.value) : 1; // Default quantity is 1 if not specified
+        const productId = pid ? pid.value : this.dataset.productId; // Use dataset as fallback
+
+        fetch(`/add-to-cart/${productId}/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"), // Helper to fetch CSRF token
+          },
+          body: JSON.stringify({
+            product_qty: qty,
+          }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === "Item added to cart") {
+              alert("Item added to cart!");
+            } else {
+              alert("Error: " + data.status);
+            }
+            if (data.cart_count !== undefined) {
+                    // Update cart count dynamically in the navbar
+                    document.getElementById('cart-count').textContent = data.cart_count;
+                }
+          })
+          .catch(error => {
+            console.error("Error:", error);
+          });
+      });
+    }
+
+    // Helper function to get CSRF token from cookies
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === name + "=") {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    // function to changeImage
+    function changeImage(src) {
+            document.getElementById('mainImage').src = src;
+    }
+  });
+</script>
+
+
+<!-- <script>
   function parseQuantity(value) {
     const qty = parseInt(value, 10);
     return isNaN(qty) ? 0 : qty;
@@ -197,7 +317,7 @@ thisShop | Is The Shop
         product_qty: qty,
       };
 
-      fetch(`/add_to_cart/${pid.value}`, {
+      fetch(`/add_to_cart/${pid.value}/`, {
         method: 'POST',
         credentials: 'same-origin',
         headers: {
@@ -250,5 +370,5 @@ thisShop | Is The Shop
   });
 
 
-</script>
+</script> -->
 {% endblock content %}

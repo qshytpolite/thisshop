@@ -8,5 +8,8 @@
   },
   "scripts": {
     "build:css": "tailwindcss -i ./static/src/input.css -o ./static/src/output.css --watch --minify"
+  },
+  "dependencies": {
+    "swiper": "^11.2.4"
   }
 }

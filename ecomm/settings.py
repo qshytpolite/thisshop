@@ -54,9 +54,11 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_tailwind',
     'whitenoise.runserver_nostatic',
+    'imagekit',
 
 
     # local apps
+    'core',
     'user',
     'store',
 ]
@@ -65,6 +67,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'core.middleware.SeparateSessionMiddleware',  # Separate session middleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -180,6 +183,23 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # custom user settings
 AUTH_USER_MODEL = 'user.User'
+
+# # Default session settings for shop users
+# SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+# SESSION_COOKIE_NAME = 'shop_user_session'
+
+# # Additional settings for session behavior
+# SESSION_COOKIE_SECURE = False  # Set to True in production if using HTTPS
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+# SESSION_SAVE_EVERY_REQUEST = False
+
+# # Admin session configuration (used dynamically in middleware)
+# ADMIN_SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+# ADMIN_SESSION_COOKIE_NAME = 'admin_sessionid'
+
+# # Default session settings for admin users
+# SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+# SESSION_COOKIE_NAME = 'admin_sessionid'
 
 # Django-unfold settings
 UNFOLD = {

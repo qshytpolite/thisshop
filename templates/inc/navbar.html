@@ -20,30 +20,37 @@
 </div>
 
 <!-- Navbar -->
-<nav class="bg-blue-100 shadow-md">
+<nav class="bg-cyan-400 text-white py-4 px-6 flex justify-between items-center">
     <div class="container mx-auto px-4 py-4 flex justify-between items-center">
         <!-- Logo -->
-        <a href="{% url 'index' %}" class="text-xl font-bold text-gray-800"><img src="{% static 'images/logos/logo.svg' %}" class=" w-20" alt="thisShop"></a>
+        <a href="{% url 'index' %}" class="text-xl font-bold text-gray-800"><img src="{% static 'images/logos/thsshoplogo.png' %}" class=" w-20" alt="thisShop"></a>
 
         <!-- Menu -->
-        <div class="menu menu-vertical lg:menu-horizontal hidden md:flex space-x-6 items-center">
+        <ul class="flex space-x-6">
+            <li><a href="{% url 'index' %}" class="hover:text-yellow-400">Home</a></li>
+            <li><a href="{% url 'shop'  %}" class="hover:text-yellow-400">Shop</a></li>
+            <li><a href="#" class="hover:text-yellow-400">Contact</a></li>
+        </ul>
+        <!-- <div class="menu menu-vertical lg:menu-horizontal hidden md:flex space-x-6 items-center">
             <a href="{% url 'index' %}" class="text-gray-600 hover:text-gray-800">Home</a>
-            <a href="{% url 'collections' %}" class="text-gray-600 hover:text-gray-800">Shop</a>
+            <a href="{% url 'shop' %}" class="text-gray-600 hover:text-gray-800">Shop</a>
             <a href="#" class="text-gray-600 hover:text-gray-800">About</a>
             <a href="#" class="text-gray-600 hover:text-gray-800">Contact</a>
-        </div>
+        </div> -->
 
         <!-- Search and Cart -->
         <div class="flex items-center space-x-4">
             <div class="relative">
-                <input type="text" class="border rounded-full py-1 px-3 text-sm" placeholder="Search...">
-                <button class="absolute right-0 top-0 mt-2 mr-3 text-gray-600">
+                <form action="{% url 'shop' %}" method="GET">
+                <input type="text" name="search" value="{{ search_query }}" class="border rounded-full py-1 px-3 text-sm" placeholder="Search...">
+                <button type="submit" class="absolute right-0 top-0 mt-2 mr-3 text-gray-600">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
                 </button>
+                </form>
             </div>
             <!-- wishlist -->
             <div class="indicator">
@@ -66,7 +73,7 @@
                             d="M164.96 300.004h.024c.02 0 .04-.004.059-.004H437a15.003 15.003 0 0 0 14.422-10.879l60-210a15.003 15.003 0 0 0-2.445-13.152A15.006 15.006 0 0 0 497 60H130.367l-10.722-48.254A15.003 15.003 0 0 0 105 0H15C6.715 0 0 6.715 0 15s6.715 15 15 15h77.969c1.898 8.55 51.312 230.918 54.156 243.71C131.184 280.64 120 296.536 120 315c0 24.812 20.188 45 45 45h272c8.285 0 15-6.715 15-15s-6.715-15-15-15H165c-8.27 0-15-6.73-15-15 0-8.258 6.707-14.977 14.96-14.996zM477.114 90l-51.43 180H177.032l-40-180zM150 405c0 24.813 20.188 45 45 45s45-20.188 45-45-20.188-45-45-45-45 20.188-45 45zm45-15c8.27 0 15 6.73 15 15s-6.73 15-15 15-15-6.73-15-15 6.73-15 15-15zm167 15c0 24.813 20.188 45 45 45s45-20.188 45-45-20.188-45-45-45-45 20.188-45 45zm45-15c8.27 0 15 6.73 15 15s-6.73 15-15 15-15-6.73-15-15 6.73-15 15-15zm0 0"
                             data-original="#000000"></path>
                     </svg>
-                    <span
+                    <span id="cart-count"
                         class="badge badge-sm indicator-item absolute left-auto -ml-1 top-0 rounded-full bg-black-500 px-1 py-0 text-xs text-white">{{ cart_count }}</span>
                 </a>
             </div>
@@ -87,8 +94,7 @@
     <!-- Mobile menu -->
     <div class="mobile-menu hidden md:hidden">
         <a href="{% url 'index' %}" class="block py-2 px-4 text-sm hover:bg-gray-200">Home</a>
-        <a href="{% url 'collections' %}" class="block py-2 px-4 text-sm hover:bg-gray-200">Shop</a>
-        <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-200">About</a>
+        <a href="{% url 'shop' %}" class="block py-2 px-4 text-sm hover:bg-gray-200">Shop</a>
         <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-200">Contact</a>
     </div>
 </nav>
@@ -100,4 +106,5 @@
     btn.addEventListener('click', () => {
         menu.classList.toggle('hidden');
     });
+    
 </script>
