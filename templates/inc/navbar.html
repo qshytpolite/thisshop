@@ -1,103 +1,70 @@
 {% load static %}
-<!-- Top Bar -->
-<div class="bg-gray-800 text-white py-2">
-    <div class="container mx-auto flex justify-between items-center">
-        <div>
-            <span class="text-sm">Contact: +254 (768) 655-577</span>
-        </div>
-        <!-- Login and Register using django -->
-        {% if user.is_authenticated %}
-        <div class="flex space-x-4">
-            <a href="{% url 'logout' %}" class="text-sm hover:text-gray-400">Logout</a>
-        </div>
-        {% else %}
-        <div class="flex space-x-4">
-            <a href="{% url 'login' %}" class="text-sm hover:text-gray-400">Login</a>
-            <a href="{% url 'register' %}" class="text-sm hover:text-gray-400">Register</a>
-        </div>
-        {% endif %}
-    </div>
-</div>
 
 <!-- Navbar -->
-<nav class="bg-cyan-400 text-white py-4 px-6 flex justify-between items-center">
-    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-        <!-- Logo -->
-        <a href="{% url 'index' %}" class="text-xl font-bold text-gray-800"><img src="{% static 'images/logos/thsshoplogo.png' %}" class=" w-20" alt="thisShop"></a>
+<nav class="navbar sticky top-0 z-50 bg-orange-400 shadow-md">
+    <div class="flex justify-between items-center container mx-auto p-2">
+        <!-- Left Section: Logo and Links -->
+        <div class="flex items-center space-x-8">
+            <!-- Logo -->
+             <div class="flex-1">
+            <a href="{% url 'index' %}" class="btn btn-ghost text-xl font-bold"><img src="{% static 'images/logos/thsshoplogo.png' %}" class=" w-20" alt="thisShop"></a>
+            </div>
+            <!-- Navigation Links -->
+            <div class="flex navbar-center">
+                <ul class="menu menu-vertical lg:menu-horizontal rounded-box p-0">
+                    <li><a href="{% url 'index' %}">Home</a></li>
+                    <li><a href="{% url 'shop'  %}">Shop</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>               
+            </div>
+        </div>
 
-        <!-- Menu -->
-        <ul class="flex space-x-6">
-            <li><a href="{% url 'index' %}" class="hover:text-yellow-400">Home</a></li>
-            <li><a href="{% url 'shop'  %}" class="hover:text-yellow-400">Shop</a></li>
-            <li><a href="#" class="hover:text-yellow-400">Contact</a></li>
-        </ul>
-        <!-- <div class="menu menu-vertical lg:menu-horizontal hidden md:flex space-x-6 items-center">
-            <a href="{% url 'index' %}" class="text-gray-600 hover:text-gray-800">Home</a>
-            <a href="{% url 'shop' %}" class="text-gray-600 hover:text-gray-800">Shop</a>
-            <a href="#" class="text-gray-600 hover:text-gray-800">About</a>
-            <a href="#" class="text-gray-600 hover:text-gray-800">Contact</a>
-        </div> -->
-
-        <!-- Search and Cart -->
-        <div class="flex items-center space-x-4">
-            <div class="relative">
+        <!-- Right Section: Search, Icons, and Authentication -->
+        <div class="flex items-center space-x-6">
+            <!-- Search Bar -->
+            <div class="form-control">
                 <form action="{% url 'shop' %}" method="GET">
-                <input type="text" name="search" value="{{ search_query }}" class="border rounded-full py-1 px-3 text-sm" placeholder="Search...">
-                <button type="submit" class="absolute right-0 top-0 mt-2 mr-3 text-gray-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                </button>
+                    <input type="text" name="search" value="{{ search_query }}" placeholder="Search" class="input input-bordered w-48">
                 </form>
             </div>
-            <!-- wishlist -->
-            <div class="indicator">
-                <a href="{% url 'fav' %}" class="text-gray-600 hover:text-gray-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                    </svg>
-                    <span
-                        class="badge badge-sm indicator-item absolute left-auto -ml-1 top-0 rounded-full bg-black-500 px-1 py-0 text-xs text-white">{{ fav|length }}</span>
-                </a>
+            <!-- Wishlist Icon -->
+            <!-- {% comment %}<a href="{% url 'fav' %}" class="btn btn-ghost btn-circle">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </a>{% endcomment %} -->
+            <!-- Shopping Cart Icon -->
+            <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                    <div class="indicator">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <span class="badge badge-sm indicator-item" id="cart-count">{{ cart_count }}</span>
+                    </div>
+                </div>
+                <div tabindex="0" class="card card-compact dropdown-content bg-white z-[1] mt-3 w-52 shadow">
+                    <div class="card-body">
+                        <span class="text-lg font-bold" id="cart-count-dropdown">{{ cart_count }} items</span>
+                        <span class="text-info" id="cart-total">Subtotal: ${{ cart_total|floatformat:2 }}</span>
+                        <div class="card-actions">
+                            <a href="{% url 'cart' %}" class="btn btn-primary btn-block">View cart</a>
+                        </div>
+                    </div>
+               </div>
             </div>
-            <!-- cart -->
-            <div class="indicator">
-                <a href="{% url 'cart' %}" class="text-gray-600 hover:text-gray-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px"
-                        class="cursor-pointer fill-[#333] inline" viewBox="0 0 512 512">
-                        <path
-                            d="M164.96 300.004h.024c.02 0 .04-.004.059-.004H437a15.003 15.003 0 0 0 14.422-10.879l60-210a15.003 15.003 0 0 0-2.445-13.152A15.006 15.006 0 0 0 497 60H130.367l-10.722-48.254A15.003 15.003 0 0 0 105 0H15C6.715 0 0 6.715 0 15s6.715 15 15 15h77.969c1.898 8.55 51.312 230.918 54.156 243.71C131.184 280.64 120 296.536 120 315c0 24.812 20.188 45 45 45h272c8.285 0 15-6.715 15-15s-6.715-15-15-15H165c-8.27 0-15-6.73-15-15 0-8.258 6.707-14.977 14.96-14.996zM477.114 90l-51.43 180H177.032l-40-180zM150 405c0 24.813 20.188 45 45 45s45-20.188 45-45-20.188-45-45-45-45 20.188-45 45zm45-15c8.27 0 15 6.73 15 15s-6.73 15-15 15-15-6.73-15-15 6.73-15 15-15zm167 15c0 24.813 20.188 45 45 45s45-20.188 45-45-20.188-45-45-45-45 20.188-45 45zm45-15c8.27 0 15 6.73 15 15s-6.73 15-15 15-15-6.73-15-15 6.73-15 15-15zm0 0"
-                            data-original="#000000"></path>
-                    </svg>
-                    <span id="cart-count"
-                        class="badge badge-sm indicator-item absolute left-auto -ml-1 top-0 rounded-full bg-black-500 px-1 py-0 text-xs text-white">{{ cart_count }}</span>
-                </a>
-            </div>
-        </div>
+            <!-- Authentication -->
+            {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary">Logout</a>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary">Signup</a>
 
-        <!-- Mobile menu button -->
-        <div class="md:hidden flex items-center">
-            <button class="mobile-menu-button">
-                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
-                    </path>
-                </svg>
-            </button>
+            {% endif %}
         </div>
-    </div>
-
-    <!-- Mobile menu -->
-    <div class="mobile-menu hidden md:hidden">
-        <a href="{% url 'index' %}" class="block py-2 px-4 text-sm hover:bg-gray-200">Home</a>
-        <a href="{% url 'shop' %}" class="block py-2 px-4 text-sm hover:bg-gray-200">Shop</a>
-        <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-200">Contact</a>
     </div>
 </nav>
+
 
 <script>
     const btn = document.querySelector('.mobile-menu-button');
@@ -106,5 +73,5 @@
     btn.addEventListener('click', () => {
         menu.classList.toggle('hidden');
     });
-    
+
 </script>

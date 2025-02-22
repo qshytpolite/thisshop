@@ -243,6 +243,11 @@ thisShop | Is The Shop
             if (data.cart_count !== undefined) {
                     // Update cart count dynamically in the navbar
                     document.getElementById('cart-count').textContent = data.cart_count;
+                    document.getElementById('cart-count-dropdown').textContent = data.cart_count;
+                }
+                // Update cart total dynamically in the navbar
+                if (data.total !== undefined) {
+                    document.getElementById('cart-total').textContent =`Subtotal: ${parseFloat(data.total).toFixed(2)}`;
                 }
           })
           .catch(error => {

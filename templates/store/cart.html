@@ -1,7 +1,9 @@
 {% extends 'layouts/base.html' %}
+
 {% block title %}
 Cart | thisShop
 {% endblock title %}
+
 {% block content %}
 <div class="bg-gray-100 h-screen py-8">
   <div class="container mx-auto px-4">
@@ -20,9 +22,9 @@ Cart | thisShop
                 <th class="text-left font-semibold">Remove</th>
               </tr>
             </thead>
-            {% for item in cart_items %}
             <tbody>
-              <tr>
+              {% for item in cart_items %}
+              <tr data-cart-item-id="{{ item.id }}">
                 <td class="py-4">
                   <div class="flex items-center">
                     <img class="h-16 w-16 mr-4" src="{{ item.product.product_image.url }}" alt="{{ item.product.name }}">
@@ -36,29 +38,22 @@ Cart | thisShop
                 {% endif %}
                 <td class="py-4">
                   <div class="flex items-center">
-                    <form method="POST" action="{% url 'update_cart' item.product.id %}">
-                      {% csrf_token %}
-                      <input type="number" name="quantity" value="{{ item.product_qty }}" min="1" class="w-16 text-center border rounded">
-                      <button type="submit" class="ml-2 bg-gray-800 text-white px-2 py-1 rounded">Update</button>
-                    </form>
+                    <input type="number" value="{{ item.product_qty }}" min="1" class="w-16 text-center border rounded update-quantity bg-orange-400" data-cart-item-id="{{ item.id }}">
+                    <button class="btn btn-primary btn-sm btn-outline rounded update-cart" data-cart-item-id="{{ item.id }}">Update</button>
                   </div>
                 </td>
-                <td class="py-4">${{ item.item_total }}</td>
+                <td class="py-4 item-total" data-cart-item-id="{{ item.id }}">${{ item.item_total }}</td>
                 <td class="py-4">
-                  <form action="{% url 'remove_cart' item.product_id %}" method="post" class="inline-block ml-4">
-                    {% csrf_token %}
-                    <button class="text-red-500 hover:text-red-700">Remove</button>
-                  </form>
+                  <button class="btn btn-primary btn-sm btn-outline remove-cart" data-cart-item-id="{{ item.id }}">Remove</button>
                 </td>
               </tr>
+              {% endfor %}
             </tbody>
-            {% endfor %}
           </table>
         </div>
-        <a href="{% url 'index' %}" class="flex font-semibold text-indigo-600 text-sm mt-10">
+        <a href="{% url 'shop' %}" class="btn-link flex font-semibold hover:text-indigo-600 text-sm mt-10">
           <svg class="fill-current mr-2 text-indigo-600 w-4" viewBox="0 0 448 512">
-            <path
-              d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z" />
+            <path d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z" />
           </svg>
           Continue Shopping
         </a>
@@ -69,16 +64,11 @@ Cart | thisShop
         <div class="bg-white rounded-lg shadow-md p-6">
           <h2 class="text-lg font-semibold mb-4">Summary</h2>
           <div class="flex justify-between mb-2">
-            <span>Subtotal</span>
-            <span>${{ total }}</span>
+            <span class="font-semibold">Total</span>
+            <span class="font-semibold" id="cart-subtotal">${{ total }}</span>
           </div>
           <hr class="my-2">
-          <div class="flex justify-between mb-2">
-            <span class="font-semibold">Total</span>
-            <span class="font-semibold">${{ total }}</span>
-          </div>
-          <button id="btnCheckout" type="button"
-            class="min-w-[200px] px-4 py-2.5 border border-gray-800 bg-transparent hover:bg-gray-50 text-gray-800 text-sm font-semibold rounded">Checkout</button>
+          <button id="btnCheckout" type="button" class="btn btn-wide btn-accent min-w-[200px] px-4 py-2.5 border border-gray-800  hover:bg-gray-50  rounded">Checkout</button>
         </div>
       </div>
       {% else %}
@@ -91,13 +81,11 @@ Cart | thisShop
 </div>
 
 <!-- Modal for login prompt -->
-<div id="loginModal"
-  class="fixed inset-0 z-50 overflow-auto bg-smoke-light items-center justify-center hidden">
+<div id="loginModal" class="fixed inset-0 z-50 overflow-auto bg-smoke-light items-center justify-center hidden">
   <div class="relative p-8 bg-white w-full max-w-md m-auto flex-col flex rounded-lg">
     <div class="modal-header">
       <h5 class="text-lg font-bold">Login Required</h5>
-      <button id="btnCloseModal"
-        class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">✕</button>
+      <button id="btnCloseModal" class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">✕</button>
     </div>
     <div class="modal-body mt-4">
       <p>Please log in to continue to the checkout page.</p>
@@ -134,6 +122,72 @@ Cart | thisShop
 
     btnClose.addEventListener("click", closeModal);
     btnCloseModal.addEventListener("click", closeModal);
+
+    // Update Cart Quantity
+    document.querySelectorAll('.update-cart').forEach(button => {
+      button.addEventListener('click', function () {
+        const cartItemId = this.dataset.cartItemId;
+        const quantity = document.querySelector(`.update-quantity[data-cart-item-id="${cartItemId}"]`).value;
+
+        fetch(`/update-cart/${cartItemId}/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}',
+          },
+          body: JSON.stringify({ quantity: quantity }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'Cart updated') {
+              alert('Cart updated successfully!');
+              // Update the item total
+              document.querySelector(`.item-total[data-cart-item-id="${cartItemId}"]`).textContent = `$${data.item_total.toFixed(2)}`;
+              // Update the cart subtotal and total
+              document.getElementById('cart-subtotal').textContent = `$${data.total.toFixed(2)}`;
+              document.getElementById('cart-total').textContent = `$${data.total.toFixed(2)}`;
+            } else {
+              alert('Error: ' + data.status);
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+      });
+    });
+
+    // Remove Cart Item
+    document.querySelectorAll('.remove-cart').forEach(button => {
+      button.addEventListener('click', function () {
+        const cartItemId = this.dataset.cartItemId;
+
+        fetch(`/remove-cart/${cartItemId}/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}',
+          },
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'Item removed from cart') {
+              alert('Item removed from cart!');
+              // Update the cart count in the navbar
+              document.getElementById('cart-count').textContent = data.cart_count;
+              // Update the cart subtotal and total
+              document.getElementById('cart-subtotal').textContent = `$${data.total.toFixed(2)}`;
+              document.getElementById('cart-total').textContent = `$${data.total.toFixed(2)}`;
+              // Remove the item row from the table
+              document.querySelector(`tr[data-cart-item-id="${cartItemId}"]`).remove();
+            } else {
+              alert('Error: ' + data.status);
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+      });
+    });
   });
 </script>
 

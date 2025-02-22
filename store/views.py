@@ -11,7 +11,7 @@ from django.views.decorators.http import require_POST
 from .form import CheckoutForm, ReviewForm
 from .models import Cart, Category, Favourite, Order, OrderItem, Payment, Product,HeroSlide, Review
 from .utils import generate_reference
-from django.db.models import Q
+from django.db.models import Q, Sum
 
 
 def home(request):
@@ -62,48 +62,18 @@ def shop(request):
         'search_query': search_query,
     })
 
-
-def favviewpage(request):
-    if request.user.is_authenticated:
-        fav = Favourite.objects.filter(user=request.user)
-        return render(request, "store/fav.html", {"fav": fav})
-    else:
-        return redirect("/")
-
-
-def remove_fav(request, fid):
-    item = Favourite.objects.get(id=fid)
-    item.delete()
-    return redirect("/favviewpage")
-
-
+# Cart page
 def cart_page(request):
-    cart_items = []
-
     if request.user.is_authenticated:
         cart_items = Cart.objects.filter(user=request.user)
+        total = sum(item.item_total for item in cart_items)
     else:
-        cart_data = request.session.get('cart', {})
-        for product_id, product_qty in cart_data.items():
-            product = Product.objects.get(pk=product_id)
-            cart_items.append(Cart(product=product, product_qty=product_qty))
+        session_id = request.session.session_key
+        cart_items = Cart.objects.filter(session_id=session_id)
+        total = sum(item.item_total for item in cart_items)
 
-    total = sum(item.item_total for item in cart_items)
     context = {'cart_items': cart_items, 'total': total}
     return render(request, 'store/cart.html', context)
-
-
-# remove_cart view function
-def remove_cart(request, product_id):
-    if request.user.is_authenticated:
-        Cart.objects.filter(user=request.user, product__id=product_id).delete()
-    else:
-        cart_data = request.session.get('cart', {})
-        if str(product_id) in cart_data:
-            del cart_data[str(product_id)]
-            request.session['cart'] = cart_data
-
-    return redirect('cart')
 
 # add_to_cart view function
 
@@ -124,58 +94,120 @@ def add_to_cart(request, product_id):
 
     if request.user.is_authenticated:
         cart_item, created = Cart.objects.get_or_create(
-            user=request.user, product=product)
+            user=request.user, product=product
+        )
         if created:
             cart_item.product_qty = quantity
         else:
             cart_item.product_qty += quantity
         cart_item.save()
 
-        # Fetch the updated cart count
-        cart_count = Cart.objects.filter(user=request.user).count()
+        # Fetch the updated cart count and total
+        cart_items = Cart.objects.filter(user=request.user)
+        cart_count = cart_items.count()
+        total = sum(item.item_total for item in cart_items)
     else:
-        session_cart = request.session.get('cart', {})
-        if str(product_id) in session_cart:
-            session_cart[str(product_id)] += quantity
+        session_id = request.session.session_key
+        if not session_id:
+            request.session.create()
+            session_id = request.session.session_key
+
+        cart_item, created = Cart.objects.get_or_create(
+            session_id=session_id, product=product
+        )
+        if created:
+            cart_item.product_qty = quantity
         else:
-            session_cart[str(product_id)] = quantity
-        request.session['cart'] = session_cart
+            cart_item.product_qty += quantity
+        cart_item.save()
 
-        # Count items in the session cart
-        cart_count = sum(session_cart.values())
+        # Fetch the updated cart count and total
+        cart_items = Cart.objects.filter(session_id=session_id)
+        cart_count = cart_items.count()
+        total = sum(item.item_total for item in cart_items)
 
-    # Return the updated cart count in the response
     return JsonResponse({
         'status': 'Item added to cart',
-        'cart_count': cart_count
+        'cart_count': cart_count,
+        'total': total
     })
-
 
 # Update cart
 
+@csrf_exempt
 @require_POST
-def update_cart(request, product_id):
-    quantity = int(request.POST.get('quantity'))
-    user = request.user if request.user.is_authenticated else None
-    product = Product.objects.get(id=product_id)
+def update_cart(request, cart_item_id):
+    try:
+        cart_item = Cart.objects.get(id=cart_item_id)
+    except Cart.DoesNotExist:
+        return JsonResponse({'status': 'Cart item not found'}, status=404)
 
-    if user:
-        cart_item, created = Cart.objects.get_or_create(user=user, product=product)
-        if quantity > 0:
-            cart_item.product_qty = quantity
-            cart_item.save()
-        else:
-            cart_item.delete()
+    try:
+        data = json.loads(request.body)
+        new_quantity = int(data.get('quantity', 1))
+    except (ValueError, KeyError):
+        return JsonResponse({'status': 'Invalid quantity'}, status=400)
+
+    # Update the cart item quantity
+    cart_item.product_qty = new_quantity
+    cart_item.save()
+
+    # Recalculate the cart total
+    if request.user.is_authenticated:
+        cart_items = Cart.objects.filter(user=request.user)
     else:
-        cart_data = request.session.get('cart', {})
-        if quantity > 0:
-            cart_data[product_id] = quantity
-        else:
-            cart_data.pop(product_id, None)
-        request.session['cart'] = cart_data
+        session_id = request.session.session_key
+        cart_items = Cart.objects.filter(session_id=session_id)
 
-    return redirect('cart')
+    total = sum(item.item_total for item in cart_items)
 
+    return JsonResponse({
+        'status': 'Cart updated',
+        'cart_count': cart_items.count(),
+        'total': total,
+        'item_total': cart_item.item_total,  # Total for the updated item
+    })
+
+# remove_cart view function
+@csrf_exempt
+@require_POST
+def remove_cart(request, cart_item_id):
+    try:
+        cart_item = Cart.objects.get(id=cart_item_id)
+    except Cart.DoesNotExist:
+        return JsonResponse({'status': 'Cart item not found'}, status=404)
+
+    # Delete the cart item
+    cart_item.delete()
+
+    # Recalculate the cart total
+    if request.user.is_authenticated:
+        cart_items = Cart.objects.filter(user=request.user)
+    else:
+        session_id = request.session.session_key
+        cart_items = Cart.objects.filter(session_id=session_id)
+
+    total = sum(item.item_total for item in cart_items)
+
+    return JsonResponse({
+        'status': 'Item removed from cart',
+        'cart_count': cart_items.count(),
+        'total': total,
+    })
+
+# Favourite view
+def favviewpage(request):
+    if request.user.is_authenticated:
+        fav = Favourite.objects.filter(user=request.user)
+        return render(request, "store/fav.html", {"fav": fav})
+    else:
+        return redirect("/")
+
+
+def remove_fav(request, fid):
+    item = Favourite.objects.get(id=fid)
+    item.delete()
+    return redirect("/favviewpage")
 
 def fav_page(request: HttpRequest):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
