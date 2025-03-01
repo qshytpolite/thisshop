@@ -1,15 +1,35 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field, Submit, Row, Column, Div
+from crispy_forms.layout import Layout, Submit, Row, Column, Div
 from .models import Review
 
 class ReviewForm(forms.ModelForm):
+    RATING_CHOICES = [
+        (1, '1 - Poor'),
+        (2, '2 - Fair'),
+        (3, '3 - Good'),
+        (4, '4 - Very Good'),
+        (5, '5 - Excellent'),
+    ]
+
+    rating = forms.ChoiceField(
+        choices=RATING_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        label='Your Rating'
+    )
+
     class Meta:
         model = Review
         fields = ['rating', 'comment']
         widgets = {
-            'rating': forms.Select(attrs={'class': 'form-control'}),
-            'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'comment': forms.Textarea(attrs={'class': 'form-control mt-2 text-gray-800 bg-white', 'rows': 4}),
+        }
+        labels = {
+            'comment': 'Your Review',
+        }
+        help_texts = {
+            'rating': 'Select a rating between 1 and 5.',
+            'comment': 'Write your review here.',
         }
 
 

@@ -1,4 +1,6 @@
 {% extends 'layouts/base.html' %}
+{% load tailwind_filters %}
+
 {% block title %}
 thisShop | Is The Shop
 {% endblock title %}
@@ -11,8 +13,7 @@ thisShop | Is The Shop
         <nav aria-label="breadcrumb">
           <ol class="flex flex-wrap list-reset pt-3 pb-3 py-4 px-4 mb-4 bg-gray-200 rounded">
             <li class="inline-block px-2 py-2 text-gray-700"><a href="{% url 'index' %}">Home</a></li>
-            <li class="inline-block px-2 py-2 text-gray-700"><a
-                href="{% url 'collections' product.category.name %}">Collections</a></li>
+            <li class="inline-block px-2 py-2 text-gray-700"><a href="{% url 'collections' product.category.name %}">Collections</a></li>
             <li class="inline-block px-2 py-2 text-gray-700 active" aria-current="page">{{products}}</li>
           </ol>
         </nav>
@@ -30,19 +31,16 @@ thisShop | Is The Shop
           {% if product.discount_percentage %}
           <span class="absolute right-11 top-3 m-0 rounded-full bg-black px-2 text-center text-md font-medium text-white">{{ product.discount_percentage| stringformat:'d' }} %</span>
           {% endif %}
-          <img src="{{ product.product_image.url }}" alt="{{ product.name }}"
-            class="w-full max-h-full object-contain object-top" id="mainImage" />
+          <img src="{{ product.product_image.url }}" alt="{{ product.name }}" class="w-full max-h-full object-contain object-top" id="mainImage" />
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-gray-100 p-4 flex items-center rounded sm:h-[182px]">
-            <img src="{{ product.product_image.url }}" alt="{{ product.name }}"
-              class="w-full max-h-full object-contain object-top cursor-pointer opacity-60 hover:opacity-100 transition duration-300" onclick="changeImage(this.src)"/>
+            <img src="{{ product.product_image.url }}" alt="{{ product.name }}" class="w-full max-h-full object-contain object-top cursor-pointer opacity-60 hover:opacity-100 transition duration-300" onclick="changeImage(this.src)" />
           </div>
 
           <div class="bg-gray-100 p-4 flex items-center rounded sm:h-[182px]">
-            <img src="{{ product.product_image.url }}" alt="{{ product.name }}"
-              class="w-full max-h-full object-contain object-top cursor-pointer opacity-60 hover:opacity-100 transition duration-300" onclick="changeImage(this.src)" />
+            <img src="{{ product.product_image.url }}" alt="{{ product.name }}" class="w-full max-h-full object-contain object-top cursor-pointer opacity-60 hover:opacity-100 transition duration-300" onclick="changeImage(this.src)" />
           </div>
         </div>
       </div>
@@ -52,43 +50,30 @@ thisShop | Is The Shop
           <h2 class="text-2xl font-extrabold text-gray-800">{{ product.name }}</h2>
           <p class="text-sm text-gray-600 mt-2">{{ product.vendor }}</p>
         </div>
-
+        <!-- Rating Section -->
         <div class="flex space-x-1 mt-4">
+          {% for i in "12345" %}
+          {% if i|add:0 <= average_rating %}
+          <!-- Filled star -->
           <svg class="w-5 fill-gray-800" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
+            <path d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
           </svg>
-          <svg class="w-5 fill-gray-800" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
-          </svg>
-          <svg class="w-5 fill-gray-800" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
-          </svg>
-          <svg class="w-5 fill-gray-800" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
-          </svg>
+          {% else %}
+          <!-- Empty star -->
           <svg class="w-5 fill-[#CED5D8]" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
+            <path d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
           </svg>
+          {% endif %}
+          {% endfor %}
 
-          <button type="button"
-            class="px-2.5 py-1.5 bg-gray-100 text-xs text-gray-800 rounded-md flex items-center !ml-4">
+          <!-- Review Count Button -->
+          <button type="button" class="px-2.5 py-1.5 bg-gray-100 text-xs text-gray-800 rounded-md flex items-center !ml-4">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-3 mr-1" fill="currentColor" viewBox="0 0 32 32">
-              <path
-                d="M14.236 21.954h-3.6c-.91 0-1.65-.74-1.65-1.65v-7.201c0-.91.74-1.65 1.65-1.65h3.6a.75.75 0 0 1 .75.75v9.001a.75.75 0 0 1-.75.75zm-3.6-9.001a.15.15 0 0 0-.15.15v7.2a.15.15 0 0 0 .15.151h2.85v-7.501z"
-                data-original="#000000" />
-              <path
-                d="M20.52 21.954h-6.284a.75.75 0 0 1-.75-.75v-9.001c0-.257.132-.495.348-.633.017-.011 1.717-1.118 2.037-3.25.18-1.184 1.118-2.089 2.28-2.201a2.557 2.557 0 0 1 2.17.868c.489.56.71 1.305.609 2.042a9.468 9.468 0 0 1-.678 2.424h.943a2.56 2.56 0 0 1 1.918.862c.483.547.708 1.279.617 2.006l-.675 5.401a2.565 2.565 0 0 1-2.535 2.232zm-5.534-1.5h5.533a1.06 1.06 0 0 0 1.048-.922l.675-5.397a1.046 1.046 0 0 0-1.047-1.182h-2.16a.751.751 0 0 1-.648-1.13 8.147 8.147 0 0 0 1.057-3 1.059 1.059 0 0 0-.254-.852 1.057 1.057 0 0 0-.795-.365c-.577.052-.964.435-1.04.938-.326 2.163-1.71 3.507-2.369 4.036v7.874z"
-                data-original="#000000" />
-              <path
-                d="M4 31.75a.75.75 0 0 1-.612-1.184c1.014-1.428 1.643-2.999 1.869-4.667.032-.241.055-.485.07-.719A14.701 14.701 0 0 1 1.25 15C1.25 6.867 7.867.25 16 .25S30.75 6.867 30.75 15 24.133 29.75 16 29.75a14.57 14.57 0 0 1-5.594-1.101c-2.179 2.045-4.61 2.81-6.281 3.09A.774.774 0 0 1 4 31.75zm12-30C8.694 1.75 2.75 7.694 2.75 15c0 3.52 1.375 6.845 3.872 9.362a.75.75 0 0 1 .217.55c-.01.373-.042.78-.095 1.186A11.715 11.715 0 0 1 5.58 29.83a10.387 10.387 0 0 0 3.898-2.37l.231-.23a.75.75 0 0 1 .84-.153A13.072 13.072 0 0 0 16 28.25c7.306 0 13.25-5.944 13.25-13.25S23.306 1.75 16 1.75z"
-                data-original="#000000" />
+              <path d="M14.236 21.954h-3.6c-.91 0-1.65-.74-1.65-1.65v-7.201c0-.91.74-1.65 1.65-1.65h3.6a.75.75 0 0 1 .75.75v9.001a.75.75 0 0 1-.75.75zm-3.6-9.001a.15.15 0 0 0-.15.15v7.2a.15.15 0 0 0 .15.151h2.85v-7.501z" data-original="#000000" />
+              <path d="M20.52 21.954h-6.284a.75.75 0 0 1-.75-.75v-9.001c0-.257.132-.495.348-.633.017-.011 1.717-1.118 2.037-3.25.18-1.184 1.118-2.089 2.28-2.201a2.557 2.557 0 0 1 2.17.868c.489.56.71 1.305.609 2.042a9.468 9.468 0 0 1-.678 2.424h.943a2.56 2.56 0 0 1 1.918.862c.483.547.708 1.279.617 2.006l-.675 5.401a2.565 2.565 0 0 1-2.535 2.232zm-5.534-1.5h5.533a1.06 1.06 0 0 0 1.048-.922l.675-5.397a1.046 1.046 0 0 0-1.047-1.182h-2.16a.751.751 0 0 1-.648-1.13 8.147 8.147 0 0 0 1.057-3 1.059 1.059 0 0 0-.254-.852 1.057 1.057 0 0 0-.795-.365c-.577.052-.964.435-1.04.938-.326 2.163-1.71 3.507-2.369 4.036v7.874z" data-original="#000000" />
+              <path d="M4 31.75a.75.75 0 0 1-.612-1.184c1.014-1.428 1.643-2.999 1.869-4.667.032-.241.055-.485.07-.719A14.701 14.701 0 0 1 1.25 15C1.25 6.867 7.867.25 16 .25S30.75 6.867 30.75 15 24.133 29.75 16 29.75a14.57 14.57 0 0 1-5.594-1.101c-2.179 2.045-4.61 2.81-6.281 3.09A.774.774 0 0 1 4 31.75zm12-30C8.694 1.75 2.75 7.694 2.75 15c0 3.52 1.375 6.845 3.872 9.362a.75.75 0 0 1 .217.55c-.01.373-.042.78-.095 1.186A11.715 11.715 0 0 1 5.58 29.83a10.387 10.387 0 0 0 3.898-2.37l.231-.23a.75.75 0 0 1 .84-.153A13.072 13.072 0 0 0 16 28.25c7.306 0 13.25-5.944 13.25-13.25S23.306 1.75 16 1.75z" data-original="#000000" />
             </svg>
-            87 Reviews
+            {{ review_count }} Reviews
           </button>
         </div>
 
@@ -96,7 +81,7 @@ thisShop | Is The Shop
           {% if product.discounted_price %}
           <!-- <h3 class="text-red-800 text-3xl font-bold"><strike
               class="text-blue-400 ml-2 font-medium">${{ products.selling_price }}</strike></h3> -->
-              <p><strong>Discount: {{ product.discount_percentage| stringformat:'d' }}%</strong></p>
+          <p><strong>Discount: {{ product.discount_percentage| stringformat:'d' }}%</strong></p>
           <h3 class="text-gray-800 text-3xl font-bold">${{ product.discounted_price }}</h3>
           {% else %}
 
@@ -120,68 +105,80 @@ thisShop | Is The Shop
 
         <div class="flex flex-wrap gap-4 mt-8">
           <button id="btnMinus" class="btn btn-primary btn-square">-</button>
-          <input id="txtQty" type="text" value="1"
-            class="w-12 h-12 border border-gray-800 text-center text-sm font-semibold rounded text-white">
+          <input id="txtQty" type="text" value="1" class="w-12 h-12 border border-gray-800 text-center text-sm font-semibold rounded text-white">
           <button id="btnPlus" class="btn btn-primary btn-square">+</button>
-          <button id="btnCart" type="button"
-            class="min-w-[200px] px-4 py-2.5 border border-gray-800 bg-transparent hover:bg-blue-500 text-gray-800 hover:text-slate-100 text-sm font-semibold rounded">Add
+          <button id="btnCart" type="button" class="min-w-[200px] px-4 py-2.5 border border-gray-800 bg-transparent hover:bg-blue-500 text-gray-800 hover:text-slate-100 text-sm font-semibold rounded">Add
             to cart</button>
         </div>
         <input type="hidden" id="pid" value="{{ product.id }}">
 
 
         <div class="mt-8">
+          <!-- Tabs -->
           <ul class="flex border-b">
-            <li
-              class="text-gray-800 font-bold text-sm bg-gray-100 py-3 px-8 border-b-2 border-gray-800 cursor-pointer transition-all">
-              Description</li>
-            <li class="text-gray-600 font-bold text-sm hover:bg-gray-100 py-3 px-8 cursor-pointer transition-all">
-              Reviews</li>
+            <li id="description-tab" class="text-gray-800 font-bold text-sm bg-gray-100 py-3 px-8 border-b-2 border-gray-800 cursor-pointer transition-all" onclick="showDescription()">
+              Description
+            </li>
+            <li id="reviews-tab" class="text-gray-600 font-bold text-sm hover:bg-gray-100 py-3 px-8 cursor-pointer transition-all" onclick="showReviews()">
+              Reviews
+            </li>
           </ul>
-
-          <div class="mt-8">
+        
+          <!-- Description Section -->
+          <div id="description-section" class="mt-8">
             <h3 class="text-lg font-bold text-gray-800">Product Description</h3>
-            <p class="text-sm text-gray-600 mt-4">{{ products.description }}.{% lorem 1 %}</p>
+            <p class="text-sm text-gray-600 mt-4">{{ product.description }}</p>
           </div>
-
-          <div class="mt-8">
+        
+          <!-- Reviews Section -->
+          <div id="reviews-section" class="mt-8 hidden">
             <h3 class="text-lg font-bold text-gray-800">Reviews</h3>
             {% if reviews %}
-            <ul>
+              <ul class="space-y-4">
                 {% for review in reviews %}
-                    <li>
-                        <strong>{{ review.user.username }}</strong> - Rated: {{ review.rating }}/5
-                        <p>{{ review.comment }}</p>
-                        <small>Reviewed on: {{ review.created_at|date:"M d, Y" }}</small>
-                    </li>
+                  <li class="border p-4 rounded-lg">
+                    <div class="flex items-center space-x-2">
+                      <span class="font-semibold">{{ review.user.username }}</span>
+                      <span class="text-yellow-500">{{ review.rating }}/5</span>
+                    </div>
+                    <p class="mt-2 text-gray-700">{{ review.comment }}</p>
+                    <small class="text-gray-500">Reviewed on: {{ review.created_at|date:"M d, Y" }}</small>
+                  </li>
                 {% endfor %}
-            </ul>
-        {% else %}
-            <p>No reviews yet. Be the first to review this product!</p>
-        {% endif %}
+              </ul>
+            {% else %}
+              <p class="text-gray-600">No reviews yet. Be the first to review this product!</p>
+            {% endif %}
+        
             <!-- Add a New Review -->
-    {% if user.is_authenticated %}
-    <h3>Submit Your Review</h3>
-    <form method="post" action="{% url 'submit_review' product.id %}">
-        {% csrf_token %}
-        {{ review_form.as_p }}
-        <button type="submit" class="btn btn-primary">Submit Review</button>
-    </form>
-{% else %}
-    <p><a href="{% url 'login' %}">Log in</a> to submit a review.</p>
-{% endif %}
-</div>
+            {% if user.is_authenticated %}
+              <h3 class="text-lg font-bold text-gray-800 mt-8">Submit Your Review</h3>
+              <form method="post" class="space-y-4">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                  Submit Review
+                </button>
+              </form>
+            {% else %}
+            <p class="text-gray-600 mt-4">
+              <a href="{% url 'login' %}?next={{ request.path }}" class="text-blue-600 hover:underline">
+                Log in
+              </a> to submit a review.
+            </p>
+            {% endif %}
           </div>
+        </div>
 
-          <!-- <ul class="space-y-3 list-disc mt-6 pl-4 text-sm text-gray-600">
+        <!-- <ul class="space-y-3 list-disc mt-6 pl-4 text-sm text-gray-600">
               <li>A pair of nike shoes is a wardrobe essential due to its versatility.</li>
               <li>Available in a wide range of sizes, from extra small to extra large, and even in tall and petite sizes.</li>
               <li>Easy to maintain, they can be machine-washed and dried on low heat.</li>
               <li>Personalize them with your own designs, patterns, or embellishments to make them uniquely yours.</li>
             </ul>-->
-        </div>
       </div>
     </div>
+  </div>
   </div>
   <!-- templates/store/product_details.html -->
 
@@ -241,14 +238,14 @@ thisShop | Is The Shop
               alert("Error: " + data.status);
             }
             if (data.cart_count !== undefined) {
-                    // Update cart count dynamically in the navbar
-                    document.getElementById('cart-count').textContent = data.cart_count;
-                    document.getElementById('cart-count-dropdown').textContent = data.cart_count;
-                }
-                // Update cart total dynamically in the navbar
-                if (data.total !== undefined) {
-                    document.getElementById('cart-total').textContent =`Subtotal: ${parseFloat(data.total).toFixed(2)}`;
-                }
+              // Update cart count dynamically in the navbar
+              document.getElementById('cart-count').textContent = data.cart_count;
+              document.getElementById('cart-count-dropdown').textContent = data.cart_count;
+            }
+            // Update cart total dynamically in the navbar
+            if (data.total !== undefined) {
+              document.getElementById('cart-total').textContent = `Subtotal: ${parseFloat(data.total).toFixed(2)}`;
+            }
           })
           .catch(error => {
             console.error("Error:", error);
@@ -274,106 +271,29 @@ thisShop | Is The Shop
 
     // function to changeImage
     function changeImage(src) {
-            document.getElementById('mainImage').src = src;
+      document.getElementById('mainImage').src = src;
     }
   });
-</script>
-
-
-<!-- <script>
-  function parseQuantity(value) {
-    const qty = parseInt(value, 10);
-    return isNaN(qty) ? 0 : qty;
+  // Javascript for tabs
+  function showDescription() {
+    document.getElementById('description-section').classList.remove('hidden');
+    document.getElementById('reviews-section').classList.add('hidden');
+    document.getElementById('description-tab').classList.add('bg-gray-100', 'border-b-2', 'border-gray-800');
+    document.getElementById('description-tab').classList.remove('text-gray-600');
+    document.getElementById('reviews-tab').classList.remove('bg-gray-100', 'border-b-2', 'border-gray-800');
+    document.getElementById('reviews-tab').classList.add('text-gray-600');
   }
 
-  document.addEventListener("DOMContentLoaded", function (event) {
-    const btnPlus = document.getElementById("btnPlus");
-    const btnMinus = document.getElementById("btnMinus");
-    const txtQty = document.getElementById("txtQty");
-    const pid = document.getElementById("pid");
-    const btnCart = document.getElementById("btnCart");
+  function showReviews() {
+    document.getElementById('reviews-section').classList.remove('hidden');
+    document.getElementById('description-section').classList.add('hidden');
+    document.getElementById('reviews-tab').classList.add('bg-gray-100', 'border-b-2', 'border-gray-800');
+    document.getElementById('reviews-tab').classList.remove('text-gray-600');
+    document.getElementById('description-tab').classList.remove('bg-gray-100', 'border-b-2', 'border-gray-800');
+    document.getElementById('description-tab').classList.add('text-gray-600');
+  }
 
-    btnPlus.addEventListener("click", function () {
-      const qty = parseQuantity(txtQty.value);
-      if (qty < 10) {
-        txtQty.value = qty + 1;
-      }
-    });
-
-    btnMinus.addEventListener("click", function () {
-      const qty = parseQuantity(txtQty.value);
-      if (qty > 1) {
-        txtQty.value = qty - 1;
-      }
-    });
-
-    function parseQuantity(value) {
-      const qty = parseInt(value, 10);
-      return isNaN(qty) ? 0 : qty;
-    }
-
-    function handleAddToCart() {
-      const qty = parseQuantity(txtQty.value);
-      if (qty <= 0) {
-        return;
-      }
-
-      const postObj = {
-        product_qty: qty,
-      };
-
-      fetch(`/add_to_cart/${pid.value}/`, {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: {
-          'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRFToken': '{{ csrf_token }}',
-          'Content-Type': 'application/json'  // Ensure content-type is correct
-        },
-        body: JSON.stringify(postObj)
-      })
-        .then(response => response.json())
-        .then(data => {
-          alert(data['status']);
-        })
-        .catch(error => {
-          console.error('Error adding to cart:', error);
-          alert('An error occurred. Please try again later.');
-        });
-    }
-
-    btnCart.addEventListener("click", handleAddToCart);
-
-    function handleAddToWishlist() {
-      const postObj = {
-        pid: pid.value
-      };
-
-      fetch("/fav", {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: {
-          'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRFToken': '{{ csrf_token }}',
-        },
-        body: JSON.stringify(postObj)
-      })
-        .then(response => response.json())
-        .then(data => {
-          alert(data['status']);
-        })
-        .catch(error => {
-          console.error('Error adding to wishlist:', error);
-          alert('An error occurred. Please try again later.');
-        });
-    }
-
-    btnFav.addEventListener("click", handleAddToWishlist);
-
-  });
-
-
-</script> -->
+  // Show description by default
+  showDescription();
+</script>
 {% endblock content %}

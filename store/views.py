@@ -9,13 +9,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from .form import CheckoutForm, ReviewForm
-from .models import Cart, Category, Favourite, Order, OrderItem, Payment, Product,HeroSlide, Review
+from .models import Cart, Category, Favourite, Order, OrderItem, Payment, Product, HeroSlide, Review
 from .utils import generate_reference
 from django.db.models import Q, Sum
 
 
 def home(request):
-    slides = HeroSlide.objects.all()   
+    slides = HeroSlide.objects.all()
     category = Category.objects.filter(status=1)
     products = Product.objects.filter(featured=True).order_by('-id')
     context = {
@@ -26,6 +26,8 @@ def home(request):
     return render(request, "store/index.html", context)
 
 # Shop view with filters
+
+
 def shop(request):
     # Get all categories to display in the filter options
     categories = Category.objects.all()
@@ -42,7 +44,8 @@ def shop(request):
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     if min_price and max_price:
-        products = products.filter(selling_price__gte=min_price, selling_price__lte=max_price)
+        products = products.filter(
+            selling_price__gte=min_price, selling_price__lte=max_price)
 
     # Filtering by latest (if 'latest' is selected)
     latest = request.GET.get('latest')
@@ -53,7 +56,8 @@ def shop(request):
     search_query = request.GET.get('search')
     if search_query:
         products = products.filter(
-            Q(name__icontains=search_query) | Q(description__icontains=search_query)
+            Q(name__icontains=search_query) | Q(
+                description__icontains=search_query)
         )
 
     return render(request, 'store/shop.html', {
@@ -63,6 +67,8 @@ def shop(request):
     })
 
 # Cart page
+
+
 def cart_page(request):
     if request.user.is_authenticated:
         cart_items = Cart.objects.filter(user=request.user)
@@ -134,6 +140,7 @@ def add_to_cart(request, product_id):
 
 # Update cart
 
+
 @csrf_exempt
 @require_POST
 def update_cart(request, cart_item_id):
@@ -169,6 +176,8 @@ def update_cart(request, cart_item_id):
     })
 
 # remove_cart view function
+
+
 @csrf_exempt
 @require_POST
 def remove_cart(request, cart_item_id):
@@ -196,6 +205,8 @@ def remove_cart(request, cart_item_id):
     })
 
 # Favourite view
+
+
 def favviewpage(request):
     if request.user.is_authenticated:
         fav = Favourite.objects.filter(user=request.user)
@@ -208,6 +219,7 @@ def remove_fav(request, fid):
     item = Favourite.objects.get(id=fid)
     item.delete()
     return redirect("/favviewpage")
+
 
 def fav_page(request: HttpRequest):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -243,16 +255,35 @@ def collectionsview(request, name):
         messages.warning(request, "No Such Category Found")
         return redirect('collections')
 
+
 def product_details(request, slug):
     product = get_object_or_404(Product, slug=slug)
-    reviews = product.reviews.all()  # Fetch related reviews
-    review_form = ReviewForm()
+    reviews = product.reviews.all()
+    review_count = product.review_count
+    average_rating = product.average_rating
 
-    return render(request, 'store/product_details.html', {
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.product = product
+            review.user = request.user
+            review.save()
+            # Redirect to the same page to avoid form resubmission
+            return redirect('product_details', slug=slug)
+    else:
+        form = ReviewForm()
+
+    context = {
         'product': product,
         'reviews': reviews,
-        'review_form': review_form
-    })
+        'review_count': review_count,
+        'average_rating': average_rating,
+        'form': form,
+    }
+
+    return render(request, 'store/product_details.html', context)
+
 
 @login_required
 def submit_review(request, product_id):
@@ -301,6 +332,7 @@ def save_cart_and_redirect_to_login(request):
 
     # Redirect to the login page
     return redirect('login')
+
 
 @login_required
 def checkout_page(request):

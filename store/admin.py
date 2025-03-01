@@ -1,7 +1,7 @@
 # from atexit import register
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
-from .models import Category, Product, Cart, Favourite, Order, OrderItem, Payment, HeroSlide
+from .models import Category, Product, Cart, Favourite, Order, OrderItem, Payment, HeroSlide, Review, ProductImage
 from django.utils.html import format_html
 from unfold.admin import ModelAdmin
 
@@ -22,16 +22,27 @@ from unfold.admin import ModelAdmin
 #     image_preview.short_description = "Preview"
 
 #  Register HeroSlide model
+
+
 @admin.register(HeroSlide)
 class HeroSlideAdmin(ModelAdmin):
     list_display = ('title', 'subtitle', 'button_text', 'button_link')
 
+
 class ProductAdmin(ModelAdmin):
-    list_display = ('name', 'vendor', 'product_image', 'quantity',
+    prepopulated_fields = {'slug': ('name',)}
+    list_display = ('name', 'slug', 'vendor', 'product_image', 'quantity',
                     'selling_price', 'discounted_price', 'description', 'status', 'trending', 'featured')
 
 
 admin.site.register(Product, ProductAdmin)
+
+# Register ProductImage model
+
+admin.site.register(ProductImage)
+
+# Register Review model
+admin.site.register(Review)
 
 
 class CategoryAdmin(ModelAdmin):

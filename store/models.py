@@ -59,21 +59,34 @@ class Category(models.Model):
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     name = models.CharField(max_length=150, blank=False)
-    slug = models.SlugField(unique=True, max_length=150,
-                            null=False, blank=False)
+    slug = models.SlugField(unique=True, max_length=150)
     vendor = models.CharField(max_length=150, blank=False)
     product_image = models.ImageField(
         upload_to=getFileName, null=True, blank=True)
     quantity = models.IntegerField(null=False, blank=False)
     selling_price = models.FloatField()
     discounted_price = models.FloatField(null=True, blank=True)
-    description = models.TextField(max_length=500, null=False, blank=False)
+    description = models.TextField(max_length=500)
     status = models.BooleanField(default=False)
     trending = models.BooleanField(
         default=False, help_text="0-default,1-Trending")
     created_at = models.DateTimeField(auto_now_add=True)
     featured = models.BooleanField(
         default=False, help_text="0-default,1-Featured")
+    rating = models.FloatField(default=0.0)
+
+    # Calculate the average rating and number of reviews
+    @property
+    def average_rating(self):
+        reviews = self.reviews.all()
+        if reviews:
+            total_rating = sum(review.rating for review in reviews)
+            return total_rating / len(reviews)
+        return 0.0
+
+    @property
+    def review_count(self):
+        return self.reviews.count()
 
     # calculate the discount percentage dynamically    @property
     def discount_percentage(self):
@@ -97,6 +110,12 @@ class Product(models.Model):
             self.slug = slug
         super(Product, self).save(*args, **kwargs)
 
+# ProductImage model
+class ProductImage(models.Model):
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to=getFileName, null=True, blank=True)
+
 # Review model
 
 
@@ -104,8 +123,7 @@ class Review(models.Model):
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="reviews")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    rating = models.PositiveSmallIntegerField(
-        choices=[(i, str(i)) for i in range(1, 6)])  # Rating 1-5
+    rating = models.IntegerField()
     comment = models.TextField(max_length=500, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

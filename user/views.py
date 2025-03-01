@@ -26,6 +26,7 @@ def logout_page(request):
 #         messages.success(request, "Logged out Successfully")
 #     return redirect("/")
 
+# Handle Login and the next Parameter
 def login_page(request):
     if request.user.is_authenticated:
         return redirect("/")
@@ -53,12 +54,17 @@ def login_page(request):
                             cart_item.save()
                     # Clear the cart data from the session
                     del request.session['cart']
-                    
-                return redirect("/")
+
+                # Redirect to the 'next' URL if it exists, otherwise redirect to the home page
+                next_url = request.POST.get('next', '/')
+                return redirect(next_url)
             else:
                 messages.error(request, "Invalid User Name or Password")
                 return redirect("login")
-        return render(request, "auths/login.html")
+        else:
+            # Pass the 'next' parameter from the GET request to the template
+            next_url = request.GET.get('next', '/')
+            return render(request, "auths/login.html", {'next': next_url})
 
 def register(request):
     form = CustomUserForm()
