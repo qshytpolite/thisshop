@@ -1,6 +1,8 @@
-{% for msg in messages %}
-<div class="relative px-3 py-3 mb-4 border rounded bg-teal-200 border-teal-300 text-teal-800  opacity-0 block" role="alert">
-  {{msg}}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  {{ message }}
   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endfor %}
+{% endif %}

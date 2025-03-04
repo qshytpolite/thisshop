@@ -1,0 +1,45 @@
+{% extends 'layouts/base.html' %}
+{% load tailwind_filters %}
+
+{% block title %}
+My Account
+{% endblock title %}
+
+{% block content %}
+<section class="bg-gray-100 py-4 my-5" style="min-height:600px;">
+  <div class="container mx-auto sm:px-4">
+    <div class="flex flex-wrap">
+      <div class="w-full">
+        <h4 class="mb-3">My Account</h4>
+        <hr style="border-color:#b8bfc2;">
+        {% include 'inc/message.html' %}
+      </div>
+    </div>
+    <div class="flex flex-wrap">
+      <div class="w-full md:w-1/4 lg:w-1/5">
+        <!-- Sidebar Navigation -->
+        <div class="bg-white p-4 rounded-lg shadow-lg">
+          <ul>
+            <li class="mb-2">
+              <a href="{% url 'profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+            </li>
+            <li class="mb-2">
+              <a href="{% url 'change_password' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Change Password</a>
+            </li>
+            <li class="mb-2">
+              <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="w-full md:w-3/4 lg:w-4/5">
+        <!-- Main Content -->
+        <div class="bg-white p-8 rounded-lg shadow-lg">
+          <h2 class="text-2xl font-bold mb-4">Welcome, {{ request.user.username }}!</h2>
+          <p class="text-gray-600">This is your account dashboard. You can update your profile, change your password, or manage other settings from here.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

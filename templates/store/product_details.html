@@ -21,12 +21,13 @@ thisShop | Is The Shop
         <hr style="border-color:#b8bfc2;">
         {% include 'inc/message.html' %}
       </div>
-
     </div>
   </div>
   <div class="font-sans p-8 tracking-wide max-lg:max-w-2xl mx-auto">
     <div class="grid items-start grid-cols-1 lg:grid-cols-2 gap-10">
+      <!-- Product Images Section -->
       <div class="space-y-4 text-center lg:sticky top-8">
+        <!-- Main Image -->
         <div class="bg-gray-100 p-4 flex items-center sm:h-[380px] rounded">
           {% if product.discount_percentage %}
           <span class="absolute right-11 top-3 m-0 rounded-full bg-black px-2 text-center text-md font-medium text-white">{{ product.discount_percentage| stringformat:'d' }} %</span>
@@ -34,22 +35,29 @@ thisShop | Is The Shop
           <img src="{{ product.product_image.url }}" alt="{{ product.name }}" class="w-full max-h-full object-contain object-top" id="mainImage" />
         </div>
 
+        <!-- Thumbnail Gallery -->
         <div class="grid grid-cols-2 gap-4">
+          <!-- Main Image Thumbnail -->
           <div class="bg-gray-100 p-4 flex items-center rounded sm:h-[182px]">
             <img src="{{ product.product_image.url }}" alt="{{ product.name }}" class="w-full max-h-full object-contain object-top cursor-pointer opacity-60 hover:opacity-100 transition duration-300" onclick="changeImage(this.src)" />
           </div>
 
+          <!-- Additional Images -->
+          {% for image in product.images.all %}
           <div class="bg-gray-100 p-4 flex items-center rounded sm:h-[182px]">
-            <img src="{{ product.product_image.url }}" alt="{{ product.name }}" class="w-full max-h-full object-contain object-top cursor-pointer opacity-60 hover:opacity-100 transition duration-300" onclick="changeImage(this.src)" />
+            <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" class="w-full max-h-full object-contain object-top cursor-pointer opacity-60 hover:opacity-100 transition duration-300" onclick="changeImage(this.src)" />
           </div>
+          {% endfor %}
         </div>
       </div>
 
+      <!-- Product Details Section -->
       <div class="max-w-xl">
         <div>
           <h2 class="text-2xl font-extrabold text-gray-800">{{ product.name }}</h2>
           <p class="text-sm text-gray-600 mt-2">{{ product.vendor }}</p>
         </div>
+
         <!-- Rating Section -->
         <div class="flex space-x-1 mt-4">
           {% for i in "12345" %}
@@ -77,44 +85,27 @@ thisShop | Is The Shop
           </button>
         </div>
 
+        <!-- Price Section -->
         <div class="mt-4">
           {% if product.discounted_price %}
-          <!-- <h3 class="text-red-800 text-3xl font-bold"><strike
-              class="text-blue-400 ml-2 font-medium">${{ products.selling_price }}</strike></h3> -->
           <p><strong>Discount: {{ product.discount_percentage| stringformat:'d' }}%</strong></p>
           <h3 class="text-gray-800 text-3xl font-bold">${{ product.discounted_price }}</h3>
           {% else %}
-
           <h3 class="text-blue-800 text-3xl font-bold">${{ product.selling_price }}</h3>
           {% endif %}
         </div>
 
-        <!-- <div class="mt-8">
-          <h3 class="text-lg font-bold text-gray-800">Choose a Size</h3>
-          <div class="flex flex-wrap gap-4 mt-4">
-            <button type="button"
-              class="w-12 h-12 border-2 hover:border-gray-800 font-semibold text-sm rounded-full flex items-center justify-center shrink-0">SM</button>
-            <button type="button"
-              class="w-12 h-12 border-2 hover:border-gray-800 border-gray-800 font-semibold text-sm rounded-full flex items-center justify-center shrink-0">MD</button>
-            <button type="button"
-              class="w-12 h-12 border-2 hover:border-gray-800 font-semibold text-sm rounded-full flex items-center justify-center shrink-0">LG</button>
-            <button type="button"
-              class="w-12 h-12 border-2 hover:border-gray-800 font-semibold text-sm rounded-full flex items-center justify-center shrink-0">XL</button>
-          </div>
-        </div> -->
-
+        <!-- Quantity and Add to Cart Section -->
         <div class="flex flex-wrap gap-4 mt-8">
           <button id="btnMinus" class="btn btn-primary btn-square">-</button>
-          <input id="txtQty" type="text" value="1" class="w-12 h-12 border border-gray-800 text-center text-sm font-semibold rounded text-white">
+          <input id="txtQty" type="text" value="1" class="w-12 h-12 border border-gray-800 text-center text-sm font-semibold rounded">
           <button id="btnPlus" class="btn btn-primary btn-square">+</button>
-          <button id="btnCart" type="button" class="min-w-[200px] px-4 py-2.5 border border-gray-800 bg-transparent hover:bg-blue-500 text-gray-800 hover:text-slate-100 text-sm font-semibold rounded">Add
-            to cart</button>
+          <button id="btnCart" type="button" class="min-w-[200px] px-4 py-2.5 border border-gray-800 bg-transparent hover:bg-blue-500 text-gray-800 hover:text-slate-100 text-sm font-semibold rounded">Add to cart</button>
         </div>
         <input type="hidden" id="pid" value="{{ product.id }}">
 
-
+        <!-- Tabs for Description and Reviews -->
         <div class="mt-8">
-          <!-- Tabs -->
           <ul class="flex border-b">
             <li id="description-tab" class="text-gray-800 font-bold text-sm bg-gray-100 py-3 px-8 border-b-2 border-gray-800 cursor-pointer transition-all" onclick="showDescription()">
               Description
@@ -123,13 +114,13 @@ thisShop | Is The Shop
               Reviews
             </li>
           </ul>
-        
+
           <!-- Description Section -->
           <div id="description-section" class="mt-8">
             <h3 class="text-lg font-bold text-gray-800">Product Description</h3>
             <p class="text-sm text-gray-600 mt-4">{{ product.description }}</p>
           </div>
-        
+
           <!-- Reviews Section -->
           <div id="reviews-section" class="mt-8 hidden">
             <h3 class="text-lg font-bold text-gray-800">Reviews</h3>
@@ -149,7 +140,7 @@ thisShop | Is The Shop
             {% else %}
               <p class="text-gray-600">No reviews yet. Be the first to review this product!</p>
             {% endif %}
-        
+
             <!-- Add a New Review -->
             {% if user.is_authenticated %}
               <h3 class="text-lg font-bold text-gray-800 mt-8">Submit Your Review</h3>
@@ -169,21 +160,16 @@ thisShop | Is The Shop
             {% endif %}
           </div>
         </div>
-
-        <!-- <ul class="space-y-3 list-disc mt-6 pl-4 text-sm text-gray-600">
-              <li>A pair of nike shoes is a wardrobe essential due to its versatility.</li>
-              <li>Available in a wide range of sizes, from extra small to extra large, and even in tall and petite sizes.</li>
-              <li>Easy to maintain, they can be machine-washed and dried on low heat.</li>
-              <li>Personalize them with your own designs, patterns, or embellishments to make them uniquely yours.</li>
-            </ul>-->
       </div>
     </div>
   </div>
-  </div>
-  <!-- templates/store/product_details.html -->
-
-
 </section>
+<!-- JavaScript for Image Gallery -->
+<script>
+  function changeImage(src) {
+    document.getElementById('mainImage').src = src;
+  }
+</script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     // For quantity increment and decrement

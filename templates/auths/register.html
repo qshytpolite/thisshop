@@ -6,14 +6,6 @@
 <div class="flex justify-center items-center h-screen">
   <div class="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
     <h2 class="text-2xl font-bold mb-6">New User Registration</h2>
-
-    {% if messages %}
-    <div class="alert alert-info" role="alert">
-      {% for message in messages %}
-        {{ message }}
-      {% endfor %}
-    </div>
-    {% endif %}
     <form action="{% url 'register' %}" method="post">
       {% csrf_token %}
         <div class="mb-4">
@@ -37,8 +29,9 @@
         </div>
       <button type="submit" class="btn btn-primary">Register</button>
     </form>
-    <p class="text-center mt-3">Already have an account? <a href="{% url 'login' %}">Login</a></p>
-  </div>
+    <p class="text-sm text-gray-600 mt-4">
+      Already have an account? <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Log in here</a>.
+    </p>  </div>
   
   <div class="col-6">
             

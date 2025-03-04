@@ -56,6 +56,8 @@
             <!-- Authentication -->
             {% if user.is_authenticated %}
             <a href="{% url 'logout' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary">Logout</a>
+            <!-- my account -->
+            <a href="{% url 'my_account' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary">My Account</a>
             {% else %}
             <a href="{% url 'login' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary">Login</a>
             <a href="{% url 'register' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary">Signup</a>
@@ -66,7 +68,7 @@
 </nav>
 
 
-<script>
+<!-- <script>
     const btn = document.querySelector('.mobile-menu-button');
     const menu = document.querySelector('.mobile-menu');
 
@@ -74,4 +76,4 @@
         menu.classList.toggle('hidden');
     });
 
-</script>
+</script> -->

@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from .models import Category, Product, Cart, Favourite, Order, OrderItem, Payment, HeroSlide, Review, ProductImage
 from django.utils.html import format_html
-from unfold.admin import ModelAdmin
+from unfold.admin import ModelAdmin, TabularInline
 
 # admin.site.unregister(Category)
 # admin.site.unregister(Product)
@@ -34,10 +34,16 @@ class ProductAdmin(ModelAdmin):
     list_display = ('name', 'slug', 'vendor', 'product_image', 'quantity',
                     'selling_price', 'discounted_price', 'description', 'status', 'trending', 'featured')
 
+class ProductImageInline(TabularInline):
+    model = ProductImage
+    extra = 1  # Number of empty forms to display
 
 admin.site.register(Product, ProductAdmin)
 
 # Register ProductImage model
+
+class ProductAdmin(ModelAdmin):
+    inlines = [ProductImageInline]
 
 admin.site.register(ProductImage)
 
