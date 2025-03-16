@@ -18,10 +18,12 @@ def home(request):
     slides = HeroSlide.objects.all()
     category = Category.objects.filter(status=1)
     products = Product.objects.filter(featured=True).order_by('-id')
+    latest_products = Product.objects.all().order_by('-created_at')
     context = {
         'category': category,
         'products': products,
         'slides': slides,
+        'latest_products': latest_products
     }
     return render(request, "store/index.html", context)
 

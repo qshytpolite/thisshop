@@ -1,15 +1,12 @@
 {
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.13",
-    "autoprefixer": "^10.4.19",
-    "daisyui": "^4.11.1",
-    "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.3"
+    "@tailwindcss/typography": "^0.5.16",
+    "autoprefixer": "^10.4.21",
+    "daisyui": "^5.0.4",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.0.14"
   },
   "scripts": {
     "build:css": "tailwindcss -i ./static/src/input.css -o ./static/src/output.css --watch --minify"
-  },
-  "dependencies": {
-    "swiper": "^11.2.4"
   }
 }
