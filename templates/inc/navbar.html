@@ -1,20 +1,20 @@
 {% load static %}
-<nav class="navbar sticky top-0 z-50 bg-black shadow-md reveal-element">
+<nav class="navbar sticky top-0 z-50 bg-black shadow-md">
     <div class="flex justify-between items-center container mx-auto p-4">
         <!-- Left Section: Logo and Links -->
         <div class="flex items-center space-x-8">
             <!-- Logo -->
             <div class="flex-1 bg-neutral-400 bg-blend-screen">
                 <a href="{% url 'index' %}" class="btn btn-ghost text-xl font-bold">
-                    <img src="{% static 'images/logos/thsshoplogo.png' %}" class="w-20 neon-glow" alt="thisShop">
+                    <img src="{% static 'images/logos/thsshoplogo.png' %}" class="w-10 h-4 neon-glow" alt="thisShop">
                 </a>
             </div>
             <!-- Navigation Links -->
             <div class="hidden lg:flex navbar-center">
                 <ul class="menu menu-horizontal rounded-box p-0 space-x-4">
-                    <li><a href="{% url 'index' %}" class="text-white hover:text-gray-300 neon-glow">Home</a></li>
-                    <li><a href="{% url 'shop' %}" class="text-white hover:text-gray-300 neon-glow">Shop</a></li>
-                    <li><a href="#" class="text-white hover:text-gray-300 neon-glow">Contact</a></li>
+                    <li><a href="{% url 'index' %}" class="text-white hover:text-gray-300">Home</a></li>
+                    <li><a href="{% url 'shop' %}" class="text-white hover:text-gray-300">Shop</a></li>
+                    <li><a href="#" class="text-white hover:text-gray-300">Contact</a></li>
                 </ul>
             </div>
         </div>

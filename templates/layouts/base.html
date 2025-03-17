@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/scrollreveal@4.0.9/dist/scrollreveal.min.js"></script>
 </head>
 
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-gray-100 min-h-screen">
   <!-- Loading Bar Animation -->
   <div class="loading-bar" id="loading-bar"></div>
 
@@ -35,9 +35,9 @@
   {% endfor %}
   {% endif %}
 
-  <main class="container mx-auto py-6">
+  <!-- <main class="container mx-auto py-6"> -->
     {% block content %}{% endblock %}
-  </main>
+  <!-- </main> -->
 
   {% include 'inc/footer.html' %}
 

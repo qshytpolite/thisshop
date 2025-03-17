@@ -70,10 +70,10 @@ module.exports = {
   plugins: [
     require('@tailwindcss/typography'), // Typography plugin
     require('daisyui'), // DaisyUI plugin
-    // require('tailwind-scrollbar'), // Scrollbar plugin
+    require('tailwind-scrollbar'), // Scrollbar plugin
   ],
   daisyui: {
-    themes: ["light", "acid"], // DaisyUI themes
+    themes: ["acid", "dracula"], // DaisyUI themes
     utils: true, // Enable DaisyUI utilities
   },
   safelist: [
