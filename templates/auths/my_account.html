@@ -1,3 +1,4 @@
+<!-- templates/auths/my_account.html -->
 {% extends 'layouts/base.html' %}
 {% load tailwind_filters %}
 
@@ -8,36 +9,100 @@ My Account
 {% block content %}
 <section class="bg-gray-100 py-4 my-5" style="min-height:600px;">
   <div class="container mx-auto sm:px-4">
-    <div class="flex flex-wrap">
+    <div class="flex flex-wrap ">
       <div class="w-full">
         <h4 class="mb-3">My Account</h4>
         <hr style="border-color:#b8bfc2;">
         {% include 'inc/message.html' %}
       </div>
     </div>
-    <div class="flex flex-wrap">
-      <div class="w-full md:w-1/4 lg:w-1/5">
-        <!-- Sidebar Navigation -->
-        <div class="bg-white p-4 rounded-lg shadow-lg">
-          <ul>
-            <li class="mb-2">
-              <a href="{% url 'profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
-            </li>
-            <li class="mb-2">
-              <a href="{% url 'change_password' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Change Password</a>
-            </li>
-            <li class="mb-2">
-              <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
-            </li>
-          </ul>
+  </div>
+  <div class="font-sans p-8 tracking-wide max-lg:max-w-2xl mx-auto">
+    <div class="bg-white p-8 rounded-lg shadow-md">
+      <!-- User Profile Section -->
+      <div class="flex items-center space-x-4">
+        {% if user.profile_picture %}
+        <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="w-20 h-20 rounded-full">
+        {% else %}
+        <div class="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center">
+          <span class="text-gray-600 text-2xl">{{ user.username|first|upper }}</span>
+        </div>
+        {% endif %}
+        <div>
+          <h2 class="text-2xl font-bold">{{ user.username }}</h2>
+          <p class="text-gray-600">{{ user.email }}</p>
         </div>
       </div>
-      <div class="w-full md:w-3/4 lg:w-4/5">
-        <!-- Main Content -->
-        <div class="bg-white p-8 rounded-lg shadow-lg">
-          <h2 class="text-2xl font-bold mb-4">Welcome, {{ request.user.username }}!</h2>
-          <p class="text-gray-600">This is your account dashboard. You can update your profile, change your password, or manage other settings from here.</p>
-        </div>
+
+      <!-- Profile Details Section -->
+      <div class="mt-8">
+        <h3 class="text-lg font-bold text-gray-800">Profile Details</h3>
+        <ul class="mt-4 space-y-2">
+          <li><strong>Name:</strong> {{ user.full_name|default:"Not provided" }}</li>
+          <li><strong>Phone:</strong> {{ user.phone_number|default:"Not provided" }}</li>
+          <li><strong>Address:</strong> {{ user.address|default:"Not provided" }}</li>
+          <li><strong>Bio:</strong> {{ user.bio|default:"Not provided" }}</li>
+        </ul>
+        <a href="{% url 'edit_profile' %}" class="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+          Edit Profile
+        </a>
+      </div>
+
+      <!-- Wishlist Section -->
+      <div class="mt-8">
+        <h3 class="text-lg font-bold text-gray-800">Wishlist</h3>
+        {% if user.favourite_set.all %}
+        <ul class="mt-4 space-y-4">
+          {% for favourite in user.favourite_set.all %}
+          <li class="border p-4 rounded-lg">
+            <div class="flex justify-between items-center">
+              <div>
+                <!-- image -->
+                <img src="{{ favourite.product.product_image.url }}" alt="{{ favourite.product.name }}" class="w-20 h-20 object-cover rounded-md">
+                <p><strong>Product:</strong> {{ favourite.product.name }}</p>
+                {% if favourite.product.discounted_price %}
+                <p><strong>Discounted Price:</strong> ${{ favourite.product.discounted_price }}</p>
+                {% else %}
+                <p><strong>Price:</strong> ${{ favourite.product.selling_price }}</p>
+                {% endif %}
+              </div>
+              <div>
+                <a href="{% url 'product_details' favourite.product.slug %}" class="text-blue-600 hover:text-blue-800">
+                  View Product
+                </a>
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-gray-600">No items in your wishlist.</p>
+        {% endif %}
+      </div>
+
+      <!-- Purchase History Section -->
+      <div class="mt-8">
+        <h3 class="text-lg font-bold text-gray-800">Purchase History</h3>
+        {% if orders %}
+        <ul class="mt-4 space-y-4">
+          {% for order in orders %}
+          <li class="border p-4 rounded-lg">
+            <div class="flex justify-between">
+              <div>
+                <p><strong>Product:</strong> {{ order.product.name }}</p>
+                <p><strong>Quantity:</strong> {{ order.quantity }}</p>
+                <p><strong>Total Price:</strong> ${{ order.total_price }}</p>
+              </div>
+              <div>
+                <p><strong>Ordered At:</strong> {{ order.ordered_at|date:"M d, Y H:i" }}</p>
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-gray-600">No purchase history found.</p>
+        {% endif %}
       </div>
     </div>
   </div>

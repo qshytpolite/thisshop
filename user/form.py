@@ -32,10 +32,16 @@ class ChangePasswordForm(PasswordChangeForm):
         label="Confirm New Password"
     )
 
-# Profile Update Form
-class ProfileUpdateForm(UserChangeForm):
-    password = None  # Remove the password field
+# # Profile Update Form
+# class ProfileUpdateForm(UserChangeForm):
+#     password = None  # Remove the password field
 
+#     class Meta:
+#         model = User
+#         fields = ['username', 'email', 'phone_number', 'address', 'profile_picture', 'bio']
+
+# Edit Profile Form
+class EditProfileForm(UserChangeForm):
     class Meta:
         model = User
-        fields = ['username', 'email', 'phone', 'address', 'profile_picture', 'bio']
+        fields = ['username', 'email', 'first_name', 'last_name', 'phone_number', 'address', 'profile_picture', 'bio']

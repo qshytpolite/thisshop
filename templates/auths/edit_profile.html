@@ -1,0 +1,32 @@
+<!-- templates/auths/edit_profile.html -->
+{% extends 'layouts/base.html' %}
+{% load tailwind_filters %}
+
+{% block title %}
+Edit Profile
+{% endblock title %}
+
+{% block content %}
+<section class="bg-gray-100 py-4 my-5" style="min-height:600px;">
+  <div class="container mx-auto sm:px-4">
+    <div class="flex flex-wrap ">
+      <div class="w-full">
+        <h4 class="mb-3">Edit Profile</h4>
+        <hr style="border-color:#b8bfc2;">
+        {% include 'inc/message.html' %}
+      </div>
+    </div>
+  </div>
+  <div class="font-sans p-8 tracking-wide max-lg:max-w-2xl mx-auto">
+    <div class="bg-white p-8 rounded-lg shadow-md">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+          Save Changes
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock content %}

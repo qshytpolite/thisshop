@@ -1,37 +1,84 @@
+<!-- templates/store/fav.html -->
 {% extends 'layouts/base.html' %}
-{% block title %}
-  Registration | thisShop
-{% endblock title %}
-{% block content %}
-  <section class="bg-gray-100 py-4 my-5" style="min-height:600px;">
-    <div class="container mx-auto sm:px-4">
-      <div class="flex flex-wrap ">
-        <div class="w-full">
-          <h4 class="mb-3">Favourite Item</h4>
-          <hr style="border-color:#b8bfc2;">
-        </div>
-      
-        <table>
-            <tr>
-                <th>Image</th>
-                <th>Product Name</th>
-                <th>Unit</th>
-                <th>Remove</th>
-            </tr>
-          
 
-            {% for item in fav %}
-           <tr>
-              <td><img src="{{item.product.product_image.url}}" height="75px" alt="{{item.product.name}}"></td>
-              <td>{{item.product.name}}</td>
-              <td>{{item.product.selling_price | stringformat:'d'}}</td>
-              <td><a href="{% url 'remove_fav' item.id %}"  onclick="return confirm('Are you sure? to Remove')"  class="inline-block align-middle text-center select-none border font-normal whitespace-no-wrap rounded  no-underline bg-red-600 text-white hover:bg-red-700 py-1 px-2 leading-tight text-xs "><i class="fa fa-trash"></i> Remove</a></td>
-            </tr>
-            {% endfor %}
-            <tr>
-        </table>
-       
+{% block title %}My Wishlist{% endblock title %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-8">My Wishlist</h1>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for item in fav %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <img src="{{ item.product.product_image.url }}" alt="{{ item.product.name }}" class="w-full h-48 object-cover">
+      <div class="p-4">
+        <h3 class="text-xl font-semibold mb-2">{{ item.product.name }}</h3>
+        <p class="text-gray-700 mb-4">{{ item.product.description|truncatewords:20 }}</p>
+        <div class="flex justify-between items-center">
+          <p class="text-lg font-bold text-blue-600">${{ item.product.selling_price }}</p>
+          <a href="{% url 'product_details' item.product.slug %}" class="btn btn-primary">View Details</a>
+        </div>
+        <!-- Add a "Remove from Wishlist" button -->
+        <button class="remove-from-wishlist-btn mt-4 w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors" data-fid="{{ item.id }}">
+          Remove from Wishlist
+        </button>
       </div>
-      </div>
-  </section>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- JavaScript to handle removing items from the wishlist -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const removeButtons = document.querySelectorAll(".remove-from-wishlist-btn");
+
+    removeButtons.forEach(button => {
+      button.addEventListener("click", function () {
+        const fid = this.dataset.fid; // Get the Favourite ID from the data attribute
+
+        // Send a POST request to remove the item from the wishlist
+        fetch(`/remove-fav/${fid}/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === "success") {
+              alert("Product removed from wishlist!");
+              // Remove the item from the DOM
+              const itemToRemove = document.querySelector(`[data-fid="${fid}"]`).closest('.bg-white');
+              if (itemToRemove) {
+                itemToRemove.remove();
+              }
+            } else {
+              alert("Error: " + data.message);
+            }
+          })
+          .catch(error => {
+            console.error("Error:", error);
+          });
+      });
+    });
+
+    // Helper function to get the CSRF token from cookies
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === name + "=") {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+  });
+</script>
 {% endblock content %}

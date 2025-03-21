@@ -4,8 +4,8 @@ from django.contrib.sessions.models import Session
 from django.contrib import messages
 # from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
-from user.form import CustomUserForm, ChangePasswordForm, ProfileUpdateForm
-from store.models import Cart, Product
+from user.form import CustomUserForm, ChangePasswordForm, EditProfileForm
+from store.models import Cart, Product, Order
 
 # Only the user can log themselves out by checking the session key.
 # Prevent normal users from logging out superusers/admins and vice versa
@@ -104,16 +104,31 @@ def change_password(request):
 # Handle Profile Update and my_account
 @login_required
 def my_account(request):
-    return render(request, 'auths/my_account.html')
+    user = request.user
+    orders = Order.objects.filter(user=user).order_by('-created_at')
+    return render(request, 'auths/my_account.html', {'user': user, 'orders': orders})
 
 @login_required
-def profile(request):
+def edit_profile(request):
     if request.method == 'POST':
-        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
+        form = EditProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Your profile has been updated!')
-            return redirect('profile')
+            messages.success(request, "Your profile has been updated successfully.")
+            return redirect('my_account')
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
-        form = ProfileUpdateForm(instance=request.user)
-    return render(request, 'auths/profile.html', {'form': form})
+        form = EditProfileForm(instance=request.user)
+    return render(request, 'auths/edit_profile.html', {'form': form})
+# @login_required
+# def profile(request):
+#     if request.method == 'POST':
+#         form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
+#         if form.is_valid():
+#             form.save()
+#             messages.success(request, 'Your profile has been updated!')
+#             return redirect('profile')
+#     else:
+#         form = ProfileUpdateForm(instance=request.user)
+#     return render(request, 'auths/profile.html', {'form': form})

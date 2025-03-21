@@ -137,7 +137,7 @@ thisShop | Is The Shop
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const addToCartButtons = document.querySelectorAll("#btnCart");
-    const addToWishlistButtons = document.querySelectorAll("#btnWishlist");
+    const addToWishlistButtons = document.querySelectorAll(".add-to-wishlist-btn");
 
     addToCartButtons.forEach(button => {
       button.addEventListener("click", function () {
@@ -179,18 +179,25 @@ thisShop | Is The Shop
       button.addEventListener("click", function () {
         const productId = this.dataset.productId;
 
-        fetch(`/add-to-wishlist/${productId}/`, {
+        fetch(`/add-to-wishlist/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "X-CSRFToken": getCookie("csrftoken"),
+            "X-Requested-With": "XMLHttpRequest",  // Add this header
+
           },
-          body: JSON.stringify({}),
+          body: JSON.stringify({ pid: productId }),  // Send product_id in the request body
         })
           .then(response => response.json())
           .then(data => {
             if (data.status === "Product Added to Favourite") {
               alert("Product added to wishlist!");
+              // Optionally, update the wishlist count in the navbar
+              const wishlistCount = document.getElementById('wishlist-count');
+              if (wishlistCount) {
+                wishlistCount.textContent = parseInt(wishlistCount.textContent) + 1;
+              }
             } else {
               alert("Error: " + data.status);
             }

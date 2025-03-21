@@ -216,28 +216,40 @@ def favviewpage(request):
     else:
         return redirect("/")
 
-
+# Remove favourite
+@csrf_exempt
 def remove_fav(request, fid):
-    item = Favourite.objects.get(id=fid)
-    item.delete()
-    return redirect("/favviewpage")
+    if request.method == "POST":
+        try:
+            item = Favourite.objects.get(id=fid)
+            item.delete()
+            return JsonResponse({"status": "success", "message": "Product removed from wishlist."})
+        except Favourite.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Product not found in wishlist."}, status=404)
+    else:
+        return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
 
-
+# Add favourite
+@csrf_exempt
 def fav_page(request: HttpRequest):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         if request.user.is_authenticated:
-            data = json.loads(request.body)
-            product_id = data['pid']
-            product_status = Product.objects.get(id=product_id)
-            if product_status:
-                if Favourite.objects.filter(user=request.user, product_id=product_id).exists():
-                    return JsonResponse({'status': 'Product Already in Favourite'}, status=200)
+            try:
+                data = json.loads(request.body)
+                product_id = data.get('pid')  # Extract product_id from the request body
+                product_status = Product.objects.get(id=product_id)
+                if product_status:
+                    if Favourite.objects.filter(user=request.user, product_id=product_id).exists():
+                        return JsonResponse({'status': 'Product Already in Favourite'}, status=200)
+                    else:
+                        Favourite.objects.create(user=request.user, product_id=product_id)
+                        return JsonResponse({'status': 'Product Added to Favourite'}, status=200)
                 else:
-                    Favourite.objects.create(
-                        user=request.user, product_id=product_id)
-                    return JsonResponse({'status': 'Product Added to Favourite'}, status=200)
-            else:
+                    return JsonResponse({'status': 'Product Not Found'}, status=404)
+            except Product.DoesNotExist:
                 return JsonResponse({'status': 'Product Not Found'}, status=404)
+            except json.JSONDecodeError:
+                return JsonResponse({'status': 'Invalid JSON data'}, status=400)
         else:
             return JsonResponse({'status': 'Login to Add Favourite'}, status=200)
     else:
