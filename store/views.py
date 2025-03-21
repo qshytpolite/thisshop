@@ -286,6 +286,17 @@ def product_details(request, slug):
 
     return render(request, 'store/product_details.html', context)
 
+# product_quick_view
+def product_quick_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    data = {
+        'status': 'success',
+        'name': product.name,
+        'description': product.description,
+        'price': product.selling_price,
+        'product_image': product.product_image.url,
+    }
+    return JsonResponse(data)
 
 @login_required
 def submit_review(request, product_id):
@@ -302,29 +313,7 @@ def submit_review(request, product_id):
 
     return redirect('product_details', slug=product.slug)
 
-# def product_details(request, cname, pname):
-#     # Check if the provided category name exists in the database
-#     if (Category.objects.filter(name=cname)):
-#         # If the category name exists, check if the product name exists in the database
-#         if (Product.objects.filter(name=pname)):
-#             # If the product name exists, retrieve the first occurrence of the product
-#             products = Product.objects.filter(name=pname).first()
-#             reviews = products.reviews.all()  # Retrieve all reviews for the product
-#             review_form = ReviewForm()
-#             # Render the product details page with the retrieved product data
-#             return render(request, "store/product_details.html", {"products": products, "reviews": reviews, "review_form": review_form})
-#         else:
-#             # If the product name does not exist, display an error message and redirect to the collections page
-#             messages.error(request, "No Such Product Found")
-#             return redirect('collections')
-#     else:
-#         # If the category name does not exist, display an error message and redirect to the collections page
-#         messages.error(request, "No Such Category Found")
-#         return redirect('collections')
-
-# Checkout view function
-
-
+# Save cart data to the session
 def save_cart_and_redirect_to_login(request):
     # Save cart data to the session
     cart_data = {}
@@ -335,7 +324,7 @@ def save_cart_and_redirect_to_login(request):
     # Redirect to the login page
     return redirect('login')
 
-
+# Checkout page
 @login_required
 def checkout_page(request):
     if not request.user.is_authenticated:

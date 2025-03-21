@@ -3,3 +3,81 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Base styling for animated elements */
+.reveal-element {
+    visibility: hidden;
+  }
+  
+  /* Neon glow effect for featured products */
+  .neon-glow {
+    transition: all 0.3s ease;
+  }
+  
+  .neon-glow:hover {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.8), 0 0 30px rgba(59, 130, 246, 0.6);
+    transform: translateY(-5px);
+  }
+  
+  /* Parallax effect for backgrounds */
+  .parallax {
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  
+  /* Animated gradient background */
+  .gradient-bg {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+  }
+  
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  /* Futuristic loading effect */
+  .loading-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background: linear-gradient(to right, #4f46e5, #06b6d4);
+    z-index: 9999;
+    transition: width 0.3s ease;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #1e1e24;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #3b82f6;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2563eb;
+  }
+
+  #quickViewModal {
+    z-index: 1000;
+  }
+  
+  #quickViewModal .bg-white {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-hidden {
+    display: none;
+  }
