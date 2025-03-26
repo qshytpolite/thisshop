@@ -24,6 +24,7 @@ urlpatterns = [
     path('paystack-webhook/', views.paystack_webhook, name='paystack_webhook'),
     path('delete-cart-items/', views.delete_cart_items, name='delete_cart_items'),
     path('shop/', views.shop, name='shop'),
+    path('save-cart-session/', views.save_cart_session, name='save_cart_session'),
 
 
 ]

@@ -1,32 +1,49 @@
 {% extends 'layouts/base.html' %}
-{% block title %}
-  Login | thisShop
-{% endblock title %}
+{% block title %}Login | {{ block.super }}{% endblock %}
+
 {% block content %}
-<div class="flex justify-center items-center h-screen">
-  <div class="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
-    <h2 class="text-2xl font-bold mb-4">Login</h2>
-    <form method="post" class="space-y-4">
-      {% csrf_token %}
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" name="username" id="username" class="form-control" required>
+<div class="hero min-h-screen bg-base-200">
+  <div class="hero-content flex-col lg:flex-row-reverse">
+    <div class="text-center lg:text-left lg:ml-12">
+      <h1 class="text-5xl font-bold">Welcome back!</h1>
+      <p class="py-6">Sign in to access your account, view your orders, and manage your profile.</p>
+      <div class="divider lg:divider-horizontal">OR</div>
+      <p class="mt-4">
+        New to our shop? <a href="{% url 'register' %}" class="link link-primary">Create an account</a>
+      </p>
+    </div>
+    <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+      <div class="card-body">
+        <h2 class="card-title text-2xl mb-4">Login to your account</h2>
+        
+        {% include 'inc/message.html' %}
+        
+        <form method="post" class="space-y-4">
+          {% csrf_token %}
+          <div class="form-control">
+            <label class="label" for="username">
+              <span class="label-text">Username</span>
+            </label>
+            <input type="text" name="username" id="username" placeholder="Enter your username(e.g user123)" 
+                   class="input input-bordered w-full" required>
+          </div>
+          <div class="form-control">
+            <label class="label" for="password">
+              <span class="label-text">Password</span>
+            </label>
+            <input type="password" name="password" id="password" placeholder="Enter your password" 
+                   class="input input-bordered w-full" required>
+            <label class="label">
+              <a href="{% url 'change_password' %}" class="label-text-alt link link-hover">Forgot password?</a>
+            </label>
+          </div>
+          <input type="hidden" name="next" value="{{ next }}">
+          <div class="form-control mt-6">
+            <button type="submit" class="btn btn-primary">Login</button>
+          </div>
+        </form>
       </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" name="password" id="password" class="form-control" required>
-      </div>
-      <input type="hidden" name="next" value="{{ next }}">
-      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-        Log In
-      </button>
-    </form>
-    <p class="text-sm text-gray-600 mt-4">
-      Forgot your password? <a href="{% url 'change_password' %}" class="text-blue-600 hover:underline">Change it here</a>.
-    </p>
-    <p class="mt-4">
-      Don't have an account? <a href="{% url 'register' %}" class="text-blue-600 hover:underline">Register here</a>.
-    </p>
+    </div>
   </div>
 </div>
-{% endblock content %}
+{% endblock %}

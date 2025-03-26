@@ -7,11 +7,15 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.urls import reverse
 
 from .form import CheckoutForm, ReviewForm
 from .models import Cart, Category, Favourite, Order, OrderItem, Payment, Product, HeroSlide, Review
 from .utils import generate_reference
 from django.db.models import Q, Sum
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+# Home view
 
 
 def home(request):
@@ -54,13 +58,26 @@ def shop(request):
     if latest == '1':
         products = products.order_by('-created_at')  # Order by latest products
 
-     # Handling search query
+    # Handling search query
     search_query = request.GET.get('search')
     if search_query:
         products = products.filter(
             Q(name__icontains=search_query) | Q(
                 description__icontains=search_query)
         )
+
+    # Pagination - 12 items per page
+    paginator = Paginator(products, 12)
+    page = request.GET.get('page')
+    
+    try:
+        products = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page
+        products = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page
+        products = paginator.page(paginator.num_pages)
 
     return render(request, 'store/shop.html', {
         'products': products,
@@ -73,13 +90,22 @@ def shop(request):
 
 def cart_page(request):
     if request.user.is_authenticated:
+        # Check for session cart items that need to be transferred
+        session_id = request.session.session_key
+        if session_id:
+            anonymous_items = Cart.objects.filter(session_id=session_id)
+            if anonymous_items.exists():
+                request.session['anonymous_cart'] = True
+                
         cart_items = Cart.objects.filter(user=request.user)
-        total = sum(item.item_total for item in cart_items)
     else:
         session_id = request.session.session_key
+        if not session_id:
+            request.session.create()
+            session_id = request.session.session_key
         cart_items = Cart.objects.filter(session_id=session_id)
-        total = sum(item.item_total for item in cart_items)
 
+    total = sum(item.item_total for item in cart_items)
     context = {'cart_items': cart_items, 'total': total}
     return render(request, 'store/cart.html', context)
 
@@ -326,21 +352,59 @@ def submit_review(request, product_id):
     return redirect('product_details', slug=product.slug)
 
 # Save cart data to the session
-def save_cart_and_redirect_to_login(request):
-    # Save cart data to the session
-    cart_data = {}
-    for item in request.cart.items.values():
-        cart_data[item.product.id] = item.product_qty
-    request.session['cart'] = cart_data
-
-    # Redirect to the login page
-    return redirect('login')
+@csrf_exempt
+@require_POST
+def save_cart_session(request):
+    if not request.user.is_authenticated:
+        session_id = request.session.session_key
+        if not session_id:
+            request.session.create()
+            session_id = request.session.session_key
+        
+        # Save cart items to session
+        cart_items = Cart.objects.filter(session_id=session_id)
+        cart_data = {
+            'items': [
+                {
+                    'product_id': item.product.id,
+                    'quantity': item.product_qty
+                } for item in cart_items
+            ]
+        }
+        request.session['anonymous_cart'] = cart_data
+        return JsonResponse({'status': 'Cart saved'})
+    
+    return JsonResponse({'status': 'User already authenticated'})
 
 # Checkout page
 @login_required
 def checkout_page(request):
-    if not request.user.is_authenticated:
-        return save_cart_and_redirect_to_login(request)
+    # Check if we need to transfer anonymous cart items
+    if request.session.get('anonymous_cart'):
+        session_id = request.session.session_key
+        if session_id:
+            # Get anonymous cart items
+            anonymous_cart_items = Cart.objects.filter(session_id=session_id)
+            
+            for item in anonymous_cart_items:
+                # Check if user already has this product in cart
+                existing_item = Cart.objects.filter(
+                    user=request.user, 
+                    product=item.product
+                ).first()
+                
+                if existing_item:
+                    # Update quantity if item exists
+                    existing_item.product_qty += item.product_qty
+                    existing_item.save()
+                    item.delete()
+                else:
+                    # Transfer item to user
+                    item.user = request.user
+                    item.session_id = None
+                    item.save()
+            
+            del request.session['anonymous_cart']
 
     # Retrieve all Cart items belonging to the logged-in user
     cart_items = Cart.objects.filter(user=request.user)

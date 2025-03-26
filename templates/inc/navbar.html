@@ -2,7 +2,7 @@
 <nav class="navbar sticky top-0 z-50 bg-lime-400 max-h-14 shadow-md">
     <div class="flex justify-between items-center container mx-auto p-4">
         <!-- Left Section: Logo and Links -->
-        <div class="flex items-center space-x-8 >
+        <div class="flex items-center space-x-8" >
             <!-- Logo -->
             <div class="flex-1 bg-transparent bg-blend-screen">
                 <a href="{% url 'index' %}" class="btn btn-ghost text-xl font-bold">
@@ -61,7 +61,6 @@
             <a href="{% url 'logout' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary neon-glow">Logout</a>
             <!-- my account -->
             <a href="{% url 'my_account' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary neon-glow">My Account</a>
-            <a href="{% url 'edit_profile' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary neon-glow">Profile</a>
             {% else %}
             <a href="{% url 'login' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary neon-glow">Login</a>
             <a href="{% url 'register' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary neon-glow">Signup</a>

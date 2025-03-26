@@ -45,32 +45,45 @@ thisShop | Is The Shop
 
     <!-- Product Grid -->
     <div class="w-3/4 pl-8">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
         {% for product in products %}
-        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-          {% if product.discount_percentage %}
-          <span class="absolute m-0 rounded-full bg-black px-2 text-center text-sm font-medium text-white">{{ product.discount_percentage| stringformat:'d' }} %</span>
-          {% endif %}
-          <a href="{% url 'product_details' slug=product.slug %}">
-            <img src="{{ product.product_image.url }}" alt="{{ product.name }}" class="w-full h-48 object-cover">
-          </a>
-          <div class="p-4">
-            <a href="{% url 'product_details' slug=product.slug %}">
-              <h3 class="text-lg font-semibold">{{ product.name }}</h3>
-            </a>
-            <p class="text-sm text-gray-500">{{ product.description|truncatewords:20 }}</p>
-            {% if product.discounted_price %}
-            <p class="mt-2 text-xl font-semibold text-blue-600">$ {{ product.discounted_price }}</p>
-            {% else %}
-            <p class="mt-2 text-xl font-semibold text-blue-600">$ {{ product.selling_price }}</p>
+        <div class="product-card neon-glow bg-white shadow-lg rounded-lg overflow-hidden">
+          <div class="relative group">
+            {% if product.discount_percentage %}
+            <div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+              {{ product.discount_percentage }}% OFF
+            </div>
             {% endif %}
-            <button id="btnCart" data-product-id="{{ product.id }}" data-product-qty="1" type="button" class="flex items-center justify-center rounded-md bg-blue-500 mt-4 px-4 py-2 text-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-blue-300">
-              <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              Add to cart
-            </button>
-            <!-- <a href="#" class="mt-4 inline-block bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-400">Add to Cart</a> -->
+            <img src="{{product.product_image.url}}" alt="{{ product.name }}" class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110">
+            <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+          </div>
+          <div class="p-4">
+            <a class="hover:text-blue-600" href="{% url 'product_details' product.slug %}">
+              <h3 class="text-lg font-semibold mb-2">{{ product.name }}</h3>
+            </a>
+            <div class="flex justify-between items-center">
+              {% if product.discount_percentage %}
+              <p>
+                <span class="text-xl font-bold text-blue-600">${{ product.discounted_price| stringformat:'d'}}</span>
+                <span class="text-sm  text-blue-600 line-through">${{ product.selling_price| stringformat:'d'}}</span>
+              </p>
+              {% else %}
+              <span class="text-xl font-bold text-blue-600">${{ product.selling_price| stringformat:'d'}}</span>
+              {% endif %}
+              <div class="flex space-x-2">
+                <button class="add-to-cart-btn p-2 bg-blue-600 rounded-full text-white hover:bg-blue-700 transition-colors" data-product-id="{{ product.id }}" id="btnCart">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </button>
+                <button class="add-to-wishlist-btn p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors" data-product-id="{{ product.id }}">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         {% empty %}
@@ -78,22 +91,35 @@ thisShop | Is The Shop
         {% endfor %}
       </div>
 
-      <!-- Pagination (if you want to paginate) -->
+      <!-- Pagination  -->
       <div class="mt-6 flex justify-center">
-        <!-- Add pagination if needed -->
         {% if products.has_other_pages %}
         <div class="flex space-x-2">
-          {% if products.has_previous %}
-          <a href="?page=1" class="px-4 py-2 bg-gray-200 rounded">First</a>
-          <a href="?page={{ products.previous_page_number }}" class="px-4 py-2 bg-gray-200 rounded">Previous</a>
-          {% endif %}
-          {% if products.has_next %}
-          <a href="?page={{ products.next_page_number }}" class="px-4 py-2 bg-gray-200 rounded">Next</a>
-          <a href="?page={{ products.paginator.num_pages }}" class="px-4 py-2 bg-gray-200 rounded">Last</a>
-          {% endif %}
+            {% if products.has_previous %}
+                <a href="?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.min_price %}min_price={{ request.GET.min_price }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price }}&{% endif %}{% if request.GET.latest %}latest={{ request.GET.latest }}&{% endif %}page=1" 
+                   class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">First</a>
+                <a href="?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.min_price %}min_price={{ request.GET.min_price }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price }}&{% endif %}{% if request.GET.latest %}latest={{ request.GET.latest }}&{% endif %}page={{ products.previous_page_number }}" 
+                   class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Previous</a>
+            {% endif %}
+    
+            {% for num in products.paginator.page_range %}
+                {% if products.number == num %}
+                    <span class="px-4 py-2 bg-blue-500 text-white rounded">{{ num }}</span>
+                {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                    <a href="?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.min_price %}min_price={{ request.GET.min_price }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price }}&{% endif %}{% if request.GET.latest %}latest={{ request.GET.latest }}&{% endif %}page={{ num }}" 
+                       class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+    
+            {% if products.has_next %}
+                <a href="?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.min_price %}min_price={{ request.GET.min_price }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price }}&{% endif %}{% if request.GET.latest %}latest={{ request.GET.latest }}&{% endif %}page={{ products.next_page_number }}" 
+                   class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Next</a>
+                <a href="?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.min_price %}min_price={{ request.GET.min_price }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price }}&{% endif %}{% if request.GET.latest %}latest={{ request.GET.latest }}&{% endif %}page={{ products.paginator.num_pages }}" 
+                   class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Last</a>
+            {% endif %}
         </div>
         {% endif %}
-      </div>
+    </div>
     </div>
   </div>
 </div>
@@ -105,27 +131,38 @@ thisShop | Is The Shop
     const minPrice = document.getElementById("min_price").value;
     const maxPrice = document.getElementById("max_price").value;
     const latest = document.getElementById("latest").value;
+    const page = new URLSearchParams(window.location.search).get('page') || '';
     let url = window.location.pathname + "?";
 
     if (category) {
-      url += `category=${category}&`;
+        url += `category=${category}&`;
     }
     if (minPrice) {
-      url += `min_price=${minPrice}&`;
+        url += `min_price=${minPrice}&`;
     }
     if (maxPrice) {
-      url += `max_price=${maxPrice}&`;
+        url += `max_price=${maxPrice}&`;
     }
     if (latest) {
-      url += `latest=${latest}&`;
+        url += `latest=${latest}&`;
+    }
+    if (page) {
+        url += `page=${page}&`;
+    }
+
+    // Remove trailing & if it exists
+    if (url.endsWith('&')) {
+        url = url.slice(0, -1);
     }
 
     window.location.href = url;
-  }
+}
 
   // Add to Cart
   document.addEventListener("DOMContentLoaded", function () {
     const addToCartButtons = document.querySelectorAll("#btnCart");
+    const addToWishlistButtons = document.querySelectorAll(".add-to-wishlist-btn");
+
     addToCartButtons.forEach(button => {
       button.addEventListener("click", function () {
         const productId = this.dataset.productId;
@@ -156,6 +193,39 @@ thisShop | Is The Shop
             // Update cart total dynamically in the navbar
             if (data.total !== undefined) {
               document.getElementById('cart-total').textContent = `Subtotal: ${parseFloat(data.total).toFixed(2)}`;
+            }
+          })
+          .catch(error => {
+            console.error("Error:", error);
+          });
+      });
+    });
+
+    addToWishlistButtons.forEach(button => {
+      button.addEventListener("click", function () {
+        const productId = this.dataset.productId;
+
+        fetch(`/add-to-wishlist/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+            "X-Requested-With": "XMLHttpRequest",  // Add this header
+
+          },
+          body: JSON.stringify({ pid: productId }),  // Send product_id in the request body
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === "Product Added to Favourite") {
+              alert("Product added to wishlist!");
+              // Optionally, update the wishlist count in the navbar
+              const wishlistCount = document.getElementById('wishlist-count');
+              if (wishlistCount) {
+                wishlistCount.textContent = parseInt(wishlistCount.textContent) + 1;
+              }
+            } else {
+              alert("Error: " + data.status);
             }
           })
           .catch(error => {

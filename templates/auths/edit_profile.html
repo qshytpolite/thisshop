@@ -1,32 +1,153 @@
-<!-- templates/auths/edit_profile.html -->
 {% extends 'layouts/base.html' %}
-{% load tailwind_filters %}
-
-{% block title %}
-Edit Profile
-{% endblock title %}
+{% block title %}Edit Profile | {{ block.super }}{% endblock %}
 
 {% block content %}
-<section class="bg-gray-100 py-4 my-5" style="min-height:600px;">
-  <div class="container mx-auto sm:px-4">
-    <div class="flex flex-wrap ">
-      <div class="w-full">
-        <h4 class="mb-3">Edit Profile</h4>
-        <hr style="border-color:#b8bfc2;">
+<div class="hero min-h-screen bg-base-200">
+  <div class="hero-content flex-col lg:flex-row-reverse">
+    <div class="text-center lg:text-left lg:ml-12">
+      <h1 class="text-5xl font-bold">Update Your Profile</h1>
+      <p class="py-6">Keep your account information up to date to ensure the best shopping experience.</p>
+      <div class="divider lg:divider-horizontal">TIP</div>
+      <p class="mt-4">
+        A complete profile helps us serve you better and speeds up the checkout process.
+      </p>
+      <a href="{% url 'my_account' %}" class="btn btn-ghost mt-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>
+        Back to Account
+      </a>
+    </div>
+    <div class="card flex-shrink-0 w-full max-w-2xl shadow-2xl bg-base-100">
+      <div class="card-body">
+        <h2 class="card-title text-2xl mb-4">Edit Profile Information</h2>
+        
         {% include 'inc/message.html' %}
+        
+        <form method="post" enctype="multipart/form-data" class="space-y-4">
+          {% csrf_token %}
+          
+          {% if form.errors %}
+            <div class="alert alert-error shadow-lg">
+              <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Please correct the errors below.</span>
+              </div>
+            </div>
+          {% endif %}
+          
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="form-control flex-1">
+              <label class="label" for="{{ form.first_name.id_for_label }}">
+                <span class="label-text">{{ form.first_name.label }}</span>
+              </label>
+              {{ form.first_name }}
+              {% if form.first_name.errors %}
+                <label class="label">
+                  <span class="label-text-alt text-error">{{ form.first_name.errors.as_text }}</span>
+                </label>
+              {% endif %}
+            </div>
+            
+            <div class="form-control flex-1">
+              <label class="label" for="{{ form.last_name.id_for_label }}">
+                <span class="label-text">{{ form.last_name.label }}</span>
+              </label>
+              {{ form.last_name }}
+              {% if form.last_name.errors %}
+                <label class="label">
+                  <span class="label-text-alt text-error">{{ form.last_name.errors.as_text }}</span>
+                </label>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="form-control">
+            <label class="label" for="{{ form.username.id_for_label }}">
+              <span class="label-text">{{ form.username.label }}</span>
+            </label>
+            {{ form.username }}
+            {% if form.username.errors %}
+              <label class="label">
+                <span class="label-text-alt text-error">{{ form.username.errors.as_text }}</span>
+              </label>
+            {% endif %}
+          </div>
+          
+          <div class="form-control">
+            <label class="label" for="{{ form.email.id_for_label }}">
+              <span class="label-text">{{ form.email.label }}</span>
+            </label>
+            {{ form.email }}
+            {% if form.email.errors %}
+              <label class="label">
+                <span class="label-text-alt text-error">{{ form.email.errors.as_text }}</span>
+              </label>
+            {% endif %}
+          </div>
+          
+          <div class="form-control">
+            <label class="label" for="{{ form.phone_number.id_for_label }}">
+              <span class="label-text">{{ form.phone_number.label }}</span>
+            </label>
+            {{ form.phone_number }}
+            {% if form.phone_number.errors %}
+              <label class="label">
+                <span class="label-text-alt text-error">{{ form.phone_number.errors.as_text }}</span>
+              </label>
+            {% endif %}
+          </div>
+          
+          <div class="form-control">
+            <label class="label" for="{{ form.address.id_for_label }}">
+              <span class="label-text">{{ form.address.label }}</span>
+            </label>
+            {{ form.address }}
+            {% if form.address.errors %}
+              <label class="label">
+                <span class="label-text-alt text-error">{{ form.address.errors.as_text }}</span>
+              </label>
+            {% endif %}
+          </div>
+          
+          <div class="form-control">
+            <label class="label" for="{{ form.bio.id_for_label }}">
+              <span class="label-text">{{ form.bio.label }}</span>
+            </label>
+            {{ form.bio }}
+            {% if form.bio.errors %}
+              <label class="label">
+                <span class="label-text-alt text-error">{{ form.bio.errors.as_text }}</span>
+              </label>
+            {% endif %}
+          </div>
+          
+          <div class="form-control">
+            <label class="label" for="{{ form.profile_picture.id_for_label }}">
+              <span class="label-text">{{ form.profile_picture.label }}</span>
+            </label>
+            {{ form.profile_picture }}
+            {% if form.profile_picture.errors %}
+              <label class="label">
+                <span class="label-text-alt text-error">{{ form.profile_picture.errors.as_text }}</span>
+              </label>
+            {% endif %}
+            {% if user.profile_picture %}
+              <div class="mt-2">
+                <span class="text-sm">Current:</span>
+                <img src="{{ user.profile_picture.url }}" alt="Current profile picture" class="w-16 h-16 rounded-full object-cover mt-1">
+              </div>
+            {% endif %}
+          </div>
+          
+          <div class="form-control mt-6">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
-  <div class="font-sans p-8 tracking-wide max-lg:max-w-2xl mx-auto">
-    <div class="bg-white p-8 rounded-lg shadow-md">
-      <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-          Save Changes
-        </button>
-      </form>
-    </div>
-  </div>
-</section>
-{% endblock content %}
+</div>
+{% endblock %}

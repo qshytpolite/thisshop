@@ -1,134 +1,141 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
-from django.contrib.sessions.models import Session
 from django.contrib import messages
-# from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
-from user.form import CustomUserForm, ChangePasswordForm, EditProfileForm
+from .form import CustomUserForm, ChangePasswordForm, EditProfileForm
 from store.models import Cart, Product, Order
 
-# Only the user can log themselves out by checking the session key.
-# Prevent normal users from logging out superusers/admins and vice versa
+# Logout
 def logout_page(request):
     if request.user.is_authenticated:
-        # Prevent normal users from logging out superusers/admins
         if request.user.is_superuser and request.user.session_key != request.session.session_key:
             messages.error(request, "You cannot log out another user.")
             return redirect("/")
 
-        # Check if the session key matches the one stored in the user model
         if request.user.session_key == request.session.session_key:
-            # Clear the session key in the user model
             request.user.session_key = None
             request.user.save()
             logout(request)
-            messages.success(request, "Logged out Successfully")
+            messages.success(request, "Logged out successfully")
         else:
             messages.error(request, "You cannot log out another user.")
     return redirect("/")
 
-# Handle Login and the next Parameter
+# Login
 def login_page(request):
     if request.user.is_authenticated:
         return redirect("/")
-    else:
-        if request.method == 'POST':
-            username = request.POST.get('username')
-            password = request.POST.get('password')
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                # Store the session key in the user model
-                user.session_key = request.session.session_key
-                user.save()
-                messages.success(request, "Logged in Successfully")
+    
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            messages.success(request, f"Welcome back, {user.username}!")
 
-                # Merge cart data from session to the user's cart
-                session_cart = request.session.get('cart', {})
-                if session_cart:
-                    for product_id, product_qty in session_cart.items():
-                        product = Product.objects.get(id=product_id)
+            # Restore cart from session if exists
+            if 'anonymous_cart' in request.session:
+                cart_data = request.session['anonymous_cart']
+                for item_data in cart_data.get('items', []):
+                    try:
+                        product = Product.objects.get(id=item_data['product_id'])
                         cart_item, created = Cart.objects.get_or_create(
                             user=user,
                             product=product,
-                            defaults={'product_qty': product_qty}
+                            defaults={'product_qty': item_data['quantity']}
                         )
                         if not created:
-                            cart_item.product_qty += product_qty
+                            cart_item.product_qty += item_data['quantity']
                             cart_item.save()
-                    # Clear the cart data from the session
-                    del request.session['cart']
+                    except Product.DoesNotExist:
+                        continue
+                del request.session['anonymous_cart']
 
-                # Redirect to the 'next' URL if it exists, otherwise redirect to the home page
-                next_url = request.POST.get('next', '/')
-                return redirect(next_url)
-            else:
-                messages.error(request, "Invalid User Name or Password")
-                return redirect("login")
+            next_url = request.POST.get('next', '/')
+            return redirect(next_url)
         else:
-            # Pass the 'next' parameter from the GET request to the template
-            next_url = request.GET.get('next', '/')
-            return render(request, "auths/login.html", {'next': next_url})
+            messages.error(request, "Invalid username or password")
+            return redirect("login")
+    
+    next_url = request.GET.get('next', '/')
+    return render(request, "auths/login.html", {
+        'next': next_url,
+        'page_title': 'Login'
+    })
 
-# Handle Registration
+# Register
 def register(request):
-    form = CustomUserForm()
+    if request.user.is_authenticated:
+        return redirect("/")
+        
     if request.method == 'POST':
         form = CustomUserForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Registration Success You can Login Now..!")
-            return redirect('/')
-    return render(request, "auths/register.html", {'form': form})
+            user = form.save()
+            messages.success(request, "Account created successfully! You can now log in.")
+            return redirect('login')
+    else:
+        form = CustomUserForm()
+    
+    return render(request, "auths/register.html", {
+        'form': form,
+        'page_title': 'Register'
+    })
 
-# Handle Password Change
+# Change password
+@login_required
 def change_password(request):
-    if not request.user.is_authenticated:
-        messages.error(request, "You must be logged in to change your password.")
-        return redirect("login")
-
     if request.method == 'POST':
         form = ChangePasswordForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)  # Keep the user logged in
-            messages.success(request, "Your password has been changed successfully.")
-            return redirect('profile')  # Redirect to the user's profile or any other page
-        else:
-            messages.error(request, "Please correct the error below.")
+            update_session_auth_hash(request, user)
+            messages.success(request, "Your password has been changed successfully!")
+            return redirect('my_account')
     else:
         form = ChangePasswordForm(request.user)
+    
+    return render(request, 'auths/change_password.html', {
+        'form': form,
+        'page_title': 'Change Password'
+    })
 
-    return render(request, 'auths/change_password.html', {'form': form})
-
-# Handle Profile Update and my_account
+# My account
 @login_required
 def my_account(request):
     user = request.user
-    orders = Order.objects.filter(user=user).order_by('-created_at')
-    return render(request, 'auths/my_account.html', {'user': user, 'orders': orders})
+    orders = Order.objects.filter(user=user).select_related('user').prefetch_related('orderitem_set').order_by('-created_at')[:10]
+    
+    # Get wishlist items with product information to avoid N+1 queries
+    wishlist_items = user.favourite_set.select_related('product').all()
+    
+    return render(request, 'auths/my_account.html', {
+        'user': user,
+        'orders': orders,
+        'wishlist_items': wishlist_items,
+        'page_title': 'My Account'
+    })
 
+# Edit profile
 @login_required
 def edit_profile(request):
     if request.method == 'POST':
         form = EditProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Your profile has been updated successfully.")
+            user = form.save()
+            messages.success(request, "Your profile has been updated successfully!")
+            
+            # If profile picture was changed, update the session
+            if 'profile_picture' in form.changed_data:
+                request.session['profile_picture'] = user.profile_picture.url if user.profile_picture else None
+            
             return redirect('my_account')
-        else:
-            messages.error(request, "Please correct the errors below.")
     else:
         form = EditProfileForm(instance=request.user)
-    return render(request, 'auths/edit_profile.html', {'form': form})
-# @login_required
-# def profile(request):
-#     if request.method == 'POST':
-#         form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, 'Your profile has been updated!')
-#             return redirect('profile')
-#     else:
-#         form = ProfileUpdateForm(instance=request.user)
-#     return render(request, 'auths/profile.html', {'form': form})
+    
+    return render(request, 'auths/edit_profile.html', {
+        'form': form,
+        'page_title': 'Edit Profile'
+    })
