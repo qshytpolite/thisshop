@@ -8,7 +8,7 @@ from django.utils.text import slugify
 from user.models import User
 
 from imagekit.models import ProcessedImageField
-from imagekit.processors import ResizeToFill
+from imagekit.processors import ResizeToFill, ResizeToFit
 
 
 def getFileName(requset, filename):
@@ -22,9 +22,9 @@ def getFileName(requset, filename):
 class HeroSlide(models.Model):
     image = ProcessedImageField(
         upload_to=getFileName,
-        processors=[ResizeToFill(1200, 720)],
-        format='JPEG',
-        options={'quality': 100},
+        processors=[ResizeToFit(800, 500)],
+        format='PNG',
+        options={'quality': 99},
     )
     title = models.CharField(max_length=100)
     subtitle = models.CharField(max_length=200)
@@ -153,16 +153,6 @@ class Cart(models.Model):
             return self.product.discounted_price * self.product_qty
         return self.product.selling_price * self.product_qty
 
-    # @property
-    # def total_cost(self):
-    #     """Calculate the total cost of all products in the cart."""
-    #     if self.user:
-    #         # For authenticated users
-    #         items = Cart.objects.filter(user=self.user)
-    #     else:
-    #         # For anonymous users
-    #         items = Cart.objects.filter(session_id=self.session_id)
-    #     return items.aggregate(total=Sum('item_total'))['total'] or 0
 
     def __len__(self):
         """Return the total number of items in the cart."""

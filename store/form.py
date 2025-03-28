@@ -1,4 +1,5 @@
 from django import forms
+from django.core.validators import EmailValidator
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Row, Column, Div
 from .models import Review
@@ -84,3 +85,34 @@ class CheckoutForm(forms.Form):
                 css_class='flex gap-4 max-md:flex-col mt-8'
             ),
         )
+
+# Contact form
+class ContactForm(forms.Form):
+    name = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={
+            'class': 'input input-bordered w-full',
+            'placeholder': 'Your Name'
+        })
+    )
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'input input-bordered w-full',
+            'placeholder': 'Your Email'
+        }),
+        validators=[EmailValidator()]
+    )
+    subject = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={
+            'class': 'input input-bordered w-full',
+            'placeholder': 'Subject'
+        })
+    )
+    message = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'textarea textarea-bordered w-full',
+            'placeholder': 'Your Message',
+            'rows': 5
+        })
+    )

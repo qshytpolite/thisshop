@@ -181,6 +181,19 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.your-email-provider.com'  # e.g., smtp.gmail.com
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your@email.com'
+# EMAIL_HOST_PASSWORD = 'your-email-password'
+# DEFAULT_FROM_EMAIL = 'your@email.com'
+CONTACT_EMAIL = os.getenv('CONTACT_EMAIL', 'default-contact@example.com')
+  # Where contact form emails should go
+
 # custom user settings
 AUTH_USER_MODEL = 'user.User'
 
@@ -230,3 +243,4 @@ if Environment == 'development':
 
 # LOGINURL SETTINGS
 LOGIN_URL = 'user/login/'
+

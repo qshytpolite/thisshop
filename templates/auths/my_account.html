@@ -164,7 +164,7 @@
                     <tr>
                       <td>{{ order.id }}</td>
                       <td>{{ order.created_at|date:"M d, Y" }}</td>
-                      <td>{{ order.orderitem_set.count }}</td>
+                      <td>{{ order.items.count }}</td>
                       <td>${{ order.total_price }}</td>
                       <td>
                         <span class="badge badge-ghost badge-sm">

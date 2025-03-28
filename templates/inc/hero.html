@@ -70,24 +70,3 @@
         },
     });
 </script>
-
-<!-- Custom CSS for Animations -->
-<style>
-    .swiper-slide-image {
-        transform: translateX(100%);
-        opacity: 0;
-        transition: transform 1s ease-in-out, opacity 1s ease-in-out;
-    }
-
-    .swiper-slide-text {
-        transform: translateX(-100%);
-        opacity: 0;
-        transition: transform 1s ease-in-out, opacity 1s ease-in-out;
-    }
-
-    .swiper-slide-active .swiper-slide-image,
-    .swiper-slide-active .swiper-slide-text {
-        transform: translateX(0);
-        opacity: 1;
-    }
-</style>

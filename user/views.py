@@ -8,17 +8,16 @@ from store.models import Cart, Product, Order
 # Logout
 def logout_page(request):
     if request.user.is_authenticated:
+        # For superusers: allow logging out other users through admin interface only
         if request.user.is_superuser and request.user.session_key != request.session.session_key:
-            messages.error(request, "You cannot log out another user.")
-            return redirect("/")
-
-        if request.user.session_key == request.session.session_key:
-            request.user.session_key = None
-            request.user.save()
-            logout(request)
-            messages.success(request, "Logged out successfully")
-        else:
-            messages.error(request, "You cannot log out another user.")
+            messages.error(request, "Please use the admin interface to log out other users.")
+            return redirect("/admin/")
+        
+        # For all users (including superusers logging themselves out)
+        request.user.session_key = None
+        request.user.save()
+        logout(request)
+        messages.success(request, "Logged out successfully")
     return redirect("/")
 
 # Login
@@ -106,7 +105,7 @@ def change_password(request):
 @login_required
 def my_account(request):
     user = request.user
-    orders = Order.objects.filter(user=user).select_related('user').prefetch_related('orderitem_set').order_by('-created_at')[:10]
+    orders = Order.objects.filter(user=user).select_related('user').prefetch_related('items').order_by('-created_at')[:10]
     
     # Get wishlist items with product information to avoid N+1 queries
     wishlist_items = user.favourite_set.select_related('product').all()

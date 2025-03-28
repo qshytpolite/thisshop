@@ -125,13 +125,26 @@
 <dialog id="loginModal" class="modal">
   <div class="modal-box max-w-md">
     <h3 class="font-bold text-lg">Login Required</h3>
-    <p class="py-4">Please log in to proceed to checkout. Your cart items will be saved.</p>
-    <div class="modal-action">
-      <form method="dialog">
-        <button class="btn btn-ghost mr-2">Close</button>
-        <button id="modalLoginButton" class="btn btn-primary">Log In</button>
-      </form>
-    </div>
+    <form method="POST" action="{% url 'login' %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{% url 'checkout_page' %}">
+      <div class="form-control py-4">
+        <label class="label" for="username">
+          <span class="label-text">Username</span>
+        </label>
+        <input type="text" id="username" name="username" class="input input-bordered w-full" required>
+      </div>
+      <div class="form-control">
+        <label class="label" for="password">
+          <span class="label-text">Password</span>
+        </label>
+        <input type="password" id="password" name="password" class="input input-bordered w-full" required>
+      </div>
+      <div class="modal-action">
+        <button type="button" class="btn btn-ghost mr-2" onclick="loginModal.close()">Close</button>
+        <button type="submit" class="btn btn-primary">Log In</button>
+      </div>
+    </form>
   </div>
 </dialog>
 
@@ -147,24 +160,19 @@ document.addEventListener("DOMContentLoaded", function() {
     
     if (!isAuthenticated) {
       loginModal.showModal();
+      // Save cart to session before showing login modal
+      fetch("{% url 'save_cart_session' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}',
+        },
+      });
     } else {
       window.location.href = "{% url 'checkout_page' %}";
     }
   });
 
-  // Handle modal login button
-  document.getElementById("modalLoginButton")?.addEventListener("click", function() {
-    // Store the current cart data in session before redirecting
-    fetch("{% url 'save_cart_session' %}", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token }}',
-      },
-    }).then(() => {
-      window.location.href = "{% url 'login' %}?next={% url 'checkout_page' %}";
-    });
-  });
   
   // Cart update handler
   document.querySelectorAll('.update-cart').forEach(button => {

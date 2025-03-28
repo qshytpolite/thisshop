@@ -1,5 +1,6 @@
 import json
 import requests
+from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -9,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.urls import reverse
 
-from .form import CheckoutForm, ReviewForm
+from .form import CheckoutForm, ReviewForm, ContactForm
 from .models import Cart, Category, Favourite, Order, OrderItem, Payment, Product, HeroSlide, Review
 from .utils import generate_reference
 from django.db.models import Q, Sum
@@ -21,15 +22,40 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 def home(request):
     slides = HeroSlide.objects.all()
     category = Category.objects.filter(status=1)
-    products = Product.objects.filter(featured=True).order_by('-id')
+    featured_products = Product.objects.filter(featured=True).order_by('-discounted_price')
+    products = Product.objects.filter(featured=True).order_by('-created_at')
     latest_products = Product.objects.all().order_by('-created_at')
     context = {
         'category': category,
+        'featured_products': featured_products,
         'products': products,
         'slides': slides,
         'latest_products': latest_products
     }
     return render(request, "store/index.html", context)
+
+# Contact view
+def contact_page(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            # Send email
+            send_mail(
+                subject=f"Contact Form: {form.cleaned_data['subject']}",
+                message=f"From: {form.cleaned_data['name']} <{form.cleaned_data['email']}>\n\n{form.cleaned_data['message']}",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.CONTACT_EMAIL],
+                fail_silently=False,
+            )
+            messages.success(request, "Your message has been sent successfully!")
+            return redirect('contact')
+    else:
+        form = ContactForm()
+    
+    return render(request, 'store/contact.html', {
+        'form': form,
+        'page_title': 'Contact Us'
+    })
 
 # Shop view with filters
 
@@ -38,8 +64,8 @@ def shop(request):
     # Get all categories to display in the filter options
     categories = Category.objects.all()
 
-    # Start the query to fetch products
-    products = Product.objects.all()
+    # Start with a base queryset ordered by a consistent field
+    products = Product.objects.all().order_by('-created_at')  # Default ordering by newest first
 
     # Filtering by category (if category is selected)
     category_filter = request.GET.get('category')
@@ -56,7 +82,7 @@ def shop(request):
     # Filtering by latest (if 'latest' is selected)
     latest = request.GET.get('latest')
     if latest == '1':
-        products = products.order_by('-created_at')  # Order by latest products
+        products = products.order_by('-created_at')  # Explicit ordering for latest
 
     # Handling search query
     search_query = request.GET.get('search')
@@ -73,10 +99,8 @@ def shop(request):
     try:
         products = paginator.page(page)
     except PageNotAnInteger:
-        # If page is not an integer, deliver first page
         products = paginator.page(1)
     except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page
         products = paginator.page(paginator.num_pages)
 
     return render(request, 'store/shop.html', {
@@ -324,17 +348,6 @@ def product_details(request, slug):
 
     return render(request, 'store/product_details.html', context)
 
-# product_quick_view
-def product_quick_view(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    data = {
-        'status': 'success',
-        'name': product.name,
-        'description': product.description,
-        'price': product.selling_price,
-        'product_image': product.product_image.url,
-    }
-    return JsonResponse(data)
 
 @login_required
 def submit_review(request, product_id):
@@ -375,6 +388,15 @@ def save_cart_session(request):
         return JsonResponse({'status': 'Cart saved'})
     
     return JsonResponse({'status': 'User already authenticated'})
+
+# Order_details view
+@login_required
+def order_details(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    return render(request, 'store/order_details.html', {
+        'order': order,
+        'page_title': f'Order #{order.id}'
+    })
 
 # Checkout page
 @login_required

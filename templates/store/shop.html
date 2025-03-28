@@ -49,12 +49,14 @@ thisShop | Is The Shop
         {% for product in products %}
         <div class="product-card neon-glow bg-white shadow-lg rounded-lg overflow-hidden">
           <div class="relative group">
+            <a class="hover:text-blue-600" href="{% url 'product_details' product.slug %}">
+            <img src="{{product.product_image.url}}" alt="{{ product.name }}" class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110">
+            </a>
             {% if product.discount_percentage %}
             <div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
               {{ product.discount_percentage }}% OFF
             </div>
             {% endif %}
-            <img src="{{product.product_image.url}}" alt="{{ product.name }}" class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110">
             <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
             </div>
           </div>
