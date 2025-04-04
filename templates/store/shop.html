@@ -4,11 +4,11 @@ thisShop | Is The Shop
 {% endblock title %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-  <!-- Filters Section -->
-  <div class="flex mb-6">
-    <!-- Sidebar Filters -->
-    <div class="w-1/4 bg-white p-6 shadow-lg rounded-lg">
+<div class="container mx-auto px-4 py-4 md:py-8">
+  <!-- Filters Section - Stack vertically on mobile -->
+  <div class="flex flex-col lg:flex-row mb-6">
+    <!-- Sidebar Filters - Full width on mobile, 1/4 on larger screens -->
+    <div class="w-full lg:w-1/4 bg-white p-4 lg:p-6 shadow-lg rounded-lg mb-4 lg:mb-0 lg:mr-6">
       <h2 class="text-xl font-semibold mb-4">Filters</h2>
 
       <!-- Category Filter -->
@@ -26,8 +26,8 @@ thisShop | Is The Shop
       <div class="mb-4">
         <label class="block font-medium mb-2">Price Range</label>
         <div class="flex space-x-2">
-          <input type="number" name="min_price" id="min_price" value="{{ request.GET.min_price }}" placeholder="Min Price" class="w-1/2 p-2 border border-gray-300 rounded">
-          <input type="number" name="max_price" id="max_price" value="{{ request.GET.max_price }}" placeholder="Max Price" class="w-1/2 p-2 border border-gray-300 rounded">
+          <input type="number" name="min_price" id="min_price" value="{{ request.GET.min_price }}" placeholder="Min" class="w-1/2 p-2 border border-gray-300 rounded">
+          <input type="number" name="max_price" id="max_price" value="{{ request.GET.max_price }}" placeholder="Max" class="w-1/2 p-2 border border-gray-300 rounded">
         </div>
       </div>
 
@@ -43,32 +43,30 @@ thisShop | Is The Shop
       <button class="w-full bg-blue-500 text-white py-2 rounded mt-4 hover:bg-gray-700" onclick="filterProducts()">Apply Filters</button>
     </div>
 
-    <!-- Product Grid -->
-    <div class="w-3/4 pl-8">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+    <!-- Product Grid - Full width on mobile -->
+    <div class="w-full lg:w-3/4 lg:pl-0">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
         {% for product in products %}
         <div class="product-card neon-glow bg-white shadow-lg rounded-lg overflow-hidden">
           <div class="relative group">
             <a class="hover:text-blue-600" href="{% url 'product_details' product.slug %}">
-            <img src="{{product.product_image.url}}" alt="{{ product.name }}" class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110">
+            <img src="{{product.product_image.url}}" alt="{{ product.name }}" class="w-full h-48 md:h-64 object-cover transition-transform duration-500 group-hover:scale-110">
             </a>
             {% if product.discount_percentage %}
             <div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
               {{ product.discount_percentage }}% OFF
             </div>
             {% endif %}
-            <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            </div>
           </div>
           <div class="p-4">
             <a class="hover:text-blue-600" href="{% url 'product_details' product.slug %}">
-              <h3 class="text-lg font-semibold mb-2">{{ product.name }}</h3>
+              <h3 class="text-lg font-semibold mb-2 line-clamp-2">{{ product.name }}</h3>
             </a>
             <div class="flex justify-between items-center">
               {% if product.discount_percentage %}
               <p>
                 <span class="text-xl font-bold text-blue-600">${{ product.discounted_price| stringformat:'d'}}</span>
-                <span class="text-sm  text-blue-600 line-through">${{ product.selling_price| stringformat:'d'}}</span>
+                <span class="text-sm text-blue-600 line-through">${{ product.selling_price| stringformat:'d'}}</span>
               </p>
               {% else %}
               <span class="text-xl font-bold text-blue-600">${{ product.selling_price| stringformat:'d'}}</span>
@@ -93,31 +91,31 @@ thisShop | Is The Shop
         {% endfor %}
       </div>
 
-      <!-- Pagination  -->
+      <!-- Pagination - Make more compact on mobile -->
       <div class="mt-6 flex justify-center">
         {% if products.has_other_pages %}
-        <div class="flex space-x-2">
+        <div class="flex flex-wrap justify-center gap-2">
             {% if products.has_previous %}
                 <a href="?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.min_price %}min_price={{ request.GET.min_price }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price }}&{% endif %}{% if request.GET.latest %}latest={{ request.GET.latest }}&{% endif %}page=1" 
-                   class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">First</a>
+                   class="px-3 py-1 md:px-4 md:py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm md:text-base">First</a>
                 <a href="?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.min_price %}min_price={{ request.GET.min_price }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price }}&{% endif %}{% if request.GET.latest %}latest={{ request.GET.latest }}&{% endif %}page={{ products.previous_page_number }}" 
-                   class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Previous</a>
+                   class="px-3 py-1 md:px-4 md:py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm md:text-base">Previous</a>
             {% endif %}
     
             {% for num in products.paginator.page_range %}
                 {% if products.number == num %}
-                    <span class="px-4 py-2 bg-blue-500 text-white rounded">{{ num }}</span>
+                    <span class="px-3 py-1 md:px-4 md:py-2 bg-blue-500 text-white rounded text-sm md:text-base">{{ num }}</span>
                 {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
                     <a href="?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.min_price %}min_price={{ request.GET.min_price }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price }}&{% endif %}{% if request.GET.latest %}latest={{ request.GET.latest }}&{% endif %}page={{ num }}" 
-                       class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">{{ num }}</a>
+                       class="px-3 py-1 md:px-4 md:py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm md:text-base">{{ num }}</a>
                 {% endif %}
             {% endfor %}
     
             {% if products.has_next %}
                 <a href="?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.min_price %}min_price={{ request.GET.min_price }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price }}&{% endif %}{% if request.GET.latest %}latest={{ request.GET.latest }}&{% endif %}page={{ products.next_page_number }}" 
-                   class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Next</a>
+                   class="px-3 py-1 md:px-4 md:py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm md:text-base">Next</a>
                 <a href="?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.min_price %}min_price={{ request.GET.min_price }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price }}&{% endif %}{% if request.GET.latest %}latest={{ request.GET.latest }}&{% endif %}page={{ products.paginator.num_pages }}" 
-                   class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Last</a>
+                   class="px-3 py-1 md:px-4 md:py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm md:text-base">Last</a>
             {% endif %}
         </div>
         {% endif %}

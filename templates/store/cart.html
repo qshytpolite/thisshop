@@ -3,60 +3,88 @@
 {% block title %}Cart | thisShop{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50 py-8">
+<div class="min-h-[calc(100dvh-64px)] bg-gray-50 py-4 sm:py-8">
   <div class="container mx-auto px-4">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">Your Shopping Cart</h1>
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">Your Shopping Cart</h1>
     
-    <div class="flex flex-col lg:flex-row gap-8">
+    <div class="flex flex-col lg:flex-row gap-6">
       {% if cart_items %}
       <div class="lg:w-2/3">
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <div class="hidden md:grid grid-cols-12 gap-4 border-b pb-4 mb-4">
-            <div class="col-span-5 font-medium text-gray-600">Product</div>
-            <div class="col-span-2 font-medium text-gray-600">Price</div>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <!-- Mobile-friendly table header -->
+          <div class="hidden sm:grid grid-cols-12 gap-3 border-b p-4 sm:p-6 bg-gray-50">
+            <div class="col-span-6 sm:col-span-5 font-medium text-gray-600">Product</div>
+            <div class="col-span-2 font-medium text-gray-600 text-right sm:text-left">Price</div>
             <div class="col-span-3 font-medium text-gray-600">Quantity</div>
-            <div class="col-span-1 font-medium text-gray-600">Total</div>
-            <div class="col-span-1"></div>
+            <div class="col-span-1 font-medium text-gray-600 text-right">Total</div>
           </div>
           
-          <div class="space-y-6">
+          <div class="divide-y">
             {% for item in cart_items %}
-            <div class="grid grid-cols-12 gap-4 items-center py-4 border-b" data-cart-item-id="{{ item.id }}">
-              <div class="col-span-5 flex items-center space-x-4">
-                <img src="{{ item.product.product_image.url }}" alt="{{ item.product.name }}" 
-                     class="w-20 h-20 object-contain rounded-lg">
-                <div>
-                  <h3 class="font-medium text-gray-800">{{ item.product.name }}</h3>
+            <div class="grid grid-cols-12 gap-3 items-center p-4 sm:p-6 hover:bg-gray-50 transition-colors" 
+                 data-cart-item-id="{{ item.id }}">
+              <!-- Product Info -->
+              <div class="col-span-8 sm:col-span-5 flex items-center gap-3">
+                <div class="relative">
+                  <img src="{{ item.product.product_image.url }}" alt="{{ item.product.name }}" 
+                       class="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded-lg bg-white p-1 border">
+                  <button class="absolute -top-2 -right-2 btn btn-circle btn-xs btn-error remove-cart sm:hidden" 
+                          data-cart-item-id="{{ item.id }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h3 class="font-medium text-gray-800 truncate">{{ item.product.name }}</h3>
                   {% if item.product.discounted_price %}
-                  <p class="text-sm text-gray-500">Save ${{ item.product.selling_price|floatformat:2|default:0 }}</p>
+                  <p class="text-xs text-success">Save ${{ item.product.saving_amount|floatformat:2 }}</p>
                   {% endif %}
                 </div>
               </div>
               
-              <div class="col-span-2">
-                <span class="font-medium text-gray-800">
-                  ${{ item.product.discounted_price|default:item.product.selling_price|floatformat:2 }}
-                </span>
-              </div>
-              
-              <div class="col-span-3">
-                <div class="flex items-center space-x-2">
-                  <input type="number" value="{{ item.product_qty }}" min="1" 
-                         class="w-16 px-3 py-2 border rounded-md text-center update-quantity" 
-                         data-cart-item-id="{{ item.id }}">
-                  <button class="btn btn-sm btn-outline update-cart" 
-                          data-cart-item-id="{{ item.id }}">Update</button>
+              <!-- Price -->
+              <div class="col-span-4 sm:col-span-2">
+                <div class="flex flex-col sm:block">
+                  <span class="text-xs text-gray-500 sm:hidden">Price</span>
+                  <span class="font-medium text-gray-800 text-right sm:text-left">
+                    ${{ item.product.discounted_price|default:item.product.selling_price|floatformat:2 }}
+                  </span>
                 </div>
               </div>
               
-              <div class="col-span-1 font-medium text-gray-800 item-total" 
-                   data-cart-item-id="{{ item.id }}">
-                ${{ item.item_total|floatformat:2 }}
+              <!-- Quantity -->
+              <div class="col-span-6 sm:col-span-3">
+                <div class="flex items-center gap-1 sm:gap-2">
+                  <span class="text-xs text-gray-500 sm:hidden">Qty</span>
+                  <div class="flex border rounded-md overflow-hidden">
+                    <button class="px-2 py-1 bg-gray-100 decrement-quantity" 
+                            data-cart-item-id="{{ item.id }}">−</button>
+                    <input type="number" value="{{ item.product_qty }}" min="1" max="99"
+                           class="w-12 px-0 py-1 text-center border-0 update-quantity" 
+                           data-cart-item-id="{{ item.id }}">
+                    <button class="px-2 py-1 bg-gray-100 increment-quantity" 
+                            data-cart-item-id="{{ item.id }}">+</button>
+                  </div>
+                </div>
               </div>
               
-              <div class="col-span-1 flex justify-end">
-                <button class="btn btn-sm btn-ghost text-error remove-cart" 
+              <!-- Total -->
+              <div class="col-span-6 sm:col-span-1">
+                <div class="flex flex-col items-end">
+                  <span class="text-xs text-gray-500 sm:hidden">Total</span>
+                  <span class="font-medium text-gray-800 item-total" 
                         data-cart-item-id="{{ item.id }}">
+                    ${{ item.item_total|floatformat:2 }}
+                  </span>
+                </div>
+              </div>
+              
+              <!-- Remove (desktop) -->
+              <div class="hidden sm:flex justify-end">
+                <button class="btn btn-sm btn-ghost text-error remove-cart" 
+                        data-cart-item-id="{{ item.id }}"
+                        aria-label="Remove item">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
@@ -66,8 +94,8 @@
             {% endfor %}
           </div>
           
-          <div class="mt-6">
-            <a href="{% url 'shop' %}" class="inline-flex items-center text-primary hover:text-primary-focus">
+          <div class="p-4 sm:p-6 border-t">
+            <a href="{% url 'shop' %}" class="btn btn-outline">
               <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
               </svg>
@@ -77,43 +105,62 @@
         </div>
       </div>
       
+      <!-- Order Summary -->
       <div class="lg:w-1/3">
-        <div class="bg-white rounded-xl shadow-sm p-6 sticky top-6">
-          <h2 class="text-xl font-bold text-gray-800 mb-4">Order Summary</h2>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden sticky top-6">
+          <div class="p-4 sm:p-6 bg-gray-50 border-b">
+            <h2 class="text-lg sm:text-xl font-bold text-gray-800">Order Summary</h2>
+          </div>
           
-          <div class="space-y-3 mb-6">
+          <div class="p-4 sm:p-6 space-y-3">
             <div class="flex justify-between">
-              <span class="text-gray-600">Subtotal</span>
+              <span class="text-gray-600">Subtotal ({{ cart_items|length }} items)</span>
               <span class="font-medium" id="cart-subtotal">${{ total|floatformat:2 }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Shipping</span>
               <span class="font-medium">Free</span>
             </div>
-            <div class="flex justify-between border-t pt-3">
+            <div class="flex justify-between pt-3 border-t">
               <span class="font-bold text-gray-800">Total</span>
               <span class="font-bold text-lg text-primary" id="cart-total">${{ total|floatformat:2 }}</span>
             </div>
           </div>
           
-          <button id="btnCheckout" class="btn btn-primary w-full">
-            Proceed to Checkout
-          </button>
-          
-          <div class="mt-4 text-sm text-gray-500">
-            <p>Secure checkout powered by Paystack</p>
+          <div class="p-4 sm:p-6 pt-0">
+            <button id="btnCheckout" class="btn btn-primary w-full gap-2">
+              Proceed to Checkout
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </button>
+            
+            <div class="mt-3 text-xs sm:text-sm text-gray-500 flex items-center justify-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              Secure checkout powered by Paystack
+            </div>
           </div>
         </div>
       </div>
       {% else %}
-      <div class="w-full bg-white rounded-xl shadow-sm p-8 text-center">
+      <!-- Empty State -->
+      <div class="w-full bg-white rounded-xl shadow-sm p-6 sm:p-8 text-center">
         <div class="max-w-md mx-auto">
-          <svg class="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-          </svg>
+          <div class="w-20 h-20 mx-auto text-gray-400">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
           <h2 class="text-xl font-bold text-gray-800 mt-4">Your cart is empty</h2>
           <p class="text-gray-600 mt-2">Looks like you haven't added any items to your cart yet.</p>
-          <a href="{% url 'shop' %}" class="btn btn-primary mt-6">Start Shopping</a>
+          <a href="{% url 'shop' %}" class="btn btn-primary mt-6 gap-2">
+            Start Shopping
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+            </svg>
+          </a>
         </div>
       </div>
       {% endif %}
@@ -123,29 +170,40 @@
 
 <!-- Login Modal -->
 <dialog id="loginModal" class="modal">
-  <div class="modal-box max-w-md">
-    <h3 class="font-bold text-lg">Login Required</h3>
+  <div class="modal-box max-w-md p-0 overflow-hidden">
     <form method="POST" action="{% url 'login' %}">
       {% csrf_token %}
       <input type="hidden" name="next" value="{% url 'checkout_page' %}">
-      <div class="form-control py-4">
-        <label class="label" for="username">
-          <span class="label-text">Username</span>
-        </label>
-        <input type="text" id="username" name="username" class="input input-bordered w-full" required>
+      <div class="p-6 border-b">
+        <h3 class="font-bold text-lg">Login Required</h3>
+        <p class="text-sm text-gray-500 mt-1">Please login to proceed to checkout</p>
       </div>
-      <div class="form-control">
-        <label class="label" for="password">
-          <span class="label-text">Password</span>
-        </label>
-        <input type="password" id="password" name="password" class="input input-bordered w-full" required>
-      </div>
-      <div class="modal-action">
-        <button type="button" class="btn btn-ghost mr-2" onclick="loginModal.close()">Close</button>
-        <button type="submit" class="btn btn-primary">Log In</button>
+      <div class="p-6 space-y-4">
+        <div class="form-control">
+          <label class="label" for="username">
+            <span class="label-text">Username or Email</span>
+          </label>
+          <input type="text" id="username" name="username" class="input input-bordered w-full" required>
+        </div>
+        <div class="form-control">
+          <label class="label" for="password">
+            <span class="label-text">Password</span>
+          </label>
+          <input type="password" id="password" name="password" class="input input-bordered w-full" required>
+        </div>
+        <div class="flex justify-between items-center pt-2">
+          <a href="{% url 'password_reset' %}" class="text-sm link link-hover">Forgot password?</a>
+          <div class="flex gap-2">
+            <button type="button" class="btn btn-ghost" onclick="loginModal.close()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Log In</button>
+          </div>
+        </div>
       </div>
     </form>
   </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
 </dialog>
 
 <script>
@@ -153,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function() {
   const btnCheckout = document.getElementById("btnCheckout");
   const loginModal = document.getElementById("loginModal");
   
-  // Checkout button handler
+  // Improved checkout button handler
   btnCheckout?.addEventListener("click", function(e) {
     e.preventDefault();
     const isAuthenticated = "{{ request.user.is_authenticated|yesno:'true,false' }}" === "true";
@@ -173,105 +231,168 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 
-  
-  // Cart update handler
-  document.querySelectorAll('.update-cart').forEach(button => {
-    button.addEventListener('click', async function() {
+  // Quantity increment/decrement handlers
+  document.querySelectorAll('.increment-quantity').forEach(button => {
+    button.addEventListener('click', function() {
       const cartItemId = this.dataset.cartItemId;
-      const quantityInput = document.querySelector(`.update-quantity[data-cart-item-id="${cartItemId}"]`);
-      const quantity = parseInt(quantityInput.value);
-      
-      if (quantity < 1) {
-        quantityInput.value = 1;
-        return;
+      const input = document.querySelector(`.update-quantity[data-cart-item-id="${cartItemId}"]`);
+      input.value = parseInt(input.value) + 1;
+      updateCartItem(cartItemId, input.value);
+    });
+  });
+
+  document.querySelectorAll('.decrement-quantity').forEach(button => {
+    button.addEventListener('click', function() {
+      const cartItemId = this.dataset.cartItemId;
+      const input = document.querySelector(`.update-quantity[data-cart-item-id="${cartItemId}"]`);
+      if (input.value > 1) {
+        input.value = parseInt(input.value) - 1;
+        updateCartItem(cartItemId, input.value);
       }
+    });
+  });
+
+  // Input change handler
+  document.querySelectorAll('.update-quantity').forEach(input => {
+    input.addEventListener('change', function() {
+      const cartItemId = this.dataset.cartItemId;
+      const quantity = Math.max(1, Math.min(99, parseInt(this.value) || 1));
+      this.value = quantity;
+      updateCartItem(cartItemId, quantity);
+    });
+  });
+
+// Improved cart update function
+async function updateCartItem(cartItemId, quantity) {
+  const itemRow = document.querySelector(`[data-cart-item-id="${cartItemId}"]`);
+  itemRow.classList.add('opacity-75');
+  
+  try {
+    const response = await fetch(`/update-cart/${cartItemId}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}',
+      },
+      body: JSON.stringify({ quantity: quantity }),
+    });
+    
+    const data = await response.json();
+    
+    if (data.status === 'Cart updated') {
+      // Update all relevant elements
+      document.querySelector(`.item-total[data-cart-item-id="${cartItemId}"]`).textContent = `$${data.item_total.toFixed(2)}`;
+      document.getElementById('cart-subtotal').textContent = `$${data.total.toFixed(2)}`;
+      document.getElementById('cart-total').textContent = `$${data.total.toFixed(2)}`;
       
-      try {
-        const response = await fetch(`/update-cart/${cartItemId}/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}',
-          },
-          body: JSON.stringify({ quantity: quantity }),
-        });
-        
-        const data = await response.json();
-        
-        if (data.status === 'Cart updated') {
-          // Update UI
-          document.querySelector(`.item-total[data-cart-item-id="${cartItemId}"]`).textContent = `$${data.item_total.toFixed(2)}`;
+      // Show success feedback
+      itemRow.classList.remove('opacity-75');
+      itemRow.classList.add('bg-success-50', 'transition-colors');
+      setTimeout(() => itemRow.classList.remove('bg-success-50'), 1000);
+      
+      showToast('Quantity updated', 'success');
+    } else {
+      showToast('Error updating cart', 'error');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showToast('Network error', 'error');
+  }
+}
+
+// Cart remove handler with confirmation
+document.querySelectorAll('.remove-cart').forEach(button => {
+  button.addEventListener('click', async function() {
+    const cartItemId = this.dataset.cartItemId;
+    const row = document.querySelector(`[data-cart-item-id="${cartItemId}"]`);
+    
+    // Confirm before removing
+    const isConfirmed = await showConfirmDialog('Remove item', 'Are you sure you want to remove this item from your cart?');
+    if (!isConfirmed) return;
+    
+    row.classList.add('opacity-75');
+    
+    try {
+      const response = await fetch(`/remove-cart/${cartItemId}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}',
+        },
+      });
+      
+      const data = await response.json();
+      
+      if (data.status === 'Item removed from cart') {
+        // Remove row with animation
+        row.classList.add('translate-x-full', 'opacity-0', 'transition-all');
+        setTimeout(() => {
+          row.remove();
+          // Update all cart counts
+          document.getElementById('cart-count').textContent = data.cart_count;
           document.getElementById('cart-subtotal').textContent = `$${data.total.toFixed(2)}`;
           document.getElementById('cart-total').textContent = `$${data.total.toFixed(2)}`;
           
-          // Show success toast
-          showToast('Cart updated successfully');
-        } else {
-          showToast('Error updating cart', 'error');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        showToast('Network error', 'error');
+          // If cart is empty, reload to show empty state
+          if (data.cart_count === 0) {
+            window.location.reload();
+          }
+        }, 300);
+        
+        showToast('Item removed', 'success');
+      } else {
+        showToast('Error removing item', 'error');
       }
-    });
+    } catch (error) {
+      console.error('Error:', error);
+      showToast('Network error', 'error');
+    }
   });
+});
   
-  // Cart remove handler
-  document.querySelectorAll('.remove-cart').forEach(button => {
-    button.addEventListener('click', async function() {
-      const cartItemId = this.dataset.cartItemId;
-      const row = document.querySelector(`[data-cart-item-id="${cartItemId}"]`);
+  // Helper function to show confirm dialog
+  async function showConfirmDialog(title, message) {
+    return new Promise((resolve) => {
+      const dialog = document.createElement('dialog');
+      dialog.className = 'modal modal-bottom sm:modal-middle';
+      dialog.innerHTML = `
+        <div class="modal-box">
+          <h3 class="font-bold text-lg">${title}</h3>
+          <p class="py-4">${message}</p>
+          <div class="modal-action">
+            <button class="btn btn-ghost" onclick="this.closest('dialog').close(false)">Cancel</button>
+            <button class="btn btn-error" onclick="this.closest('dialog').close(true)">Remove</button>
+          </div>
+        </div>
+      `;
       
-      try {
-        const response = await fetch(`/remove-cart/${cartItemId}/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}',
-          },
-        });
-        
-        const data = await response.json();
-        
-        if (data.status === 'Item removed from cart') {
-          // Remove row with animation
-          row.style.opacity = '0';
-          setTimeout(() => {
-            row.remove();
-            // Update cart counts
-            document.getElementById('cart-count').textContent = data.cart_count;
-            document.getElementById('cart-subtotal').textContent = `$${data.total.toFixed(2)}`;
-            document.getElementById('cart-total').textContent = `$${data.total.toFixed(2)}`;
-            
-            // If cart is empty, reload to show empty state
-            if (data.cart_count === 0) {
-              window.location.reload();
-            }
-          }, 300);
-          
-          showToast('Item removed from cart');
-        } else {
-          showToast('Error removing item', 'error');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        showToast('Network error', 'error');
-      }
+      dialog.addEventListener('close', function() {
+        resolve(dialog.returnValue === 'true');
+        dialog.remove();
+      });
+      
+      document.body.appendChild(dialog);
+      dialog.showModal();
     });
-  });
+  }
   
-  // Helper function to show toast notifications
+  // Improved toast notification
   function showToast(message, type = 'success') {
     const toast = document.createElement('div');
-    toast.className = `fixed bottom-4 right-4 px-4 py-2 rounded-md shadow-lg text-white ${
-      type === 'success' ? 'bg-success' : 'bg-error'
-    }`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
+    toast.className = `toast toast-end`;
+    toast.innerHTML = `
+      <div class="alert ${type === 'success' ? 'alert-success' : 'alert-error'} shadow-lg">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${type === 'success' ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'}" />
+          </svg>
+          <span>${message}</span>
+        </div>
+      </div>
+    `;
     
-    setTimeout(() => {
-      toast.remove();
-    }, 3000);
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
   }
 });
 </script>
