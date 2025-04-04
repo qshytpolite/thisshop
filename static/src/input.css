@@ -4,6 +4,57 @@
 @tailwind components;
 @tailwind utilities;
 
+/* toast css */
+@layer components {
+  .toast {
+      @apply fixed bottom-5 right-5 z-[9999] flex items-center p-3 rounded-lg shadow-lg bg-white text-gray-800;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      max-width: 320px;
+      border-left-width: 4px;
+  }
+  
+  .toast.show {
+      @apply translate-y-0 opacity-100;
+  }
+  
+  .toast.success {
+      @apply border-green-500;
+  }
+  
+  .toast.error {
+      @apply border-red-500;
+  }
+  
+  .toast-icon {
+      @apply mr-3 text-xl;
+  }
+  
+  @media (max-width: 640px) {
+      .toast {
+          @apply bottom-2 right-2 left-2 max-w-none;
+      }
+  }
+}
+
+@layer utilities {
+  .toast-enter {
+      @apply translate-y-[100px] opacity-0;
+  }
+  .toast-enter-active {
+      @apply translate-y-0 opacity-100;
+      transition: all 300ms ease-out;
+  }
+  .toast-exit {
+      @apply translate-y-0 opacity-100;
+  }
+  .toast-exit-active {
+      @apply translate-y-[100px] opacity-0;
+      transition: all 300ms ease-in;
+  }
+}
+
 /* Base styling for animated elements */
 .reveal-element {
     visibility: hidden;
