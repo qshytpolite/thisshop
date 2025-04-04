@@ -184,6 +184,7 @@ def add_to_cart(request, product_id):
         cart_count = cart_items.count()
         total = sum(item.item_total for item in cart_items)
 
+    messages.success(request, "Item added to cart")
     return JsonResponse({
         'status': 'Item added to cart',
         'cart_count': cart_count,
@@ -220,6 +221,7 @@ def update_cart(request, cart_item_id):
 
     total = sum(item.item_total for item in cart_items)
 
+    messages.success(request, "Cart updated")
     return JsonResponse({
         'status': 'Cart updated',
         'cart_count': cart_items.count(),

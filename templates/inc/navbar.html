@@ -1,70 +1,129 @@
 {% load static %}
-<nav class="navbar sticky top-0 z-50 bg-lime-400 max-h-14 shadow-md">
-    <div class="flex justify-between items-center container mx-auto p-4">
-        <!-- Left Section: Logo and Links -->
-        <div class="flex items-center space-x-8" >
-            <!-- Logo -->
-            <div class="flex-1 bg-transparent bg-blend-screen">
-                <a href="{% url 'index' %}" class="btn btn-ghost text-xl font-bold">
-                    <img src="{% static 'images/logos/thsshoplogo.png' %}" class="w-10 h-4 neon-glow" alt="thisShop">
-                </a>
-            </div>
-            <!-- Navigation Links -->
-            <div class="hidden lg:flex navbar-center">
-                <ul class="menu menu-horizontal rounded-box p-0 space-x-4">
-                    <li><a href="{% url 'index' %}" class="text-white hover:text-gray-300 neon-glow">Home</a></li>
-                    <li><a href="{% url 'shop' %}" class="text-white hover:text-gray-300 neon-glow">Shop</a></li>
-                    <li><a href="{% url 'contact' %}" class="text-white hover:text-gray-300 neon-glow">Contact</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Right Section: Search, Icons, and Authentication -->
-        <div class="flex items-center space-x-6">
-            <!-- Search Bar -->
-            <div class="form-control">
-                <form action="{% url 'shop' %}" method="GET">
-                    <input type="text" name="search" value="{{ search_query }}" placeholder="Search" class="input input-bordered w-48 bg-white text-black neon-glow">
-                </form>
-            </div>
-            <!-- Wishlist Icon -->
-            <a href="{% url 'favviewpage' %}" class="btn btn-ghost btn-circle neon-glow">
-                <div class="indicator">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                <span class="badge badge-sm indicator-item bg-red-500 text-white" id="wishlist-count">{{ wishlist_count }}</span>
-                </div>
-              </a>
-            <!-- Shopping Cart Icon -->
-            <div class="dropdown dropdown-end">
-                <div tabindex="0" role="button" class="btn btn-ghost btn-circle neon-glow">
-                    <div class="indicator">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        <span class="badge badge-sm indicator-item bg-red-500 text-white" id="cart-count">{{ cart_count }}</span>
-                    </div>
-                </div>
-                <div tabindex="0" class="card card-compact dropdown-content bg-white z-[1] mt-3 w-52 shadow">
-                    <div class="card-body">
-                        <span class="text-lg font-bold" id="cart-count-dropdown">{{ cart_count }} items</span>
-                        <span class="text-info" id="cart-total">Subtotal: ${{ cart_total|floatformat:2 }}</span>
-                        <div class="card-actions">
-                            <a href="{% url 'cart' %}" class="btn btn-primary btn-block neon-glow">View cart</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Authentication -->
-            {% if user.is_authenticated %}
-            <a href="{% url 'logout' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary neon-glow">Logout</a>
-            <!-- my account -->
-            <a href="{% url 'my_account' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary neon-glow">My Account</a>
-            {% else %}
-            <a href="{% url 'login' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary neon-glow">Login</a>
-            <a href="{% url 'register' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary neon-glow">Signup</a>
-            {% endif %}
-        </div>
+<nav class="navbar sticky top-0 z-50 bg-lime-400 shadow-md" x-data="{ open: false }">
+  <div class="container mx-auto p-4 flex justify-between items-center">
+    <!-- Left Section: Logo -->
+    <div class="flex items-center">
+      <a href="{% url 'index' %}" class="text-xl font-bold">
+        <img src="{% static 'images/logos/thsshoplogo.png' %}" class="w-20 h-6 neon-glow" alt="thisShop">
+      </a>
     </div>
+
+    <!-- Desktop Navigation & Search: visible on large screens -->
+    <div class="hidden lg:flex items-center space-x-6">
+      <ul class="menu menu-horizontal rounded-box p-0 space-x-4">
+        <li><a href="{% url 'index' %}" class="text-white hover:text-gray-300 neon-glow">Home</a></li>
+        <li><a href="{% url 'shop' %}" class="text-white hover:text-gray-300 neon-glow">Shop</a></li>
+        <li><a href="{% url 'contact' %}" class="text-white hover:text-gray-300 neon-glow">Contact</a></li>
+      </ul>
+
+      <!-- Desktop Search Bar -->
+      <div class="form-control">
+        <form action="{% url 'shop' %}" method="GET">
+          <input type="text" name="search" value="{{ search_query }}" placeholder="Search" class="input input-bordered w-48 bg-white text-black neon-glow">
+        </form>
+      </div>
+
+      <!-- Desktop Icons and Authentication -->
+      <a href="{% url 'favviewpage' %}" class="btn btn-ghost btn-circle neon-glow">
+        <div class="indicator">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+          <span class="badge badge-sm indicator-item bg-red-500 text-white" id="wishlist-count">{{ wishlist_count }}</span>
+        </div>
+      </a>
+
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost btn-circle neon-glow">
+          <div class="indicator">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span class="badge badge-sm indicator-item bg-red-500 text-white" id="cart-count">{{ cart_count }}</span>
+          </div>
+        </div>
+        <div tabindex="0" class="card card-compact dropdown-content bg-white z-[1] mt-3 w-52 shadow">
+          <div class="card-body">
+            <span class="text-lg font-bold" id="cart-count-dropdown">{{ cart_count }} items</span>
+            <span class="text-info" id="cart-total">Subtotal: ${{ cart_total|floatformat:2 }}</span>
+            <div class="card-actions">
+              <a href="{% url 'cart' %}" class="btn btn-primary btn-block neon-glow">View cart</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop Authentication -->
+      {% if user.is_authenticated %}
+        <a href="{% url 'logout' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary neon-glow">Logout</a>
+        <a href="{% url 'my_account' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary neon-glow">My Account</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary neon-glow">Login</a>
+        <a href="{% url 'register' %}" class="btn btn-xs sm:btn-sm lg:btn-small btn-primary neon-glow">Signup</a>
+      {% endif %}
+    </div>
+
+    <!-- Mobile Icons: visible on small screens (outside hamburger menu) -->
+    <div class="flex items-center space-x-4 lg:hidden">
+      <a href="{% url 'favviewpage' %}" class="btn btn-ghost btn-circle neon-glow">
+        <div class="indicator">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </div>
+      </a>
+      <a href="{% url 'cart' %}" class="btn btn-ghost btn-circle neon-glow">
+        <div class="indicator">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+      </a>
+      <!-- Mobile Hamburger Button -->
+      <button @click="open = true" class="btn btn-ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Drawer Menu: appears as a full-screen overlay drawer from the right -->
+  <div class="fixed inset-0 z-50" x-show="open" x-transition:enter="transition duration-300 ease-out"
+       x-transition:enter-start="opacity-0 transform translate-x-full"
+       x-transition:enter-end="opacity-100 transform translate-x-0"
+       x-transition:leave="transition duration-200 ease-in"
+       x-transition:leave-start="opacity-100 transform translate-x-0"
+       x-transition:leave-end="opacity-0 transform translate-x-full">
+    <div class="absolute inset-0 bg-black opacity-50" @click="open = false"></div>
+    <div class="absolute right-0 top-0 h-full w-4/5 bg-lime-400 shadow-xl p-6 overflow-y-auto">
+      <button @click="open = false" class="mb-6 text-white focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <ul class="menu menu-vertical space-y-4">
+        <li><a href="{% url 'index' %}" class="text-white hover:text-gray-300 neon-glow">Home</a></li>
+        <li><a href="{% url 'shop' %}" class="text-white hover:text-gray-300 neon-glow">Shop</a></li>
+        <li><a href="{% url 'contact' %}" class="text-white hover:text-gray-300 neon-glow">Contact</a></li>
+        <li>
+          <!-- Mobile Search Bar -->
+          <form action="{% url 'shop' %}" method="GET">
+            <input type="text" name="search" value="{{ search_query }}" placeholder="Search" class="input input-bordered w-full bg-white text-black neon-glow">
+          </form>
+        </li>
+        <li><a href="{% url 'favviewpage' %}" class="text-white neon-glow">Wishlist</a></li>
+        <li><a href="{% url 'cart' %}" class="text-white neon-glow">Cart</a></li>
+        <li>
+          {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}" class="text-white neon-glow">Logout</a>
+            <a href="{% url 'my_account' %}" class="text-white neon-glow">My Account</a>
+          {% else %}
+            <a href="{% url 'login' %}" class="text-white neon-glow">Login</a>
+            <a href="{% url 'register' %}" class="text-white neon-glow">Signup</a>
+          {% endif %}
+        </li>
+      </ul>
+    </div>
+  </div>
 </nav>

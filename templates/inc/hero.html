@@ -1,33 +1,31 @@
 {% load static %}
 <section class="hero-section reveal-element">
-    <div class="relative w-full h-screen overflow-hidden">
-        <!-- Swiper Container -->
+    <div class="relative w-full h-[50vh] md:h-screen overflow-hidden">
         <div class="swiper-container w-full h-full">
             <div class="swiper-wrapper">
                 {% for slide in slides %}
                 <div class="swiper-slide">
-                    <!-- Slide Content -->
-                    <div class="w-full h-full absolute inset-0 flex items-center justify-between bg-cover bg-center bg-gradient-to-r from-black/80 via-black/50 to-transparent">
-                        <!-- Text Content (Left Side) -->
-                        <div class="text-white text-center max-w-lg space-y-6 transform transition-all duration-1000 ease-in-out swiper-slide-text">
-                            <h1 class="text-5xl font-bold">{{ slide.title }}</h1>
-                            <p class="text-xl">{{ slide.subtitle }}</p>
+                    <div class="w-full h-full flex flex-col md:flex-row items-center justify-center bg-cover bg-center bg-gradient-to-r from-neutral-950/80 via-gray-500/50 to-transparent">
+                        <!-- Text Content -->
+                        <div class="text-white text-center md:text-left p-8 space-y-4 md:space-y-6 md:w-1/2">
+                            <h1 class="text-3xl md:text-5xl font-bold leading-tight">{{ slide.title }}</h1>
+                            <p class="text-lg md:text-xl">{{ slide.subtitle }}</p>
                             {% if slide.button_text %}
-                            <a href="{{ slide.button_link }}" class="inline-block mt-6 px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors neon-glow">
+                            <a href="{{ slide.button_link }}" class="btn btn-primary btn-lg mt-4 neon-glow">
                                 {{ slide.button_text }}
                             </a>
                             {% endif %}
                         </div>
 
-                        <!-- Image (Right Side) -->
-                        <div class="transform transition-all duration-1000 ease-in-out swiper-slide-image">
-                            <img src="{{ slide.image.url }}" alt="{{ slide.title }}" class=" rounded-lg shadow-2xl neon-glow">
+                        <!-- Image -->
+                        <div class="md:w-1/2 p-8 flex justify-center">
+                            <img src="{{ slide.image.url }}" alt="{{ slide.title }}" 
+                                 class="max-h-[200px] md:max-h-[400px] rounded-lg shadow-2xl neon-glow">
                         </div>
                     </div>
                 </div>
                 {% endfor %}
             </div>
-            <!-- Navigation Buttons -->
             <div class="swiper-button-next"></div>
             <div class="swiper-button-prev"></div>
         </div>

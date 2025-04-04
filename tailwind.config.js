@@ -71,7 +71,6 @@ module.exports = {
     require('@tailwindcss/typography'), // Typography plugin
     require('daisyui'), // DaisyUI plugin
     require('tailwind-scrollbar'), // Scrollbar plugin
-    require('tailwindcss-motion'), // Motion plugin
   ],
   daisyui: {
     themes: ["acid", "dracula"], // DaisyUI themes
