@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import dj_database_url
 from django.templatetags.static import static
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
+
 from pathlib import Path
 import os
 from dotenv import load_dotenv
@@ -206,6 +209,21 @@ AUTH_USER_MODEL = 'user.User'
 #         lambda request: static("js/script.js"),
 #     ],
 # }
+UNFOLD = {
+    "SITE_HEADER": "ThisShop",
+    "SITE_LOGO": {
+        "light": lambda request: static("images/logos/thsshoplogo.png"),  # light mode
+        "dark": lambda request: static("images/logos/thsshoplogo.png"),  # dark mode
+    },
+    "STYLES": [
+        lambda request: static("src/output.css"),
+        lambda request: static("src/swiper-bundle.min.css"),
+    ],
+    "SCRIPTS": [
+        lambda request: static("js/myfunctions.js"),
+        lambda request: static("src/swiper-bundle.min.js"),
+    ],
+}
 
 # Paystack api settings
 PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY')

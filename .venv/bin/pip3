@@ -1,4 +1,4 @@
-#!/media/shift-data/Stuff/thisshop/.venv/bin/python3.12
+#!/media/wachtech/Stuff/thisshop/.venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
